@@ -50,10 +50,22 @@ export interface Layer {
   tag?: string;
 }
 
+export interface RigLook {
+  /** Outline pass draws only the edge (no filled silhouette): neon, blueprint, line art. */
+  hollow?: boolean;
+  /** Opacity of the outline pass (a soft glow under a thin line). */
+  outlineOpacity?: number;
+  /** A stroke on every body shape in the fill pass (the bright tube of a neon sign). */
+  edge?: { color: string; width: number; opacity?: number };
+  /** An offset copy of every body silhouette drawn first: hard shadows, paper layers, misregistration. */
+  drop?: { dx: number; dy: number; color: string; opacity: number };
+}
+
 export interface RigOptions {
   viewBox: string;
   label: string;
   layers: Layer[];
+  look?: RigLook;
   /** Hand-drawn boil: amplitude in px (0 = off). Points move on 2s (12 fps), 3 variants. */
   boil?: number;
   defs?: string;
@@ -97,11 +109,19 @@ export class Rig {
     this.svg.setAttribute('aria-label', opts.label);
     this.svg.setAttribute('shape-rendering', 'geometricPrecision');
     if (opts.defs) this.svg.innerHTML = `<defs>${opts.defs}</defs>`;
+    const look = opts.look ?? {};
     for (const layer of opts.layers) {
-      const groups = [
-        ...(layer.outline ? [this.build(layer.root, 'outline', layer.outline)] : []),
-        this.build(layer.root, 'fill', layer.outline),
-      ];
+      let drop: SVGGElement | null = null;
+      if (look.drop && !layer.tag) {
+        drop = document.createElementNS(SVGNS, 'g') as SVGGElement;
+        drop.setAttribute('transform', `translate(${look.drop.dx},${look.drop.dy})`);
+        drop.setAttribute('opacity', String(look.drop.opacity));
+        drop.setAttribute('data-drop', '');
+        drop.append(this.build(layer.root, 'drop', layer.outline));
+      }
+      const outlineG = layer.outline ? this.build(layer.root, 'outline', layer.outline) : null;
+      if (outlineG && look.outlineOpacity !== undefined) outlineG.setAttribute('opacity', String(look.outlineOpacity));
+      const groups = [...(drop ? [drop] : []), ...(outlineG ? [outlineG] : []), this.build(layer.root, 'fill', layer.outline)];
       for (const g of groups) {
         if (layer.tag) g.setAttribute(`data-${layer.tag}`, '');
         this.svg.append(g);
@@ -114,7 +134,7 @@ export class Rig {
     if (list) list.push(el); else map.set(key, [el]);
   }
 
-  private build(part: Part, pass: 'outline' | 'fill', outline: Layer['outline']): SVGGElement {
+  private build(part: Part, pass: 'drop' | 'outline' | 'fill', outline: Layer['outline']): SVGGElement {
     const g = document.createElementNS(SVGNS, 'g') as SVGGElement;
     // Pivot group (static translate) wrapping the animated group.
     const outer = document.createElementNS(SVGNS, 'g');
@@ -129,11 +149,12 @@ export class Rig {
     return outer as SVGGElement;
   }
 
-  private shape(s: Shape, pass: 'outline' | 'fill', outline: Layer['outline']): Element | null {
+  private shape(s: Shape, pass: 'drop' | 'outline' | 'fill', outline: Layer['outline']): Element | null {
     const kind = s.kind ?? 'body';
     if (pass === 'outline' && (kind !== 'body' || !outline)) return null;
+    if (pass === 'drop' && kind !== 'body') return null;
     if (s.clip) {
-      if (pass === 'outline') return null;
+      if (pass !== 'fill') return null;
       const id = `c${this.uid}${Math.random().toString(36).slice(2, 7)}`;
       const g = document.createElementNS(SVGNS, 'g');
       g.innerHTML = `<clipPath id="${id}"><ellipse cx="${s.clip[0]}" cy="${s.clip[1]}" rx="${s.clip[2]}" ry="${s.clip[3]}"/></clipPath>`;
@@ -166,7 +187,22 @@ export class Rig {
         if (entry) entry.els.push(el); else this.paths.set(s.pathRef, { els: [el], spec: null });
       }
     }
-    if (pass === 'outline' && outline && s.stroke && (!s.fill || s.fill === 'none')) {
+    const look = this.opts.look ?? {};
+    const strokeLimb = !!s.stroke && (!s.fill || s.fill === 'none');
+    if (pass === 'drop') {
+      const c = look.drop!.color, w = outline ? outline.width * 2 : 0;
+      el.setAttribute('fill', strokeLimb ? 'none' : c);
+      el.setAttribute('stroke', c);
+      el.setAttribute('stroke-width', String(strokeLimb ? (s.width ?? 2) + w : w));
+      el.setAttribute('stroke-linejoin', 'round');
+      el.setAttribute('stroke-linecap', 'round');
+    } else if (pass === 'outline' && outline && look.hollow) {
+      el.setAttribute('fill', 'none');
+      el.setAttribute('stroke', outline.color);
+      el.setAttribute('stroke-width', String(strokeLimb ? (s.width ?? 2) + outline.width * 2 : outline.width));
+      el.setAttribute('stroke-linejoin', 'round');
+      el.setAttribute('stroke-linecap', 'round');
+    } else if (pass === 'outline' && outline && strokeLimb) {
       // a limb drawn as a thick stroke: its outline is a wider stroke underneath
       el.setAttribute('fill', 'none');
       el.setAttribute('stroke', outline.color);
@@ -189,6 +225,12 @@ export class Rig {
         el.setAttribute('stroke-linecap', 'round');
       }
       if (s.opacity !== undefined) el.setAttribute('opacity', String(s.opacity));
+      if (look.edge && kind === 'body' && !strokeLimb) {
+        el.setAttribute('stroke', look.edge.color);
+        el.setAttribute('stroke-width', String(look.edge.width));
+        el.setAttribute('stroke-linejoin', 'round');
+        if (look.edge.opacity !== undefined) el.setAttribute('stroke-opacity', String(look.edge.opacity));
+      }
     }
     if (s.ref) this.add(this.refs, s.ref, el);
     return el;

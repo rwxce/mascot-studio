@@ -1,0 +1,27 @@
+{
+  "id": "crayon",
+  "title": "Crayon",
+  "family": "Drawn by hand",
+  "look": "Waxy crayon that spills past a wobbly dark line, on twos.",
+  "bg": "#FDF3E1",
+  "axes": {
+    "line": "wax",
+    "fill": "pattern",
+    "texture": "wax",
+    "palette": "bright",
+    "eyes": "dot",
+    "stage": "paper",
+    "rhythm": "twos"
+  },
+  "doc": {
+    "essence": "A child's crayon drawing done by a skilled hand: wax texture, colour spilling past the line.",
+    "notIt": "Not pencil (colour, wax), not watercolor (opaque, textured).",
+    "shapes": "A dark crayon edge; an offset copy of the colour spills out a little.",
+    "colour": "Saturated +20 %; a lighter wax texture over each area.",
+    "eyes": "Dots.",
+    "motion": "On twos, boiling.",
+    "pitfalls": [
+      "The spill uses the body colour: very dark bodies spill dark."
+    ]
+  }
+}

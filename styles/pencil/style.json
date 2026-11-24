@@ -1,0 +1,27 @@
+{
+  "id": "pencil",
+  "title": "Pencil",
+  "family": "Drawn by hand",
+  "look": "Graphite on paper: hatched shading, a soft boiling line, on twos.",
+  "bg": "#ECE4D2",
+  "axes": {
+    "line": "graphite",
+    "fill": "hatch",
+    "texture": "grain",
+    "palette": "mono",
+    "eyes": "solid",
+    "stage": "paper",
+    "rhythm": "twos"
+  },
+  "doc": {
+    "essence": "A sketchbook study: soft graphite edges that boil on twos, diagonal hatching for value.",
+    "notIt": "Not line art (the line wobbles and the value is hatched), not chalkboard (light on dark).",
+    "shapes": "Edges in graphite; points jitter three ways at 12 fps.",
+    "colour": "Greys from the palette's luminance; cheeks a touch of red pencil.",
+    "eyes": "Solid graphite.",
+    "motion": "Time steps at 12 fps (on twos) and the line boils.",
+    "pitfalls": [
+      "Hatching at small scale turns grey: keep shapes big."
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "riso",
+  "title": "Riso",
+  "family": "Print",
+  "look": "Two-ink risograph: halftone fills in pink and blue, slightly misregistered, grainy paper.",
+  "bg": "#F6F1E7",
+  "axes": {
+    "line": "none",
+    "fill": "halftone",
+    "texture": "grain",
+    "palette": "two-ink",
+    "eyes": "solid",
+    "stage": "paper",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A risograph print in two or three inks: halftone screens, overprinted blue a hair off register.",
+    "notIt": "Not comic (no black line, inks not process colours), not screenprint (halftone, not flat).",
+    "shapes": "No outline; a blue copy of the silhouette is offset like a misregistered plate.",
+    "colour": "Every colour snaps to fluorescent pink, blue, yellow or paper.",
+    "eyes": "Dark blue ink.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Two roles snapping to the same ink merge: tweak the palette."
+    ]
+  }
+}

@@ -19,7 +19,7 @@ export interface MascotSpec {
   style?: string;
   /** Colours by role. Which roles exist depends on the anatomy (see its ANATOMY.md). */
   palette: Record<string, string>;
-  /** Per-style tweaks merged over `palette` (e.g. a pink body in soft-gradient). */
+  /** Per-style tweaks merged over `palette`: by style id, or "@no-outline" for every style without an outline. */
   palettes?: Record<string, Record<string, string>>;
   /** Anatomy parameters (sizes, optional parts). */
   body?: Record<string, number | boolean | string>;

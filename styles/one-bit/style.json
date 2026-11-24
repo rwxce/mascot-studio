@@ -1,0 +1,27 @@
+{
+  "id": "one-bit",
+  "title": "One-bit",
+  "family": "Retro screen",
+  "look": "Black and white only, with ordered dither for grey, like an early Mac.",
+  "bg": "#D8D8CF",
+  "axes": {
+    "line": "thin-black",
+    "fill": "dither",
+    "texture": "none",
+    "palette": "mono",
+    "eyes": "pixel",
+    "stage": "white",
+    "rhythm": "steps"
+  },
+  "doc": {
+    "essence": "A 1-bit screen: every grey is a dither pattern of black pixels on paper white.",
+    "notIt": "Not pixel (no colour), not line art (dithered fills).",
+    "shapes": "Thin black outline.",
+    "colour": "Luminance → 5 dither levels.",
+    "eyes": "Black.",
+    "motion": "Steps at 10 fps.",
+    "pitfalls": [
+      "Mid-greys look alike: separate parts by luminance."
+    ]
+  }
+}

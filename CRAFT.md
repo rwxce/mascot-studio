@@ -32,6 +32,17 @@ the ones a tool can check are enforced by `pnpm check` (marked ✓).
 | **No jumps**: the drawing never moves more than 22 px between two frames at 30 fps. ✓ | That is a pop, not motion. |
 | Actions **last under 15 s**. ✓ | Then idle life comes back. |
 
+## Styles
+
+| Rule | Why |
+|---|---|
+| A style never changes geometry or motion — only how roles are painted. | Then every mascot works in every style, and the motion checks hold for all of them. |
+| **No two styles share more than 3 of the 7 axes.** ✓ | Otherwise a "new" style is an old one with another colour. |
+| **No two styles look alike** in a rendered still. ✓ (`pnpm check:styles`) | Axes on paper can still produce look-alikes (same background, same weight). |
+| Light eyes stay light on a dark visor in every style. | A style that darkens every "ink" role would blind the robot. |
+| Stepped styles hold poses for whole steps. ✓ (sampled at their rhythm) | Stop-motion is a look, not a bug; the motion underneath is checked in the smooth styles. |
+| `STYLE.md` is generated from `style.json`. ✓ (CI) | Docs and code never drift. |
+
 ## Budget ✓
 
 - JS under **2 ms per frame** on average across every action.

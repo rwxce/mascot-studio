@@ -1,0 +1,27 @@
+{
+  "id": "knit",
+  "title": "Knit",
+  "family": "Materials",
+  "look": "A knitted plush: V-stitch texture in every colour, a soft darker seam.",
+  "bg": "#F1D6DE",
+  "axes": {
+    "line": "seam",
+    "fill": "pattern",
+    "texture": "knit",
+    "palette": "warm",
+    "eyes": "dot",
+    "stage": "wool",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "An amigurumi plush: every area knitted in V stitches, joined by darker seams.",
+    "notIt": "Not crayon (regular stitches, no spill).",
+    "shapes": "A soft darker seam on every piece.",
+    "colour": "Warmed slightly towards wool.",
+    "eyes": "Button dots.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Stitches need room: tiny parts look noisy."
+    ]
+  }
+}

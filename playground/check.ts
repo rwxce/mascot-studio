@@ -3,7 +3,7 @@ import { anatomies } from '../anatomies/index';
 import { createClock } from '../kit/clock';
 import { validateSpec } from '../kit/spec';
 import { makeMascot, specs } from '../mascots/index';
-import { styles } from '../styles/index';
+import { styleById, styles } from '../styles/index';
 
 interface Issue { rule: string; where: string; message: string }
 
@@ -39,7 +39,7 @@ const MAX_STEP = 22;
   const [vx, vy, vw, vh] = svg.getAttribute('viewBox')!.split(/\s+/).map(Number);
   // The character's visible ink: every leaf shape that is not part of the stage and is not
   // faded out, in viewBox coordinates.
-  const leaves = [...svg.querySelectorAll('path, ellipse, circle, rect, text, line')].filter((el) => !el.closest('[data-stage]')) as SVGGraphicsElement[];
+  const leaves = [...svg.querySelectorAll('path, ellipse, circle, rect, text, line')].filter((el) => !el.closest('defs') && !el.closest('[data-stage]') && !el.closest('[data-drop]') && !el.closest('[data-overlay]')) as SVGGraphicsElement[];
   const visible = (el: Element) => {
     for (let n: Element | null = el; n && n !== svg; n = n.parentElement) {
       const o = n.getAttribute('opacity');
@@ -83,7 +83,13 @@ const MAX_STEP = 22;
   clock.freeze(false);
   clock.stop();
 
-  const step = 1000 / 30;
+  // Stepped styles (stop-motion, pixel) hold each pose for a step: sample at their rhythm, and
+  // allow the distance a part travels in one of their steps.
+  const painter = styleById[style ?? spec.style ?? 'soft-gradient'].painter(spec.palette, 'probe');
+  let styleStep = 0;
+  for (let t = 1; t <= 300; t++) if (painter.time(t) > 0) { styleStep = painter.time(t); break; }
+  const step = styleStep > 1000 / 30 ? styleStep : 1000 / 30;
+  const maxStep = MAX_STEP * (step / (1000 / 30));
   let worst = 0, total = 0, frames = 0;
   for (const action of m.actions) {
     m.reset([action]);
@@ -113,15 +119,17 @@ const MAX_STEP = 22;
       if (t > 700 && m.playing() === null) break;
     }
     // A pop: one part moves far more in one frame than it does in the frames around it.
-    // Fast motion is fine; a part teleporting is not.
-    let popped = false;
+    // Fast motion is fine; a part teleporting is not. Stepped styles (stop-motion, pixel) skip
+    // it: the motion underneath is the same in every style and is checked in the smooth ones,
+    // and a fast move landing in one step is what stop-motion looks like.
+    let popped = styleStep > 34;
     for (const steps of moves) {
       if (popped || !steps) continue;
       for (let i = 0; i < steps.length; i++) {
         const around = [steps[i - 2], steps[i - 1], steps[i + 1], steps[i + 2]].filter(Boolean).map((x) => x.d).sort((a, b) => a - b);
         const typical = around.length ? around[Math.floor(around.length / 2)] : 0;
-        if (steps[i].d > MAX_STEP && steps[i].d > 2.5 * typical + 4) {
-          issues.push({ rule: 'no-jumps', where: `${action} @ ${steps[i].t} ms`, message: `a part pops ${Math.round(steps[i].d)} px in one frame (around it: ~${Math.round(typical)} px)` });
+        if (steps[i].d > maxStep && steps[i].d > 2.5 * typical + 4) {
+          issues.push({ rule: 'no-jumps', where: `${action} @ ${steps[i].t} ms`, message: `a part pops ${Math.round(steps[i].d)} px in one ${styleStep > 34 ? `${Math.round(step)} ms step` : 'frame'} (around it: ~${Math.round(typical)} px)` });
           popped = true;
           break;
         }
@@ -132,4 +140,44 @@ const MAX_STEP = 22;
   if (avg > 2) issues.push({ rule: 'budget-js', where: 'all actions', message: `average update ${avg.toFixed(2)} ms per frame (max 2 ms)` });
   const bytes = new Blob([svg.outerHTML]).size;
   return { issues, stats: { actions: m.actions.length, frames, avgMs: +avg.toFixed(3), worstMs: +worst.toFixed(2), svgBytes: bytes } };
+};
+
+/** Visual distinctness: the rest pose of one mascot in every style, rasterised and compared. */
+(window as any).__distinct = async (name: string) => {
+  const spec = specs.find((s) => s.name === name)!;
+  const N = 40;
+  const pics: { id: string; px: Float32Array }[] = [];
+  for (const st of styles) {
+    const stage = document.getElementById('stage')!;
+    stage.innerHTML = '';
+    const clock = createClock();
+    const m = makeMascot(spec, { style: st.id });
+    stage.append(m.el);
+    clock.add(m);
+    clock.freeze(true);
+    const svg = m.el.querySelector('svg')!.cloneNode(true) as SVGSVGElement;
+    svg.setAttribute('width', String(N * 4));
+    svg.setAttribute('height', String(N * 4));
+    const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(svg));
+    const img = new Image();
+    await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+    const c = document.createElement('canvas');
+    c.width = N; c.height = N;
+    const g = c.getContext('2d')!;
+    g.fillStyle = st.bg; g.fillRect(0, 0, N, N);
+    g.drawImage(img, 0, 0, N, N);
+    const d = g.getImageData(0, 0, N, N).data;
+    const px = new Float32Array(N * N * 3);
+    for (let i = 0; i < N * N; i++) { px[i * 3] = d[i * 4]; px[i * 3 + 1] = d[i * 4 + 1]; px[i * 3 + 2] = d[i * 4 + 2]; }
+    pics.push({ id: st.id, px });
+    clock.stop();
+  }
+  const pairs: { a: string; b: string; diff: number }[] = [];
+  for (let i = 0; i < pics.length; i++) for (let j = i + 1; j < pics.length; j++) {
+    let s = 0;
+    const A = pics[i].px, B = pics[j].px;
+    for (let k = 0; k < A.length; k++) s += Math.abs(A[k] - B[k]);
+    pairs.push({ a: pics[i].id, b: pics[j].id, diff: +(s / A.length).toFixed(1) });
+  }
+  return pairs.sort((x, y) => x.diff - y.diff);
 };

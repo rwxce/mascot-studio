@@ -1,0 +1,27 @@
+{
+  "id": "sticker",
+  "title": "Sticker",
+  "family": "Clean vector",
+  "look": "A thick white border and a hard shadow, like a die-cut sticker on a dotted page.",
+  "bg": "#DDF1E8",
+  "axes": {
+    "line": "sticker",
+    "fill": "flat",
+    "texture": "gloss",
+    "palette": "bright",
+    "eyes": "oval-shine",
+    "stage": "dots",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A vinyl sticker: bright flat colours inside a fat white die-cut border, lifted off the page by a hard shadow.",
+    "notIt": "Not ink (the border is white and fat, not a black line).",
+    "shapes": "The white border is the outline pass; the shadow is an offset copy of the silhouette.",
+    "colour": "Saturated +15 %. Page: pale lilac with a dot pattern.",
+    "eyes": "Ovals with a shine.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "A white mascot loses its edge on the white border: give it a palette tweak."
+    ]
+  }
+}
