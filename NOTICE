@@ -1,0 +1,4 @@
+mascot-studio includes code derived from rossark-motion-skill
+(https://github.com/rossark0/rossark-motion-skill), MIT License, Copyright (c) Ross.
+kit/motion.ts ports its motion engine (track, flow, seg, wave, loop, bell, seeded and
+the curves) from React Native / Reanimated to the web.
