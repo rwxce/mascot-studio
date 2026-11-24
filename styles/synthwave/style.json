@@ -1,0 +1,27 @@
+{
+  "id": "synthwave",
+  "title": "Synthwave",
+  "family": "Retro screen",
+  "look": "Pink-to-purple gradients, a cyan neon edge, scanlines, a striped sun and a grid.",
+  "bg": "#1A0B2E",
+  "axes": {
+    "line": "neon-thin",
+    "fill": "gradient",
+    "texture": "scanlines",
+    "palette": "neon",
+    "eyes": "glow",
+    "stage": "sun-grid",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "An 80s album cover: magenta-violet bodies edged in cyan neon over a striped sunset and a grid.",
+    "notIt": "Not neon (filled, sun and grid), not soft-gradient (neon palette, scanlines).",
+    "shapes": "A thin cyan hollow edge.",
+    "colour": "Each area blended towards magenta at the top and indigo at the bottom.",
+    "eyes": "Bright with a shine.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Scanlines dim everything a little: keep eyes bright."
+    ]
+  }
+}

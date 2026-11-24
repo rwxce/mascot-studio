@@ -1,0 +1,27 @@
+{
+  "id": "flat",
+  "title": "Flat",
+  "family": "Clean vector",
+  "look": "Solid colours, no outline, no gradient: shapes and nothing else.",
+  "bg": "#FFE3CC",
+  "axes": {
+    "line": "none",
+    "fill": "flat",
+    "texture": "none",
+    "palette": "pastel",
+    "eyes": "dot",
+    "stage": "light",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "Pure geometry in solid colour. Volume comes only from neighbouring colours, never from light.",
+    "notIt": "Not soft-gradient (no gradient, no glow) and not ink (no line).",
+    "shapes": "No outline: separate parts with different roles, or they merge.",
+    "colour": "The character's palette, lifted 12 % towards white.",
+    "eyes": "Solid dots, no shine; cheeks faintly visible.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Two touching parts in the same colour become one blob: give one a darker role."
+    ]
+  }
+}

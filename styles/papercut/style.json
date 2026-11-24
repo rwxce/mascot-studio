@@ -1,0 +1,27 @@
+{
+  "id": "papercut",
+  "title": "Papercut",
+  "family": "Materials",
+  "look": "Layers of cut paper casting shadows on each other, stop-motion.",
+  "bg": "#BFE0D8",
+  "axes": {
+    "line": "none",
+    "fill": "layered",
+    "texture": "paper",
+    "palette": "warm",
+    "eyes": "cutout",
+    "stage": "paper",
+    "rhythm": "stop-motion"
+  },
+  "doc": {
+    "essence": "A paper diorama: each layer of the rig is a sheet of cut paper casting a shadow on the one below.",
+    "notIt": "Not flat (shadows between layers, stop-motion, paper grain).",
+    "shapes": "Every layer casts an offset shadow.",
+    "colour": "Warmed towards kraft paper.",
+    "eyes": "Flat cut-outs.",
+    "motion": "8 fps.",
+    "pitfalls": [
+      "Many layers stack many shadows: keep layers few."
+    ]
+  }
+}

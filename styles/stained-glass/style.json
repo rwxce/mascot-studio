@@ -1,0 +1,27 @@
+{
+  "id": "stained-glass",
+  "title": "Stained Glass",
+  "family": "Materials",
+  "look": "Jewel-coloured glass in heavy lead came, glowing from behind.",
+  "bg": "#2A1D12",
+  "axes": {
+    "line": "lead",
+    "fill": "translucent",
+    "texture": "cracks",
+    "palette": "jewel",
+    "eyes": "solid",
+    "stage": "dark",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A church window: saturated jewel glass lit from behind, held in thick dark lead.",
+    "notIt": "Not glass (opaque jewel tones, heavy lead), not ink (dark lead on a dark stage, glowing fills).",
+    "shapes": "Thick dark-violet outline.",
+    "colour": "Saturated +35 % with a bright radial centre.",
+    "eyes": "Lead dark.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Lead and eyes share a colour: eyes need a light part around them."
+    ]
+  }
+}

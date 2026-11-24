@@ -1,35 +1,34 @@
+<!-- Generated from style.json by scripts/style-docs.mjs. Edit style.json, then run it. -->
 # Soft Gradient
 
-**Family:** Clean vector · **Axes:** line none · fill gradient · texture none · palette character · eyes oval-shine · stage glow · rhythm smooth
+**Family:** Clean vector · **Look:** No outline: every piece has a vertical gradient, a glow of the character's colour behind it, eyes with a shine.
+
+| line | fill | texture | palette | eyes | stage | rhythm |
+|---|---|---|---|---|---|---|
+| none | gradient | none | character | oval-shine | glow | smooth |
 
 ## Essence, and what it is not
-Friendly product-mascot vector, lit from above: no outline at all, every piece a vertical
-gradient (light at the top, saturated at the bottom), a soft glow of the character's colour
-behind it on a dark stage. It is not glassy (no reflections), not 3D (no shading beyond the
-gradient).
+Friendly product-mascot vector lit from above: no outline, every piece a vertical gradient, a glow of the character's colour behind it on a dark stage.
+
+Not glassy (no reflections), not 3D (no shading beyond the gradient).
 
 ## Shapes and line
-- No outline. Edges come from colour contrast, so neighbouring parts need different roles
-  (`body` vs `body-dark` vs `belly`).
-- Details that would vanish without an outline (an envelope's lid edges) are drawn as thin lines
-  in the `line` role.
+No outline: edges come from colour contrast, so neighbouring parts need different roles. Details that would vanish (an envelope's lid edges) are drawn as thin lines.
 
 ## Colour
-- Volume roles (`body`, `body-dark`, `belly`, `visor`, `accent`, `inside`) get a gradient from
-  34 % lighter (12 % for `belly`) down to the role colour.
-- The stage is `#15121F` with a radial glow in the `glow` role.
-- Ink-coloured props (zzz, ?, sparkles) turn light so they read on the dark stage.
-- A light body (paper white) looks unfinished here: tune it with `palettes["soft-gradient"]`.
+Volume roles get a gradient from 34 % lighter (12 % for belly) down to the role colour. Stage #15121F with a radial glow; ink-coloured props turn light.
 
 ## Eyes and face
-Dark oval eyes with a white shine at the top left; cheeks always faintly visible (0.45).
+Dark ovals with a white shine; cheeks always faintly visible (0.45).
 
 ## Motion
-Smooth, 60 fps. The ground shadow narrows and fades as the character leaves the floor.
+Smooth; the ground shadow narrows as the character rises.
 
 ## Pitfalls
-- Gradients on thin strokes break (zero-width box): limbs drawn as strokes use flat colours.
-- Gradient ids must be unique per instance (the painter prefixes them).
+- Gradients on thin strokes break (zero-width box): stroke limbs use flat colours.
+- A paper-white body looks unfinished here: tune it with palettes['@no-outline'].
 
 ## Checklist
-No outline · a gradient on every big piece · glow behind · eye shine · readable on dark.
+- `pnpm check --style soft-gradient` is green for every mascot.
+- The look matches the line above at a glance, next to its neighbours in the gallery.
+- No two styles share more than 3 of the 7 axes (`pnpm test`).

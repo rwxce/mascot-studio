@@ -64,7 +64,9 @@ let instances = 0;
 
 export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style, opts: { salt?: number } = {}): Mascot {
   const salt = opts.salt ?? 0;
-  const paint = style.painter({ ...spec.palette, ...(spec.palettes?.[style.id] ?? {}) }, `m${(instances++).toString(36)}${spec.name.slice(0, 3)}`);
+  // A mascot may tune its palette for styles without an outline ("@no-outline") and per style.
+  const noOutline = !style.painter(spec.palette, 'probe').outline(1);
+  const paint = style.painter({ ...spec.palette, ...(noOutline ? spec.palettes?.['@no-outline'] ?? {} : {}), ...(spec.palettes?.[style.id] ?? {}) }, `m${(instances++).toString(36)}${spec.name.slice(0, 3)}`);
   const built = anatomy.build(spec, paint);
   const anchors = spec.props ?? {};
   const [sx, sy, sr] = built.stage;
@@ -74,9 +76,25 @@ export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style
     { outline: null, tag: 'props', root: { at: built.rootAt, children: buildProps(anchors, { ink: paint.flat('ink'), prop: paint.flat('prop'), accent: paint.flat('accent'), glow: paint.flat('glow') }) } },
   ];
   const vb = built.viewBox.split(/\s+/).map(Number) as [number, number, number, number];
-  if (paint.overlay) layers.push({ outline: null, root: { children: paint.overlay(vb) } });
-  const rig = new Rig({ viewBox: built.viewBox, label: built.label, boil: paint.boil, defs: paint.defs(), layers });
-  if (paint.filter) rig.svg.querySelectorAll(':scope > g').forEach((g) => g.setAttribute('filter', `url(#${paint.filter})`));
+  if (paint.overlay) layers.push({ outline: null, tag: 'overlay', root: { children: paint.overlay(vb) } });
+  const rig = new Rig({ viewBox: built.viewBox, label: built.label, boil: paint.boil, defs: paint.defs(), layers, look: paint.look });
+  if (paint.filter) {
+    // One wrapper in viewBox space so the filter region (and its sample grid) is the viewBox.
+    const f = rig.svg.querySelector(`#${paint.filter}`);
+    if (f) {
+      const [x, y, w, h] = vb;
+      f.setAttribute('x', String(x)); f.setAttribute('y', String(y));
+      f.setAttribute('width', String(w)); f.setAttribute('height', String(h));
+      const block = Number(f.getAttribute('data-block') ?? 4);
+      const flood = f.querySelector('feFlood');
+      flood?.setAttribute('x', String(x + block / 2));
+      flood?.setAttribute('y', String(y + block / 2));
+    }
+    const wrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    wrap.setAttribute('filter', `url(#${paint.filter})`);
+    rig.svg.querySelectorAll(':scope > g:not([data-stage])').forEach((g) => wrap.append(g));
+    rig.svg.append(wrap);
+  }
   rig.svg.dataset.style = style.id;
   const actions = mergeActions(anatomy.builtins, spec.actions);
   const director = new Director(toActions(actions), { salt: salt + 11, gap: spec.life?.gap ?? [1200, 3000] });
@@ -109,6 +127,7 @@ export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style
       else p[ch] = s.step(p[ch], dt);
     }
     rig.boil(time);
+    paint.frame?.(time, rig.svg);
     anatomy.render(rig, p, { x: gaze.x.value, y: gaze.y.value }, t, paint);
     props.update(rig, p, dt, still, t);
   }

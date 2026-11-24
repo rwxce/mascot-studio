@@ -1,0 +1,27 @@
+{
+  "id": "chalkboard",
+  "title": "Chalkboard",
+  "family": "Drawn by hand",
+  "look": "Chalk on a green board: dusty hatching, a light boiling line, a wooden frame.",
+  "bg": "#2F4A3A",
+  "axes": {
+    "line": "chalk",
+    "fill": "hatch",
+    "texture": "chalk",
+    "palette": "chalk",
+    "eyes": "solid",
+    "stage": "board",
+    "rhythm": "twos"
+  },
+  "doc": {
+    "essence": "A teacher's chalk drawing: light lines and dusty hatching on dark green.",
+    "notIt": "Not pencil (light on dark).",
+    "shapes": "Chalk-white edges that boil.",
+    "colour": "Pastel chalk versions of the palette over the green board; eyes chalk white.",
+    "eyes": "Solid chalk.",
+    "motion": "On twos.",
+    "pitfalls": [
+      "Dark eye colours vanish: the style turns them chalk white."
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "watercolor",
+  "title": "Watercolor",
+  "family": "Drawn by hand",
+  "look": "Pale washes that bleed past their edges, a faint darker rim, paper grain.",
+  "bg": "#E6EEF3",
+  "axes": {
+    "line": "wash-edge",
+    "fill": "wash",
+    "texture": "paper",
+    "palette": "pastel",
+    "eyes": "dot",
+    "stage": "paper",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "Washes of pigment on cold-press paper: soft, light, bleeding a little beyond the drawing.",
+    "notIt": "Not crayon (no wax, no dark line).",
+    "shapes": "A faint darker rim; an offset bleed copy.",
+    "colour": "35 % lighter than the palette.",
+    "eyes": "Dots.",
+    "motion": "Smooth with a slight boil.",
+    "pitfalls": [
+      "Light bodies on light paper: keep enough contrast with a palette tweak."
+    ]
+  }
+}
