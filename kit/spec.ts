@@ -1,6 +1,7 @@
 // mascot.json: everything a mascot is, as data. The anatomy brings the skeleton and the
 // built-in life (idle, blinks, gaze, reactions); the spec brings proportions, colours,
 // props and its own actions. validateSpec() is what `pnpm check` runs first.
+import { resolvePalette } from './style.js';
 import type { ActionSpec } from './timeline.js';
 
 export type Point = [number, number];
@@ -18,6 +19,8 @@ export interface MascotSpec {
   style?: string;
   /** Colours by role. Which roles exist depends on the anatomy (see its ANATOMY.md). */
   palette: Record<string, string>;
+  /** Per-style tweaks merged over `palette` (e.g. a pink body in soft-gradient). */
+  palettes?: Record<string, Record<string, string>>;
   /** Anatomy parameters (sizes, optional parts). */
   body?: Record<string, number | boolean | string>;
   /** Props by name → anchor point (root coordinates, y up is negative). */
@@ -54,7 +57,10 @@ export function contrast(a: string, b: string): number {
 export interface AnatomyContract {
   name: string;
   channels: readonly string[];
+  /** Palette roles the anatomy uses; any missing one is derived from `body` (kit/style.ts). */
   palette: readonly string[];
+  /** Roles a mascot must set. */
+  required: readonly string[];
   /** [eye colour role, the role the eyes sit on] pairs that must reach 3:1. */
   contrastPairs: readonly [string, string][];
   body?: Record<string, 'number' | 'boolean' | 'string'>;
@@ -70,16 +76,27 @@ export function validateSpec(spec: MascotSpec, anatomy: AnatomyContract): SpecIs
   if (!spec.title) add('title', 'is required');
   if (spec.anatomy !== anatomy.name) add('anatomy', `is "${spec.anatomy}", expected "${anatomy.name}"`);
 
-  for (const role of anatomy.palette) {
-    const c = spec.palette?.[role];
-    if (!c) add(`palette.${role}`, 'is required by the anatomy');
+  for (const role of anatomy.required) {
+    if (!spec.palette?.[role]) add(`palette.${role}`, 'is required by the anatomy');
+  }
+  for (const [role, c] of Object.entries(spec.palette ?? {})) {
+    if (!anatomy.palette.includes(role)) add(`palette.${role}`, `unknown role (known: ${anatomy.palette.join(', ')})`);
     else if (!HEX.test(c)) add(`palette.${role}`, `"${c}" is not a hex colour`);
   }
-  for (const role of Object.keys(spec.palette ?? {})) {
-    if (!anatomy.palette.includes(role)) add(`palette.${role}`, `unknown role (known: ${anatomy.palette.join(', ')})`);
+  for (const [style, over] of Object.entries(spec.palettes ?? {})) {
+    for (const [role, c] of Object.entries(over)) {
+      if (!anatomy.palette.includes(role)) add(`palettes.${style}.${role}`, 'unknown role');
+      else if (!HEX.test(c)) add(`palettes.${style}.${role}`, `"${c}" is not a hex colour`);
+    }
+    const merged = { ...spec.palette, ...over };
+    for (const [eye, on] of anatomy.contrastPairs) {
+      const f = resolvePalette(merged);
+      if (HEX.test(f[eye]) && HEX.test(f[on]) && contrast(f[eye], f[on]) < 3) add(`palettes.${style}.${eye}`, `contrast with ${on} is ${contrast(f[eye], f[on]).toFixed(2)}:1, needs 3:1`);
+    }
   }
+  const full = issues.length ? {} as Record<string, string> : resolvePalette(spec.palette);
   for (const [eye, on] of anatomy.contrastPairs) {
-    const a = spec.palette?.[eye], b = spec.palette?.[on];
+    const a = full[eye], b = full[on];
     if (a && b && HEX.test(a) && HEX.test(b) && contrast(a, b) < 3) {
       add(`palette.${eye}`, `contrast with ${on} is ${contrast(a, b).toFixed(2)}:1, needs 3:1 so the face reads`);
     }

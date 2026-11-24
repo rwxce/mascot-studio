@@ -1,0 +1,73 @@
+{
+  "$schema": "../../schema/mascot.schema.json",
+  "name": "fox",
+  "title": "Fox",
+  "description": "A sitting fox whose tail swings from the base and bends at the tip a beat later; ears that twitch and react.",
+  "anatomy": "quadruped",
+  "style": "soft-gradient",
+  "palette": {
+    "body": "#F2621F",
+    "belly": "#FFF1E0",
+    "eye": "#2B1408",
+    "ink": "#2B1408",
+    "cheek": "#FF8FA8",
+    "glow": "#FF8A3D",
+    "accent": "#FFD166"
+  },
+  "props": {
+    "heart": [-48, -96],
+    "zzz": [30, -100],
+    "note": [-50, -92],
+    "exclaim": [46, -104],
+    "sparkles": [[-56, -110], [58, -100], [-44, -136], [46, -138]]
+  },
+  "actions": [
+    {
+      "name": "wag", "duration": 2600, "weight": 3,
+      "tracks": [
+        { "ch": "tail.rot", "keys": [[0, -6], [2600, -6]], "osc": { "amp": 22, "period": 380 } },
+        { "ch": "eyes.happy", "keys": [[0, 1], [2600, 1]] },
+        { "ch": "head.rot", "keys": [[0, 8], [2600, 8]] },
+        { "ch": "face.blush", "op": "max", "keys": [[0, 0], [300, 1], [2300, 1], [2600, 0]] },
+        { "ch": "prop.heart", "op": "set", "curve": "linear", "keys": [[0, -1], [399, -1], [400, 0], [2600, 1]] }
+      ]
+    },
+    {
+      "name": "ear-flick", "duration": 1600, "weight": 2,
+      "tracks": [
+        { "ch": "earR", "env": false, "keys": [[0, 0], [100, -22], [260, 6], [420, -18], [600, 0], [1600, 0]] },
+        { "ch": "earL", "env": false, "keys": [[0, 0], [700, 0], [800, -16], [980, 0], [1600, 0]] },
+        { "ch": "head.rot", "keys": [[0, 0], [300, -5], [900, 4], [1600, 0]] }
+      ]
+    },
+    {
+      "name": "pounce", "duration": 2600, "weight": 1.5,
+      "jumps": [{ "at": 1000, "air": 520, "height": 30 }],
+      "tracks": [
+        { "ch": "body.sy", "op": "mul", "keys": [[0, 1], [500, 0.86], [950, 0.86], [1000, 1], [2600, 1]] },
+        { "ch": "body.sx", "op": "mul", "keys": [[0, 1], [500, 1.08], [950, 1.08], [1000, 1], [2600, 1]] },
+        { "ch": "body.rot", "osc": { "amp": 1.5, "period": 160, "window": [450, 950] } },
+        { "ch": "tail.rot", "keys": [[0, 0], [500, -14], [950, -14], [1100, -40], [1500, -40], [1900, 0], [2600, 0]] },
+        { "ch": "look.y", "op": "set", "keys": [[0, 0.6], [2600, 0.6]] },
+        { "ch": "look.w", "keys": [[0, 1], [1000, 1], [1300, 0], [2600, 0]] },
+        { "ch": "eyes.scale", "op": "mul", "keys": [[0, 1], [500, 1.15], [950, 1.15], [1200, 1], [2600, 1]] },
+        { "ch": "earL", "keys": [[0, 0], [500, -12], [1500, -12], [1900, 0], [2600, 0]] },
+        { "ch": "earR", "keys": [[0, 0], [500, -12], [1500, -12], [1900, 0], [2600, 0]] },
+        { "ch": "prop.exclaim", "op": "set", "curve": "linear", "keys": [[0, 0], [999, 0], [1000, 1], [1700, 1], [1701, 0], [2600, 0]] }
+      ]
+    },
+    {
+      "name": "curl-up", "duration": 5000, "weight": 1, "fade": 600,
+      "tracks": [
+        { "ch": "eyes.open", "op": "min", "curve": "track", "keys": [[0, 1], [1300, 0.05], [4200, 0.05], [4500, 1], [5000, 1]] },
+        { "ch": "head.y", "keys": [[0, 0], [1300, 6], [4200, 6], [4500, 0], [5000, 0]] },
+        { "ch": "head.rot", "keys": [[0, 0], [1300, 12], [4200, 12], [4500, 0], [5000, 0]] },
+        { "ch": "tail.rot", "keys": [[0, 0], [1300, 12], [4200, 12], [4500, 0], [5000, 0]] },
+        { "ch": "earL", "keys": [[0, 0], [1300, 10], [4200, 10], [4500, 0], [5000, 0]] },
+        { "ch": "earR", "keys": [[0, 0], [1300, 10], [4200, 10], [4500, 0], [5000, 0]] },
+        { "ch": "body.sy", "op": "mul", "keys": [[0, 1], [1300, 0.96], [4200, 0.96], [4500, 1], [5000, 1]], "osc": { "amp": 0.015, "period": 2000, "window": [1300, 4200] } },
+        { "ch": "prop.zzz", "op": "set", "curve": "linear", "keys": [[0, -1], [1199, -1], [1200, 0], [4200, 1], [4201, -1], [5000, -1]] }
+      ]
+    }
+  ]
+}

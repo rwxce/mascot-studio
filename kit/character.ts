@@ -8,6 +8,7 @@ import { container, type Mascot } from './mascot.js';
 import { lerp, seeded, track } from './motion.js';
 import { buildProps, PROP_DEFAULTS, propsAnimator } from './props.js';
 import { Rig, type Layer } from './rig.js';
+import type { Painter, Style } from './style.js';
 import type { AnatomyContract, MascotSpec, Point } from './spec.js';
 import { Spring1, Spring2, type SpringParams } from './spring.js';
 import { toActions, type ActionSpec, type Pose } from './timeline.js';
@@ -18,8 +19,8 @@ export interface Built {
   rootAt: Point;
   layers: Layer[];
   label: string;
-  boil?: number;
-  defs?: string;
+  /** Centre and radius of the style's stage (the glow behind the character). */
+  stage: [number, number, number];
 }
 
 export interface Anatomy {
@@ -30,11 +31,13 @@ export interface Anatomy {
   builtins: ActionSpec[];
   /** Channels smoothed by a spring (follow-through), with their spring. */
   springs: Record<string, SpringParams>;
-  build(spec: MascotSpec): Built;
+  build(spec: MascotSpec, paint: Painter): Built;
   /** Idle life written onto the pose every frame (breath, sway, small fidgets). */
   idle(p: Pose, t: number): void;
+  /** Channels computed from others after the actions (e.g. an antenna that lags the head). */
+  derive?(p: Pose, t: number): void;
   /** Draw the pose. `gaze` is already smoothed, -1..1. */
-  render(rig: Rig, p: Pose, gaze: { x: number; y: number }, t: number): void;
+  render(rig: Rig, p: Pose, gaze: { x: number; y: number }, t: number, paint: Painter): void;
 }
 
 export function mergeActions(builtins: ActionSpec[], own: ActionSpec[] = []): ActionSpec[] {
@@ -57,21 +60,24 @@ function blinkAt(t: number, salt: number, every: number): number {
   return b;
 }
 
-export function createCharacter(spec: MascotSpec, anatomy: Anatomy, opts: { salt?: number } = {}): Mascot {
+let instances = 0;
+
+export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style, opts: { salt?: number } = {}): Mascot {
   const salt = opts.salt ?? 0;
-  const built = anatomy.build(spec);
-  const pal = spec.palette;
+  const paint = style.painter({ ...spec.palette, ...(spec.palettes?.[style.id] ?? {}) }, `m${(instances++).toString(36)}${spec.name.slice(0, 3)}`);
+  const built = anatomy.build(spec, paint);
   const anchors = spec.props ?? {};
-  const rig = new Rig({
-    viewBox: built.viewBox,
-    label: built.label,
-    boil: built.boil,
-    defs: built.defs,
-    layers: [
-      ...built.layers,
-      { outline: null, root: { at: built.rootAt, children: buildProps(anchors, { ink: pal.ink ?? '#141414', prop: pal.prop ?? '#E5383B', accent: pal.accent ?? '#EC4899', glow: pal.glow ?? '#FFE680' }) } },
-    ],
-  });
+  const [sx, sy, sr] = built.stage;
+  const layers: Layer[] = [
+    { outline: null, tag: 'stage', root: { children: paint.stage([sx, sy], sr) } },
+    ...built.layers,
+    { outline: null, tag: 'props', root: { at: built.rootAt, children: buildProps(anchors, { ink: paint.flat('ink'), prop: paint.flat('prop'), accent: paint.flat('accent'), glow: paint.flat('glow') }) } },
+  ];
+  const vb = built.viewBox.split(/\s+/).map(Number) as [number, number, number, number];
+  if (paint.overlay) layers.push({ outline: null, root: { children: paint.overlay(vb) } });
+  const rig = new Rig({ viewBox: built.viewBox, label: built.label, boil: paint.boil, defs: paint.defs(), layers });
+  if (paint.filter) rig.svg.querySelectorAll(':scope > g').forEach((g) => g.setAttribute('filter', `url(#${paint.filter})`));
+  rig.svg.dataset.style = style.id;
   const actions = mergeActions(anatomy.builtins, spec.actions);
   const director = new Director(toActions(actions), { salt: salt + 11, gap: spec.life?.gap ?? [1200, 3000] });
   const gaze = new Spring2({ freq: 2.6, damping: 0.75 });
@@ -82,14 +88,16 @@ export function createCharacter(spec: MascotSpec, anatomy: Anatomy, opts: { salt
   const el = container(rig.svg, spec.name);
   bindReactions(el, () => director.play('notice', lastT), () => director.play('surprise', lastT));
 
-  function update(t: number, dt: number, mode: FrameMode) {
-    lastT = t;
+  function update(time: number, dt: number, mode: FrameMode) {
+    lastT = time;
+    const t = paint.time(time);
     const still = !!mode.still;
     const p: Pose = { ...anatomy.defaults, ...PROP_DEFAULTS };
     if (!still) {
       anatomy.idle(p, t);
       p['eyes.open'] = 1 - blinkAt(t, salt, blinkEvery);
       director.update(p, t);
+      anatomy.derive?.(p, t);
     }
     let [gx, gy] = still ? [0, 0] : gazeTarget(el, t, !!mode.scripted, salt);
     const w = Math.min(1, Math.max(0, p['look.w'] ?? 0));
@@ -100,8 +108,8 @@ export function createCharacter(spec: MascotSpec, anatomy: Anatomy, opts: { salt
       if (still) s.reset(anatomy.defaults[ch] ?? 0);
       else p[ch] = s.step(p[ch], dt);
     }
-    rig.boil(t);
-    anatomy.render(rig, p, { x: gaze.x.value, y: gaze.y.value }, t);
+    rig.boil(time);
+    anatomy.render(rig, p, { x: gaze.x.value, y: gaze.y.value }, t, paint);
     props.update(rig, p, dt, still, t);
   }
 
