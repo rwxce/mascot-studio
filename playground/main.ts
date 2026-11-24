@@ -1,10 +1,10 @@
 import { createClock } from '../kit/clock';
 import type { Mascot } from '../kit/mascot';
-import { secretLetter } from '../mascots/secret-letter/index';
+import { makeMascot, specs } from '../mascots/index';
 
-export const registry: Record<string, { title: string; make: () => Mascot; bg?: string }> = {
-  'secret-letter': { title: 'Secret Letter', make: () => secretLetter() },
-};
+export const registry: Record<string, { title: string; make: () => Mascot; bg?: string }> = Object.fromEntries(
+  specs.map((s) => [s.name, { title: s.title, make: () => makeMascot(s) }]),
+);
 
 const params = new URLSearchParams(location.search);
 const only = params.get('only');
