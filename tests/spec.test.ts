@@ -14,10 +14,10 @@ describe('validateSpec', () => {
     const s = ok(); s.name = 'Secret Letter';
     expect(rules(s).join()).toMatch(/kebab-case/);
   });
-  it('needs every palette role of the anatomy, as hex', () => {
-    const s = ok(); delete (s.palette as any).ink; s.palette.body = 'white';
+  it('needs the required palette roles, as hex', () => {
+    const s = ok(); delete (s.palette as any).body; s.palette.ink = 'black';
     const r = rules(s).join();
-    expect(r).toMatch(/palette.ink: is required/);
+    expect(r).toMatch(/palette.body: is required/);
     expect(r).toMatch(/not a hex colour/);
   });
   it('rejects unknown palette roles and body parameters', () => {
@@ -27,7 +27,7 @@ describe('validateSpec', () => {
     expect(r).toMatch(/body.wings: unknown parameter/);
   });
   it('needs 3:1 contrast between the eyes and the body', () => {
-    const s = ok(); s.palette.ink = '#EEEEEE';
+    const s = ok(); s.palette.eye = '#EEEEEE';
     expect(rules(s).join()).toMatch(/contrast with body/);
     expect(contrast('#000000', '#FFFFFF')).toBeCloseTo(21, 0);
   });
@@ -58,5 +58,19 @@ describe('validateSpec', () => {
     const r = rules(s).join();
     expect(r).toMatch(/anticipation/);
     expect(r).toMatch(/settle/);
+  });
+});
+
+describe('every mascot in the repo', () => {
+  it('passes the static rules of its anatomy', async () => {
+    const { anatomies } = await import('../anatomies/index');
+    const { specs } = await import('../mascots/index');
+    for (const s of specs) expect(validateSpec(s, anatomies[s.anatomy].contract), s.name).toEqual([]);
+  });
+  it('checks per-style palettes too', () => {
+    const s = ok(); s.palettes = { 'soft-gradient': { body: '#2A0F1A', eye: '#2A0F1A', wings: '#fff' } };
+    const r = rules(s).join();
+    expect(r).toMatch(/palettes.soft-gradient.wings: unknown role/);
+    expect(r).toMatch(/palettes.soft-gradient.eye: contrast/);
   });
 });

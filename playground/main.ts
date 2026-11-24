@@ -1,9 +1,11 @@
 import { createClock } from '../kit/clock';
 import type { Mascot } from '../kit/mascot';
 import { makeMascot, specs } from '../mascots/index';
+import { styleById } from '../styles/index';
 
+const forced = new URLSearchParams(location.search).get('style') ?? undefined;
 export const registry: Record<string, { title: string; make: () => Mascot; bg?: string }> = Object.fromEntries(
-  specs.map((s) => [s.name, { title: s.title, make: () => makeMascot(s) }]),
+  specs.map((s) => [s.name, { title: s.title, make: () => makeMascot(s, { style: forced }), bg: styleById[forced ?? s.style ?? 'soft-gradient']?.bg }]),
 );
 
 const params = new URLSearchParams(location.search);

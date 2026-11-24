@@ -1,0 +1,75 @@
+{
+  "$schema": "../../schema/mascot.schema.json",
+  "name": "robot",
+  "title": "Robot",
+  "description": "A small robot with a visor, an antenna on a loose spring and arms with real elbows.",
+  "anatomy": "biped",
+  "style": "soft-gradient",
+  "palette": {
+    "body": "#5B63E8",
+    "body-dark": "#363B8F",
+    "visor": "#14163A",
+    "eye": "#8FF0D1",
+    "accent": "#FF5A7A",
+    "cheek": "#FF8FB1",
+    "glow": "#6D7BFF"
+  },
+  "props": {
+    "question": [48, -92],
+    "exclaim": [48, -92],
+    "note": [-50, -86],
+    "zzz": [32, -90],
+    "sparkles": [[-56, -100], [56, -104], [-46, -128], [50, -126]]
+  },
+  "actions": [
+    {
+      "name": "scan", "duration": 3000, "weight": 2,
+      "tracks": [
+        { "ch": "look.x", "op": "set", "keys": [[0, -1], [700, 1], [1400, -1], [2100, 1], [2700, 0], [3000, 0]] },
+        { "ch": "look.w", "keys": [[0, 1], [3000, 1]] },
+        { "ch": "core", "op": "set", "keys": [[0, 0.5], [3000, 0.5]], "osc": { "amp": 0.5, "period": 300 } },
+        { "ch": "head.rot", "osc": { "amp": 3, "period": 1400 } },
+        { "ch": "prop.exclaim", "op": "set", "curve": "linear", "keys": [[0, 0], [2199, 0], [2200, 1], [2850, 1], [2851, 0], [3000, 0]] }
+      ]
+    },
+    {
+      "name": "dance", "duration": 3200, "weight": 2,
+      "tracks": [
+        { "ch": "legL.lift", "op": "set", "keys": [[0, 0], [3200, 0]], "osc": { "amp": 6, "period": 800, "abs": true, "window": [200, 3000] } },
+        { "ch": "legR.lift", "op": "set", "keys": [[0, 0], [3200, 0]], "osc": { "amp": 6, "period": 800, "phase": 0.25, "abs": true, "window": [200, 3000] } },
+        { "ch": "body.y", "osc": { "amp": 2, "period": 400, "window": [200, 3000] } },
+        { "ch": "armR.sh", "osc": { "amp": 40, "period": 800 } },
+        { "ch": "armL.sh", "osc": { "amp": 40, "period": 800, "phase": 0.5 } },
+        { "ch": "armR.el", "keys": [[0, -40], [3200, -40]] },
+        { "ch": "armL.el", "keys": [[0, -40], [3200, -40]] },
+        { "ch": "head.rot", "osc": { "amp": 6, "period": 800 } },
+        { "ch": "eyes.happy", "keys": [[0, 1], [3200, 1]] },
+        { "ch": "prop.note", "op": "set", "curve": "linear", "keys": [[0, 0], [300, 1], [2900, 1], [3200, 0]] }
+      ]
+    },
+    {
+      "name": "think", "duration": 3000, "weight": 2,
+      "tracks": [
+        { "ch": "head.rot", "keys": [[0, 10], [3000, 10]] },
+        { "ch": "look.x", "op": "set", "keys": [[0, 0.6], [3000, 0.6]] },
+        { "ch": "look.y", "op": "set", "keys": [[0, -0.8], [3000, -0.8]] },
+        { "ch": "look.w", "keys": [[0, 1], [3000, 1]] },
+        { "ch": "armL.sh", "keys": [[0, -50], [3000, -50]] },
+        { "ch": "armL.el", "keys": [[0, -120], [3000, -120]] },
+        { "ch": "core", "op": "set", "keys": [[0, 0.5], [3000, 0.5]], "osc": { "amp": 0.5, "period": 700 } },
+        { "ch": "prop.question", "op": "set", "curve": "linear", "keys": [[0, 0], [399, 0], [400, 1], [2600, 1], [2601, 0], [3000, 0]] }
+      ]
+    },
+    {
+      "name": "nap", "duration": 4800, "weight": 1, "fade": 500,
+      "jumps": [{ "at": 3900, "air": 240, "height": 10 }],
+      "tracks": [
+        { "ch": "eyes.open", "op": "min", "curve": "track", "keys": [[0, 1], [1200, 0.05], [3800, 0.05], [4000, 1], [4800, 1]] },
+        { "ch": "head.rot", "keys": [[0, 0], [1200, 9], [3800, 9], [4000, 0], [4800, 0]] },
+        { "ch": "head.y", "keys": [[0, 0], [1200, 3], [3800, 3], [4000, 0], [4800, 0]] },
+        { "ch": "core", "op": "set", "keys": [[0, 1], [1200, 0.05], [3800, 0.05], [4000, 1], [4800, 1]] },
+        { "ch": "prop.zzz", "op": "set", "curve": "linear", "keys": [[0, -1], [1099, -1], [1100, 0], [3800, 1], [3801, -1], [4800, -1]] }
+      ]
+    }
+  ]
+}
