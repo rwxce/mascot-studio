@@ -1,17 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { contract } from '../anatomies/object-limbs/index';
+import { contract } from '../anatomies/anchor/index';
 import { contrast, validateSpec, type MascotSpec } from '../kit/spec';
-import base from '../mascots/secret-letter/mascot.json';
+import base from '../mascots/nodi/mascot.json';
 
 const ok = () => structuredClone(base) as unknown as MascotSpec;
 const rules = (s: MascotSpec) => validateSpec(s, contract).map((i) => `${i.path}: ${i.message}`);
 
 describe('validateSpec', () => {
-  it('accepts Secret Letter', () => {
+  it('accepts Nodi', () => {
     expect(rules(ok())).toEqual([]);
   });
   it('needs kebab-case names', () => {
-    const s = ok(); s.name = 'Secret Letter';
+    const s = ok(); s.name = 'My Mascot';
     expect(rules(s).join()).toMatch(/kebab-case/);
   });
   it('needs the required palette roles, as hex', () => {
@@ -49,7 +49,7 @@ describe('validateSpec', () => {
   });
   it('rejects add tracks without envelope that do not return to 0 (a jump)', () => {
     const s = ok();
-    s.actions!.push({ name: 'pop', duration: 800, tracks: [{ ch: 'armR.rot', env: false, keys: [[0, 0], [800, -60]] }] });
+    s.actions!.push({ name: 'pop', duration: 800, tracks: [{ ch: 'handleR', env: false, keys: [[0, 0], [800, -60]] }] });
     expect(rules(s).join()).toMatch(/start and end at 0/);
   });
   it('rejects jumps without room to anticipate or settle', () => {

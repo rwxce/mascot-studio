@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Nodi, the mascot-studio mascot: a vector anchor point whose Bézier handles are its arms. A new
+  anatomy, `anchor`, with a body that morphs between a rounded square, a circle, a star and a
+  heart, and five built-in actions: draw (sketches a curve in the air), morph, select (a
+  selection box appears and it gets resized), snap (steps along a dot grid) and spin.
+- The README shows Nodi: a large animated hero, its twelve actions, all 25 styles and the matrix.
+- Mascots are discovered from `mascots/*/mascot.json`: adding or deleting a folder is all it
+  takes, and nothing else in the repo names a specific example mascot.
+
+## 0.5.0
+
 - 25 styles in 6 families (clean vector, drawn by hand, print, retro screen, materials, light and
   plan), each a plugin with `style.json` (7 axes + docs) and a generated `STYLE.md`.
 - The style gallery (`playground/styles.html`, `pnpm build:gallery` for one HTML file): pick a

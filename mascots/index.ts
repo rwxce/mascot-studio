@@ -4,12 +4,14 @@ import { createCharacter } from '../kit/character.js';
 import { styleById } from '../styles/index.js';
 import type { Mascot } from '../kit/mascot.js';
 import type { MascotSpec } from '../kit/spec.js';
-import fox from './fox/mascot.json';
-import ghost from './ghost/mascot.json';
-import robot from './robot/mascot.json';
-import secretLetter from './secret-letter/mascot.json';
-
-export const specs: MascotSpec[] = [secretLetter, robot, fox, ghost].map((s) => s as unknown as MascotSpec);
+// Every folder with a mascot.json is a mascot: adding or deleting a folder is all it takes.
+// The repo's own mascot comes first, then the rest in a fixed order, then any others by name.
+const found = import.meta.glob<{ default: MascotSpec }>('./*/mascot.json', { eager: true });
+const ORDER = ['nodi', 'robot', 'fox', 'ghost'];
+const rank = (n: string) => (ORDER.includes(n) ? ORDER.indexOf(n) : ORDER.length);
+export const specs: MascotSpec[] = Object.values(found)
+  .map((m) => m.default as unknown as MascotSpec)
+  .sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name));
 
 export function makeMascot(spec: MascotSpec, opts: { salt?: number; style?: string } = {}): Mascot {
   const anatomy = anatomies[spec.anatomy];
