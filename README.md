@@ -33,11 +33,35 @@ A mascot here is not a video: it is a live SVG that breathes, blinks, looks at y
 5. **Shape morphs** — a puzzle tab stretches into an arm or grows a thumb, point by point (`kit/morph.ts`).
 6. **A director** that blends actions over the idle life and reacts to you (`kit/director.ts`).
 
+## Make your own
+
+A mascot is a `mascot.json`: an anatomy (the skeleton, with idle life and reactions built in),
+a palette, proportions, props and its own actions as keyframes on named channels. No engine code.
+
+```jsonc
+{
+  "name": "my-mascot", "title": "My Mascot", "anatomy": "object-limbs",
+  "palette": { "ink": "#141414", "body": "#FFFDF8", "inside": "#2A1F2B", "accent": "#EC4899", "cheek": "#F7A8B8", "prop": "#E5383B", "glow": "#FFE680" },
+  "props": { "heart": [98, -86] },
+  "actions": [
+    { "name": "love", "duration": 2400, "weight": 2, "tracks": [
+      { "ch": "prop.heart", "op": "set", "curve": "linear", "keys": [[0, 0], [2400, 1]] },
+      { "ch": "eyes.happy", "keys": [[0, 1], [2400, 1]] }
+    ] }
+  ]
+}
+```
+
+Then `pnpm check my-mascot` runs every rule in [CRAFT.md](CRAFT.md): the spec against its
+[anatomy](anatomies/object-limbs/ANATOMY.md), and every action frame by frame (in frame, no jumps,
+a good rest pose, budget). Green means it ships.
+
 ## Try it
 
 ```bash
 pnpm install
 pnpm dev                                   # playground: every mascot, a button per action
+pnpm check                                 # every rule, every mascot, every frame
 node tools/render.mjs secret-letter \
   --reel wave,idea,reveal --ms 12000       # deterministic MP4 + GIF export
 node tools/grid.mjs secret-letter wave:1300,idea:1400   # labelled stills
