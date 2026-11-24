@@ -1,0 +1,2 @@
+# Installs only versions published at least 5 days ago (minutes).
+minimumReleaseAge: 7200
