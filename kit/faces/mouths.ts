@@ -53,13 +53,13 @@ export const mouthModels: Record<string, MouthModel> = {
       smile: sc(lens([-6.5, -1], [0, -1], [6.5, -1], [0, 6.2]), s),
     }),
   },
-  /** Blocks of 4 px (pixel art). */
+  /** Blocks of 3 px (pixel art), every stroke two blocks thick so the filter never drops it. */
   pixel: {
     id: 'pixel',
     poses: () => ({
-      rest: rects([[-4, 0, 0, 4], [0, 0, 4, 4], [-4, 0, 4, 4]]),
-      open: rects([[-4, -4, 4, 4], [-4, -4, 4, 0], [-4, 0, 4, 4]]),
-      smile: rects([[-6, -4, -2, 0], [-2, 0, 2, 4], [2, -4, 6, 0]]),
+      rest: rects([[-6, 0, 0, 6], [0, 0, 6, 6], [-6, 0, 6, 6]]),
+      open: rects([[-6, -6, 6, 6], [-6, -6, 6, 0], [-6, 0, 6, 6]]),
+      smile: rects([[-9, -6, -3, 0], [-3, 0, 3, 6], [3, -6, 9, 0]]),
     }),
   },
 };

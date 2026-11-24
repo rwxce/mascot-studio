@@ -248,18 +248,20 @@ function dotEye(rx: number, ry: number, paint: Painter, colour?: string): EyeSet
 /** Pixel-art eyes: 2 × 3 blocks of 4 px with a one-block shine; shut and happy are block rows. */
 function pixelEye(_rx: number, _ry: number, paint: Painter, colour?: string): EyeSet {
   const k = faceInks(paint, colour);
-  const u = 4;
+  // One pixel block (the Pixel style's filter block). The filter keeps one sample per block, so every
+  // piece is at least 2 × 2 blocks: it survives any tilt, when the blocks fall off the grid.
+  const u = 3;
   const z = [0, 0, 0, 0] as const;
   return layered({
-    rx: u, ry: 1.5 * u, pivot: 0, blink: 'cut',
+    rx: u, ry: 2 * u, pivot: 0, blink: 'cut',
     open: () => [
-      det({ d: d(rects([[-u, -1.5 * u, u, 1.5 * u]])), fill: k.eye }),
-      det({ d: d(rects([[-u, -1.5 * u, 0, -0.5 * u]])), fill: k.shine }),
+      det({ d: d(rects([[-u, -2 * u, u, 2 * u]])), fill: k.eye }),
+      det({ d: d(rects([[-u, -2 * u, 0, -u]])), fill: k.shine }),
     ],
     lid: {
       open: rects([z, z, z]),
-      shut: rects([[-1.5 * u, 0, -0.5 * u, u], [-0.5 * u, 0, 0.5 * u, u], [0.5 * u, 0, 1.5 * u, u]]),
-      happy: rects([[-1.5 * u, 0, -0.5 * u, u], [-0.5 * u, -u, 0.5 * u, 0], [0.5 * u, 0, 1.5 * u, u]]),
+      shut: rects([[-3 * u, -u, -u, u], [-u, -u, u, u], [u, -u, 3 * u, u]]),
+      happy: rects([[-3 * u, -0.5 * u, -u, 1.5 * u], [-u, -1.5 * u, u, 0.5 * u], [u, -0.5 * u, 3 * u, 1.5 * u]]),
     },
     lidFill: k.eye,
   });

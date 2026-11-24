@@ -68,7 +68,7 @@ function blinkAt(t: number, salt: number, every: number): number {
 
 let instances = 0;
 
-export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style, opts: { salt?: number } = {}): Mascot {
+export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style, opts: { salt?: number; unsnapped?: boolean } = {}): Mascot {
   const salt = opts.salt ?? 0;
   // A mascot may tune its palette for styles without an outline ("@no-outline") and per style.
   const noOutline = !style.painter(spec.palette, 'probe').outline(1);
@@ -94,8 +94,8 @@ export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style
       f.setAttribute('width', String(w)); f.setAttribute('height', String(h));
       const block = Number(f.getAttribute('data-block') ?? 4);
       const flood = f.querySelector('feFlood');
-      flood?.setAttribute('x', String(x + block / 2));
-      flood?.setAttribute('y', String(y + block / 2));
+      flood?.setAttribute('x', String(x + (block - 1) / 2));
+      flood?.setAttribute('y', String(y + (block - 1) / 2));
     }
     const wrap = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     wrap.setAttribute('filter', `url(#${paint.filter})`);
@@ -118,7 +118,8 @@ export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style
 
   function update(time: number, dt: number, mode: FrameMode) {
     lastT = time;
-    const t = snapTime(paint.time(time), form.motion.snap);
+    // `unsnapped` (checks only): the continuous timeline under a hold-then-snap form.
+    const t = opts.unsnapped ? paint.time(time) : snapTime(paint.time(time), form.motion.snap);
     const still = !!mode.still;
     const p: Pose = { ...anatomy.defaults, ...PROP_DEFAULTS };
     if (!still) {

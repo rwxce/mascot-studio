@@ -18,7 +18,7 @@ import type { Painter } from '../../kit/style.js';
 import type { ActionSpec } from '../../kit/timeline.js';
 
 const det = (s: Shape): Shape => ({ ...s, kind: 'detail' });
-const N = 40;
+const N = 120;
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
 /** A closed Catmull-Rom curve through `pts`, as N cubic segments (same commands for every shape). */
@@ -47,12 +47,32 @@ const polar = (r: (th: number) => number) => closedCurve(polarPts(r));
 const SQUARE = polar((th) => 31 / (Math.abs(Math.cos(th)) ** 5 + Math.abs(Math.sin(th)) ** 5) ** (1 / 5));
 const CIRCLE = polar(() => 32);
 const STAR = polar((th) => 24 + 19 * ((Math.cos(5 * th) + 1) / 2) ** 2.2);
-const HEART_PTS = Array.from({ length: N }, (_, i) => {
-  const t = (i / N) * Math.PI * 2;
-  const x = 16 * Math.sin(t) ** 3;
-  const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-  return [x * 2.15, (y + 2.5) * 2.15] as [number, number];
-});
+/**
+ * The heart, sampled at the same N angles as the other shapes (a ray from its centre per angle),
+ * so point i of the heart lies in the same direction as point i of the square, circle and star:
+ * every in-between frame of a morph is a clean shape instead of a twisted one.
+ */
+const HEART_PTS = (() => {
+  const cy = 9;
+  const dense = Array.from({ length: 4000 }, (_, i) => {
+    const t = (i / 4000) * Math.PI * 2;
+    const x = 16 * Math.sin(t) ** 3;
+    const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+    const X = x * 2.15, Y = (y + 2.5) * 2.15;
+    const th = (Math.atan2(X, -(Y - cy)) + Math.PI * 2) % (Math.PI * 2);
+    return { th, r: Math.hypot(X, Y - cy) };
+  });
+  return Array.from({ length: N }, (_, i) => {
+    const th = (i / N) * Math.PI * 2;
+    // the farthest boundary point along this ray (the top dip is a single crossing from the centre)
+    let best = dense[0], bd = Infinity;
+    for (const d of dense) {
+      const dd = Math.abs(((d.th - th + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+      if (dd < bd) { bd = dd; best = d; }
+    }
+    return [Math.sin(th) * best.r, cy - Math.cos(th) * best.r] as [number, number];
+  });
+})();
 const HEART = closedCurve(HEART_PTS);
 
 
@@ -93,7 +113,7 @@ export const builtins: ActionSpec[] = [
   {
     name: 'wave', duration: 2600, weight: 3,
     tracks: [
-      { ch: 'handleR', keys: C(2600, -120), osc: { amp: 24, period: 480 } },
+      { ch: 'handleR', keys: C(2600, -46), osc: { amp: 12, period: 480 } },
       { ch: 'handleR.len', keys: C(2600, 6) },
       { ch: 'smooth', op: 'set', keys: C(2600, 0.45) },
       { ch: 'body.rot', keys: C(2600, -5) },
@@ -142,7 +162,7 @@ export const builtins: ActionSpec[] = [
     tracks: [
       { ch: 'eyes.scale', op: 'mul', keys: [[0, 1], [250, 1.3], [500, 1], [1900, 1]] },
       { ch: 'body.y', env: false, keys: [[0, 0], [200, -10], [500, 0], [1900, 0]] },
-      { ch: 'handleR', keys: [[0, 0], [500, 0], [800, -120], [1900, -120]], osc: { amp: 22, period: 460, window: [700, 1900] } },
+      { ch: 'handleR', keys: [[0, 0], [500, 0], [800, -46], [1900, -46]], osc: { amp: 12, period: 460, window: [700, 1900] } },
       { ch: 'smooth', op: 'set', keys: C(1900, 0.4) },
       { ch: 'eyes.happy', keys: [[0, 0], [450, 0], [700, 1], [1900, 1]] },
       { ch: 'mouth.smile', keys: [[0, 0], [450, 0], [700, 1], [1900, 1]] },
@@ -180,9 +200,10 @@ export const builtins: ActionSpec[] = [
     // Square → circle → star → heart → square, a little bounce at each one.
     name: 'morph', duration: 4200, weight: 2.5,
     tracks: [
-      { ch: 'shape.circle', keys: [[0, 0], [500, 1], [1100, 1], [1500, 0], [4200, 0]] },
-      { ch: 'shape.star', keys: [[0, 0], [1100, 0], [1500, 1], [2300, 1], [2700, 0], [4200, 0]] },
-      { ch: 'shape.heart', keys: [[0, 0], [2300, 0], [2700, 1], [3500, 1], [3900, 0], [4200, 0]] },
+      // Star → heart goes through the circle: two radial blends, never a star with lobes.
+      { ch: 'shape.circle', keys: [[0, 0], [500, 1], [1100, 1], [1500, 0], [2300, 0], [2500, 1], [2700, 0], [4200, 0]] },
+      { ch: 'shape.star', keys: [[0, 0], [1100, 0], [1500, 1], [2300, 1], [2500, 0], [4200, 0]] },
+      { ch: 'shape.heart', keys: [[0, 0], [2500, 0], [2750, 1], [3500, 1], [3900, 0], [4200, 0]] },
       { ch: 'body.rot', keys: [[0, 0], [1500, 0], [1900, 14], [2300, 0], [4200, 0]] },
       { ch: 'body.sy', op: 'mul', keys: [[0, 1], [400, 0.9], [600, 1.06], [800, 1], [1400, 0.9], [1600, 1.06], [1800, 1], [2600, 0.9], [2800, 1.06], [3000, 1], [3800, 0.92], [4000, 1.04], [4200, 1]] },
       { ch: 'handleL', keys: [[0, 0], [1500, -30], [2300, -30], [2700, 10], [3500, 10], [4200, 0]] },
@@ -273,7 +294,9 @@ function geometry(form: Form): Geo {
       star: fit(polarPts((th) => 24 + 19 * ((Math.cos(5 * th) + 1) / 2) ** 2.2)),
       heart: fit(HEART_PTS),
     },
-    stick: Math.floor(Math.min(50 * S.arm, REACH - handReach(form.hands, 2.2 * S.thick)) / (form.grid || 0.01)) * (form.grid || 0.01),
+    // The stick reaches past the body (so the hand never sits on it) and the hand stays in frame.
+    stick: snapDown(form, Math.min(FRAME - handReach(form.hands, 2.2 * S.thick),
+      Math.max(Math.min(50 * S.arm, REACH - handReach(form.hands, 2.2 * S.thick)), 31 * hs * Math.max(1, S.aspect) + handReach(form.hands, 2.2 * S.thick) + 12))),
     thick: 2.2 * S.thick,
     eyesAt: [0, -5 * sy + fy],
     eyeX: snapTo(form, 11 * hs * form.face.spacing),
@@ -282,6 +305,9 @@ function geometry(form: Form): Geo {
   };
 }
 
+/** Round down to the form's grid (no grid: unchanged). */
+const snapDown = (form: Form, v: number) => (form.grid ? Math.floor(v / form.grid) * form.grid : v);
+
 /** How far a hand reaches past the end of its stick. */
 function handReach(kind: Form['hands'], thick: number): number {
   const k = Math.sqrt(thick / 2.2);
@@ -289,9 +315,11 @@ function handReach(kind: Form['hands'], thick: number): number {
 }
 /** The farthest a handle (stick + hand) may reach from the centre and still keep every action in frame. */
 const REACH = 56;
+/** The farthest a form's handle may reach at rest (the viewBox edge, less a margin). */
+const FRAME = 70;
 
 /** Per character: its geometry and face models (keyed by the character's painter). */
-interface Instance { geo: Geo; eyes: EyeSet; mouth: MouthSet; brows: BrowSet; noodle: boolean; marks: Form['marks'] }
+interface Instance { geo: Geo; eyes: EyeSet; mouth: MouthSet; brows: BrowSet; noodle: boolean; marks: Form['marks']; hand: number; custom: boolean }
 const instances = new WeakMap<Painter, Instance>();
 
 /** A stick from the centre out along +x, `t` thick at the root, thinning by `taper`. */
@@ -373,7 +401,7 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
     cheeks: [[-g.cheek[0], g.cheek[1]], [g.cheek[0], g.cheek[1]]],
     speed: [half * 0.7, half + 8],
   }, paint);
-  instances.set(paint, { geo: g, eyes, mouth, brows, noodle, marks: form.marks });
+  instances.set(paint, { geo: g, eyes, mouth, brows, noodle, marks: form.marks, hand: handReach(form.hands, g.thick), custom });
 
   return {
     viewBox: '0 -6 160 166',
@@ -481,9 +509,15 @@ export const anchor: Anatomy = {
     const du = Math.max(0, Math.min(1, p.draw));
     const L = g.stick;
     const angR = lerp(14 + p.handleR, drawAngle(du), dw);
-    const lenR = lerp(L + p['handleR.len'], drawLen(du), dw);
+    let lenR = lerp(L + p['handleR.len'], drawLen(du), dw);
     const angL = 14 + p.handleL;
-    const lenL = L + p['handleL.len'];
+    let lenL = L + p['handleL.len'];
+    if (I.custom) {
+      // A form's arm (stick + hand) stays in frame however the body stretches, jumps or scales.
+      const cap = (FRAME - 0.8 * lift - 0.6 * Math.abs(p['body.x'])) / Math.max(1, Math.abs(p['body.sx']), Math.abs(p['body.sy'])) - I.hand;
+      lenR = Math.min(lenR, cap);
+      lenL = Math.min(lenL, cap);
+    }
     rig.set('handleR', { rot: angR });
     rig.set('handleL', { rot: -angL });
     if (I.noodle) {
