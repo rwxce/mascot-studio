@@ -4,6 +4,7 @@
   "title": "Secret Letter",
   "description": "An envelope that is also a puzzle piece: its tabs are arms, and the flap opens to show a small secret inside.",
   "anatomy": "object-limbs",
+  "style": "ink",
   "palette": {
     "ink": "#141414",
     "body": "#FFFDF8",
@@ -12,6 +13,17 @@
     "cheek": "#F7A8B8",
     "prop": "#E5383B",
     "glow": "#FFE680"
+  },
+  "palettes": {
+    "soft-gradient": {
+      "body": "#FF4F7B",
+      "inside": "#8E1A40",
+      "accent": "#FFF6EC",
+      "line": "#B0204F",
+      "eye": "#2A0F1A",
+      "cheek": "#FFFFFF",
+      "glow": "#FF5A7A"
+    }
   },
   "body": { "width": 148, "height": 96, "notch": 17, "crossLines": true, "inner": true, "line": 5.5 },
   "props": {
