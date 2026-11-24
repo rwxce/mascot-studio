@@ -13,7 +13,7 @@ A sticker-clean cartoon on paper: one heavy, even black line around every silhou
 Not a sketch (the line never wobbles) and not a comic (no shading, no halftone).
 
 ## Shapes and line
-The outline is its own pass under the fills, so touching parts fuse with no seam. ~5.5 px at Secret Letter's scale; anatomies scale it.
+The outline is its own pass under the fills, so touching parts fuse with no seam. ~5.5 px at the scale of a 160-unit viewBox; anatomies scale it.
 
 ## Colour
 Flat fills straight from the palette on paper (#FAF8F4). Body colour, one accent, ink.
