@@ -1,0 +1,232 @@
+// A rig: a tree of parts with real pivots, rendered so outlines are seamless.
+//
+// Clean joins come from drawing each LAYER twice: first every part's silhouette as an
+// outline pass (ink, stroke = 2 × line width), then every part's fill on top. Where two
+// parts of the same layer overlap, the fills cover the outlines between them, so the joint
+// reads as one shape with no seam. Parts that must show an outline over the body (an arm
+// in front) go in a later layer. Details (eyes, inner lines) are drawn in the fill pass.
+//
+// Animation writes transforms and path data straight to the DOM through refs: no
+// framework, no re-render, one string per changed attribute.
+import { mapPoints, parse, toD, type PathSpec, type Seg } from './morph.js';
+import { seeded } from './motion.js';
+
+const SVGNS = 'http://www.w3.org/2000/svg';
+
+export interface Shape {
+  /** Static geometry (SVG path syntax, absolute M L Q C Z) or a ref to set each frame. */
+  d?: string;
+  /** Shape whose path is set every frame with rig.path(ref, spec). */
+  pathRef?: string;
+  /** 'body' joins the layer's outline; 'detail' is drawn on top in the fill pass only. */
+  kind?: 'body' | 'detail';
+  fill?: string;
+  stroke?: string;
+  width?: number;
+  opacity?: number;
+  /** Other SVG element instead of a path (ellipse, circle, rect, text…) — detail only. */
+  el?: { tag: string; attrs: Record<string, string | number>; text?: string };
+  /** Ref for an element whose attributes are animated (e.g. opacity). */
+  ref?: string;
+  /** Clip children shapes to this ellipse (eyes): [cx, cy, rx, ry]. */
+  clip?: readonly [number, number, number, number];
+  clipped?: Shape[];
+}
+
+export interface Part {
+  /** Ref for transforms set with rig.set(id, …). */
+  id?: string;
+  /** Origin of this part in its parent's coordinates = its pivot. */
+  at?: readonly [number, number];
+  shapes?: Shape[];
+  children?: Part[];
+}
+
+export interface Layer {
+  root: Part;
+  /** Line colour and width for this layer's outline pass; null = no outline. */
+  outline: { color: string; width: number } | null;
+}
+
+export interface RigOptions {
+  viewBox: string;
+  label: string;
+  layers: Layer[];
+  /** Hand-drawn boil: amplitude in px (0 = off). Points move on 2s (12 fps), 3 variants. */
+  boil?: number;
+  defs?: string;
+}
+
+export interface Transform {
+  x?: number;
+  y?: number;
+  rot?: number;
+  sx?: number;
+  sy?: number;
+  /** Shear along x in degrees (smear on fast moves, lean). */
+  skew?: number;
+}
+
+const r2 = (n: number) => Math.round(n * 100) / 100;
+const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 9973, 7);
+
+export function transformString(t: Transform): string {
+  let s = '';
+  if (t.x || t.y) s += `translate(${r2(t.x ?? 0)},${r2(t.y ?? 0)})`;
+  if (t.rot) s += `rotate(${r2(t.rot)})`;
+  if (t.skew) s += `skewX(${r2(t.skew)})`;
+  if ((t.sx ?? 1) !== 1 || (t.sy ?? 1) !== 1) s += `scale(${r2((t.sx ?? 1) * 1000) / 1000},${r2((t.sy ?? 1) * 1000) / 1000})`;
+  return s;
+}
+
+export class Rig {
+  readonly svg: SVGSVGElement;
+  private parts = new Map<string, Element[]>();
+  private paths = new Map<string, { els: Element[]; spec: PathSpec | null }>();
+  private refs = new Map<string, Element[]>();
+  private statics = new Map<Shape, { els: Element[]; spec: Seg[] }>();
+  private boilFrame = -1;
+  private uid = Math.random().toString(36).slice(2, 8);
+
+  constructor(private opts: RigOptions) {
+    this.svg = document.createElementNS(SVGNS, 'svg') as SVGSVGElement;
+    this.svg.setAttribute('viewBox', opts.viewBox);
+    this.svg.setAttribute('role', 'img');
+    this.svg.setAttribute('aria-label', opts.label);
+    this.svg.setAttribute('shape-rendering', 'geometricPrecision');
+    if (opts.defs) this.svg.innerHTML = `<defs>${opts.defs}</defs>`;
+    for (const layer of opts.layers) {
+      if (layer.outline) this.svg.append(this.build(layer.root, 'outline', layer.outline));
+      this.svg.append(this.build(layer.root, 'fill', layer.outline));
+    }
+  }
+
+  private add(map: Map<string, Element[]>, key: string, el: Element) {
+    const list = map.get(key);
+    if (list) list.push(el); else map.set(key, [el]);
+  }
+
+  private build(part: Part, pass: 'outline' | 'fill', outline: Layer['outline']): SVGGElement {
+    const g = document.createElementNS(SVGNS, 'g') as SVGGElement;
+    // Pivot group (static translate) wrapping the animated group.
+    const outer = document.createElementNS(SVGNS, 'g');
+    if (part.at) outer.setAttribute('transform', `translate(${part.at[0]},${part.at[1]})`);
+    outer.append(g);
+    if (part.id) this.add(this.parts, part.id, g);
+    for (const s of part.shapes ?? []) {
+      const el = this.shape(s, pass, outline);
+      if (el) g.append(el);
+    }
+    for (const c of part.children ?? []) g.append(this.build(c, pass, outline));
+    return outer as SVGGElement;
+  }
+
+  private shape(s: Shape, pass: 'outline' | 'fill', outline: Layer['outline']): Element | null {
+    const kind = s.kind ?? 'body';
+    if (pass === 'outline' && (kind !== 'body' || !outline)) return null;
+    if (s.clip) {
+      if (pass === 'outline') return null;
+      const id = `c${this.uid}${Math.random().toString(36).slice(2, 7)}`;
+      const g = document.createElementNS(SVGNS, 'g');
+      g.innerHTML = `<clipPath id="${id}"><ellipse cx="${s.clip[0]}" cy="${s.clip[1]}" rx="${s.clip[2]}" ry="${s.clip[3]}"/></clipPath>`;
+      const inner = document.createElementNS(SVGNS, 'g');
+      inner.setAttribute('clip-path', `url(#${id})`);
+      for (const c of s.clipped ?? []) {
+        const el = this.shape({ ...c, kind: 'detail' }, 'fill', outline);
+        if (el) inner.append(el);
+      }
+      g.append(inner);
+      return g;
+    }
+    let el: Element;
+    if (s.el) {
+      el = document.createElementNS(SVGNS, s.el.tag);
+      for (const [k, v] of Object.entries(s.el.attrs)) el.setAttribute(k, String(v));
+      if (s.el.text) el.textContent = s.el.text;
+    } else {
+      el = document.createElementNS(SVGNS, 'path');
+      if (s.d) {
+        const spec = parse(s.d);
+        el.setAttribute('d', toD(spec));
+        if (this.opts.boil) {
+          const entry = this.statics.get(s);
+          if (entry) entry.els.push(el); else this.statics.set(s, { els: [el], spec });
+        }
+      }
+      if (s.pathRef) {
+        const entry = this.paths.get(s.pathRef);
+        if (entry) entry.els.push(el); else this.paths.set(s.pathRef, { els: [el], spec: null });
+      }
+    }
+    if (pass === 'outline' && outline) {
+      el.setAttribute('fill', outline.color);
+      el.setAttribute('stroke', outline.color);
+      el.setAttribute('stroke-width', String(outline.width * 2));
+      el.setAttribute('stroke-linejoin', 'round');
+      el.setAttribute('stroke-linecap', 'round');
+    } else {
+      el.setAttribute('fill', s.fill ?? 'none');
+      if (s.stroke) {
+        el.setAttribute('stroke', s.stroke);
+        el.setAttribute('stroke-width', String(s.width ?? 2));
+        el.setAttribute('stroke-linejoin', 'round');
+        el.setAttribute('stroke-linecap', 'round');
+      }
+      if (s.opacity !== undefined) el.setAttribute('opacity', String(s.opacity));
+    }
+    if (s.ref) this.add(this.refs, s.ref, el);
+    return el;
+  }
+
+  /** Set a part's transform (all passes). */
+  set(id: string, t: Transform) {
+    const els = this.parts.get(id);
+    if (!els) return;
+    const s = transformString(t);
+    for (const el of els) el.setAttribute('transform', s);
+  }
+
+  /** Set a morphing shape's path. */
+  path(ref: string, spec: PathSpec) {
+    const entry = this.paths.get(ref);
+    if (!entry) return;
+    entry.spec = spec;
+    const d = toD(this.boilFrame >= 0 && this.opts.boil ? this.jitter(spec, hash(ref)) : spec);
+    for (const el of entry.els) el.setAttribute('d', d);
+  }
+
+  /** Set an attribute on referenced elements. */
+  attr(ref: string, name: string, value: string | number) {
+    const els = this.refs.get(ref);
+    if (!els) return;
+    const v = typeof value === 'number' ? String(r2(value)) : value;
+    for (const el of els) el.setAttribute(name, v);
+  }
+
+  has(id: string) {
+    return this.parts.has(id) || this.paths.has(id) || this.refs.has(id);
+  }
+
+  private jitter(spec: PathSpec, salt: number): Seg[] {
+    const a = this.opts.boil ?? 0;
+    const f = this.boilFrame;
+    return mapPoints(spec, (i, x, y) => [
+      x + (seeded(i + salt, f * 7 + 1) - 0.5) * 2 * a,
+      y + (seeded(i + salt, f * 7 + 2) - 0.5) * 2 * a,
+    ]);
+  }
+
+  /** Advance the hand-drawn boil: 3 variants, changing on 2s (every 83 ms). */
+  boil(timeMs: number) {
+    if (!this.opts.boil) return;
+    const f = Math.floor(timeMs / 83) % 3;
+    if (f === this.boilFrame) return;
+    this.boilFrame = f;
+    let k = 0;
+    for (const s of this.statics.values()) {
+      const d = toD(this.jitter(s.spec, ++k * 13));
+      for (const el of s.els) el.setAttribute('d', d);
+    }
+    for (const [ref, entry] of this.paths) if (entry.spec) this.path(ref, entry.spec);
+  }
+}
