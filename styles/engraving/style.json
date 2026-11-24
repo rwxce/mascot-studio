@@ -1,0 +1,28 @@
+{
+  "id": "engraving",
+  "title": "Engraving",
+  "family": "Print",
+  "look": "A copperplate engraving: tone built from fine parallel and crossed lines, dark sepia on cream, in an oval cartouche.",
+  "bg": "#F1E9D6",
+  "axes": {
+    "line": "burin",
+    "fill": "cross-hatch",
+    "texture": "plate",
+    "palette": "sepia-black",
+    "eyes": "solid",
+    "stage": "cartouche",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "An illustration cut into a copper plate with a burin and printed in dark ink: no flat tone at all, only lines, closer together where it is darker and crossed where it is darkest.",
+    "notIt": "Not pencil (crisp printed lines of even ink, crossed for dark tones, an engraved frame), not manga (lines, not dots), not woodblock (no colour, no wood grain).",
+    "shapes": "A thin, firm contour. Every area is ruled with parallel lines whose angle changes from part to part, so the parts read as separate planes.",
+    "colour": "Only dark sepia ink on cream. The gap between lines follows how dark the area was; below mid-grey a second set of lines crosses the first.",
+    "eyes": "Solid ink, or cream on a dark visor.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Close line gaps alias into moiré at small sizes: the gap never drops below 2 px.",
+      "Light palettes leave areas blank: the contour carries them."
+    ]
+  }
+}

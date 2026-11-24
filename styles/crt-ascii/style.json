@@ -1,0 +1,28 @@
+{
+  "id": "crt-ascii",
+  "title": "CRT ASCII",
+  "family": "Retro screen",
+  "look": "A green phosphor terminal: the character drawn in text-mode glyphs, scanlines, a blinking prompt.",
+  "bg": "#03130A",
+  "axes": {
+    "line": "phosphor",
+    "fill": "glyphs",
+    "texture": "scanlines",
+    "palette": "green-phosphor",
+    "eyes": "block",
+    "stage": "terminal",
+    "rhythm": "refresh"
+  },
+  "doc": {
+    "essence": "ASCII art on a monochrome monitor: every area is filled with character cells whose glyph gets denser the brighter the area, glowing green behind the glass.",
+    "notIt": "Not pixel (one green, text cells instead of colour pixels), not one-bit (glowing green on black, glyphs not dither), not synthwave (no neon gradient, no sun).",
+    "shapes": "A thin phosphor edge on each part. Inside, a grid of 5 by 7 cells, each holding one glyph: a dot, a plus, a hash or a full block.",
+    "colour": "Only green phosphor in four brightnesses on a near-black screen. Brighter areas get heavier glyphs.",
+    "eyes": "The brightest phosphor, solid, like a cursor block.",
+    "motion": "Redraws at 15 fps, like a slow terminal.",
+    "pitfalls": [
+      "Two areas of the same lightness get the same glyph: the edge keeps them apart.",
+      "Scanlines over the eyes must stay faint."
+    ]
+  }
+}

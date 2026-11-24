@@ -1,0 +1,28 @@
+{
+  "id": "art-deco",
+  "title": "Art Deco",
+  "family": "Graphic",
+  "look": "Gold on black: a symmetric sunburst fan, stepped arcs, pinstripes and metallic edges.",
+  "bg": "#0D0D0F",
+  "axes": {
+    "line": "gilt",
+    "fill": "pinstripe",
+    "texture": "none",
+    "palette": "black-gold",
+    "eyes": "gold",
+    "stage": "fan",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A 1920s lobby panel: lacquer black, gold inlay, a rising fan of rays and stepped arcs, every line ruled and every shape mirrored.",
+    "notIt": "Not gilded (black lacquer and machine geometry, no vellum, no diaper), not neon (solid black parts edged in metal, no glow), not stained glass (no colour, no lead).",
+    "shapes": "No dark outline: every part is edged with a thin gold line, like inlay set into lacquer.",
+    "colour": "Bodies are black lacquer with fine gold pinstripes; bellies cream; accents, props and lines polished gold.",
+    "eyes": "Pale gold, so they shine out of the black.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "A black body on a black page relies on the gold edge: never drop it.",
+      "The fan must stay symmetric about the character's centre."
+    ]
+  }
+}

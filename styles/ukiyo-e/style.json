@@ -1,0 +1,35 @@
+{
+  "id": "ukiyo-e",
+  "title": "Ukiyo-e",
+  "family": "Print",
+  "look": "A Japanese woodblock print: flat pigments fading in bokashi gradients, a fine key line, washi paper, a curling wave.",
+  "bg": "#EADFC4",
+  "axes": {
+    "line": "fine-key",
+    "fill": "bokashi",
+    "texture": "washi",
+    "palette": "pigment",
+    "eyes": "small-ink",
+    "stage": "wave",
+    "rhythm": "smooth"
+  },
+  "form": {
+    "corners": 0.62,
+    "taper": 0.35,
+    "brows": "thin",
+    "mouth": "small",
+    "face": { "scale": 0.92, "spacing": 0.95 }
+  },
+  "doc": {
+    "essence": "An Edo-period colour print: a hair-thin black key block, a handful of mineral and plant pigments, each one wiped into a soft gradient on the block, on fibrous paper with a stylised wave behind.",
+    "notIt": "Not woodblock (no wood grain, no muted brown inks: indigo, vermilion and ochre fading in bokashi), not ink-wash (colour, a crisp key line, a composed stage), not flat (gradients and paper).",
+    "shapes": "A fine, even key line. Slightly softer corners and limbs that thin towards their ends, the way a carver's line tapers.",
+    "colour": "Every area snaps to the nearest of six pigments (indigo, vermilion, ochre, sage, pale pink, paper) and fades from full strength at the top to half strength at the bottom.",
+    "eyes": "Small sumi-ink eyes with thin brows and a small mouth: a quiet face.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Two roles snapping to the same pigment merge: the key line keeps them apart.",
+      "The wave must stay behind the feet, never over the face."
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "thermal",
+  "title": "Thermal",
+  "family": "Sensors and circuits",
+  "look": "A thermal camera view: false-colour heat from cold violet through magenta and orange to white-hot, a scale bar and crosshair.",
+  "bg": "#0B0630",
+  "axes": {
+    "line": "none",
+    "fill": "heat",
+    "texture": "none",
+    "palette": "ironbow",
+    "eyes": "hot",
+    "stage": "cold-field",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "What an infrared camera sees: not the character's colours but its warmth, mapped onto a false-colour scale, glowing hottest in the core of the body and cooling towards the edges, against a cold room.",
+    "notIt": "Not synthwave (no grid, no sun, heat gradients from the centre out), not soft-gradient (the colour ignores the palette and follows the heat scale), not neon (filled, no tubes).",
+    "shapes": "No outline: each part is a soft blob of heat, brightest in its middle.",
+    "colour": "Every area uses the same heat scale (violet, magenta, red, orange, yellow, white). The belly runs hottest, the body warm, dark parts and limbs cooler.",
+    "eyes": "Dark cool spots on the hot face, or white-hot where the eyes were light.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "The palette is ignored by design: two mascots in this style differ only in shape.",
+      "The scale bar and crosshair sit in the corners and centre, never over the eyes."
+    ]
+  }
+}

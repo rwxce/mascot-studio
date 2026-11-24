@@ -38,7 +38,7 @@ describe('form', () => {
   });
   it('the styles that redraw the character carry a form', () => {
     const withForm = styles.filter((s) => s.form).map((s) => s.id).sort();
-    expect(withForm).toEqual(['anime', 'bauhaus', 'cel-anime-80s', 'clay', 'comic', 'manga', 'pixel', 'rubber-hose']);
+    expect(withForm).toEqual(['anime', 'bauhaus', 'brick-toy', 'cel-anime-80s', 'clay', 'comic', 'manga', 'mid-century', 'pictogram', 'pixel', 'pop-art', 'rubber-hose', 'shadow-puppet', 'ukiyo-e']);
   });
   it('snap time holds, then catches up, and never runs backwards', () => {
     let prev = -1;

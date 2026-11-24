@@ -1,0 +1,28 @@
+{
+  "id": "scratchboard",
+  "title": "Scratchboard",
+  "family": "Print",
+  "look": "White lines scratched out of a black board: the light is what was taken away.",
+  "bg": "#0E0D0C",
+  "axes": {
+    "line": "scratched",
+    "fill": "scratch-lines",
+    "texture": "none",
+    "palette": "white-on-black",
+    "eyes": "white",
+    "stage": "scratch-halo",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A board coated in black ink, worked with a blade: every light in the picture is a line scraped back to the white clay underneath.",
+    "notIt": "Not engraving (white on black, light carved out of dark), not neon (scraped lines, no glow, no colour), not chalkboard (pure black, crisp blade lines, no green board).",
+    "shapes": "A thin white scraped edge on every part. Inside, white lines that are closer together where the area was lighter, each part at its own angle.",
+    "colour": "Only black and white. Very dark areas stay unscratched black.",
+    "eyes": "Solid white, scraped clean, so the face reads first.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Dense white lines around the eyes drown them: the line gap never drops below 3 px.",
+      "Mascots with very dark palettes become a white outline only: that is correct."
+    ]
+  }
+}

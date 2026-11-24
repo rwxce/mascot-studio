@@ -1,0 +1,28 @@
+{
+  "id": "x-ray",
+  "title": "X-ray",
+  "family": "Sensors and circuits",
+  "look": "A security scanner image: translucent orange and blue layers on black, every inner part showing through, on a belt.",
+  "bg": "#03070D",
+  "axes": {
+    "line": "dense-edge",
+    "fill": "translucent-layers",
+    "texture": "none",
+    "palette": "scanner",
+    "eyes": "dense",
+    "stage": "belt",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "The character passing through a baggage scanner: soft parts read as see-through orange, harder parts as blue, and wherever parts overlap the image gets denser, so you see right into it.",
+    "notIt": "Not glass (dark scanner field, two material colours, no blobs), not hologram (two hues by density, a belt not a HUD, no scan lines), not blueprint (translucent fills, no grid).",
+    "shapes": "Every part has a dense bright rim and a translucent inside, so overlapping parts and their edges all show.",
+    "colour": "Body and belly in organic orange, darker and harder parts in metal blue, all translucent over near-black.",
+    "eyes": "Near-white: the densest thing in the scan.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Overlaps add up to opaque: keep the fill opacities low.",
+      "The palette only decides which parts are 'metal': colours themselves are not kept."
+    ]
+  }
+}

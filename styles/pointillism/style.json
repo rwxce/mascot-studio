@@ -1,0 +1,28 @@
+{
+  "id": "pointillism",
+  "title": "Firefly Pointillism",
+  "family": "Fine art",
+  "look": "The character made of glowing dots on a night field, among twinkling fireflies.",
+  "bg": "#0A0F24",
+  "axes": {
+    "line": "none",
+    "fill": "glow-dots",
+    "texture": "fireflies",
+    "palette": "night-glow",
+    "eyes": "spark",
+    "stage": "fireflies",
+    "rhythm": "twinkle"
+  },
+  "doc": {
+    "essence": "A pointillist picture painted with light: every area is a scatter of small luminous dots in three values of its colour, as if a swarm of fireflies had settled into the shape of the character on a summer night.",
+    "notIt": "Not riso or comic (scattered glowing dots on dark, no regular screen), not neon (filled with dots, no tubes), not synthwave (no gradient, no grid).",
+    "shapes": "No outline, only a faint lighter rim. The shape is carried by the density of the dots.",
+    "colour": "Each area keeps its hue: dots in its own colour, a lighter tint and a near-white, over a deep tint of the same colour mixed into the night.",
+    "eyes": "Warm white sparks, the brightest dots in the frame.",
+    "motion": "Smooth; the fireflies around the character slowly pulse.",
+    "pitfalls": [
+      "Dark palettes make dim dots: the lightest tint keeps every area visible.",
+      "Dense dots behind the eyes compete with them: the dot tile is kept sparse."
+    ]
+  }
+}
