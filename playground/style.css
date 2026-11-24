@@ -1,0 +1,17 @@
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif; color: #141414; background: #FAF8F4; }
+header { max-width: 1120px; margin: 0 auto; padding: 28px 20px 4px; }
+h1 { font-size: 22px; margin: 0 0 2px; letter-spacing: -0.01em; }
+header p { margin: 0; color: #6b6b70; }
+.bar { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-top: 12px; font-size: 13px; color: #6b6b70; }
+.bar output { color: #141414; font-variant-numeric: tabular-nums; }
+main { max-width: 1120px; margin: 0 auto; padding: 16px 20px 48px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.card { background: #fff; border-radius: 20px; border: 1px solid rgba(0,0,0,.06); padding: 12px 14px 14px; }
+.card h2 { font-size: 15px; margin: 6px 2px 8px; }
+.mascot svg { display: block; width: 100%; height: auto; }
+.actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.actions button { font: inherit; font-size: 12.5px; border: 1px solid rgba(0,0,0,.12); background: #fff; border-radius: 99px; padding: 4px 10px; cursor: pointer; }
+.actions button:hover { background: #f3f1ec; }
+body.export header, body.export .card h2, body.export .actions { display: none; }
+body.export main { padding: 0; display: block; }
+body.export .card { border: 0; border-radius: 0; padding: 0; width: 520px; }
