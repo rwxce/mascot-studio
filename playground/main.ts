@@ -1,9 +1,9 @@
 import { createClock } from '../kit/clock';
 import type { Mascot } from '../kit/mascot';
-import { cartasSecretas } from '../mascots/cartas-secretas/index';
+import { secretLetter } from '../mascots/secret-letter/index';
 
 export const registry: Record<string, { title: string; make: () => Mascot; bg?: string }> = {
-  'cartas-secretas': { title: 'Cartas Secretas', make: () => cartasSecretas() },
+  'secret-letter': { title: 'Secret Letter', make: () => secretLetter() },
 };
 
 const params = new URLSearchParams(location.search);
