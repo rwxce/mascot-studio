@@ -13,12 +13,20 @@
     "stage": "dark",
     "rhythm": "steps"
   },
+  "form": {
+    "corners": 0.12,
+    "grid": 4,
+    "eyes": "pixel",
+    "mouth": "pixel",
+    "hands": "knob",
+    "feet": "block"
+  },
   "doc": {
     "essence": "A sprite from an old console: chunky pixels, few colours, steps instead of tweens.",
     "notIt": "Not one-bit (colour), not flat (pixelated, stepped).",
-    "shapes": "The whole drawing goes through a pixelate filter (4 px blocks).",
+    "shapes": "The whole drawing goes through a pixelate filter (4 px blocks); sizes snap to the 4 px grid, corners are nearly square, hands are round knobs and feet are blocks.",
     "colour": "Channels quantised to 4 levels.",
-    "eyes": "Pixel blocks.",
+    "eyes": "Eyes and mouth are built from 4 px blocks (2 × 3 per eye, one shine block), so the pixelate filter never drops them.",
     "motion": "Time steps at 8 fps.",
     "pitfalls": [
       "SVG filters cost more than plain shapes: check the budget on phones.",

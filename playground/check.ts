@@ -85,7 +85,10 @@ const MAX_STEP = 22;
 
   // Stepped styles (stop-motion, pixel) hold each pose for a step: sample at their rhythm, and
   // allow the distance a part travels in one of their steps.
-  const painter = styleById[style ?? spec.style ?? 'soft-gradient'].painter(spec.palette, 'probe');
+  const styleDef = styleById[style ?? spec.style ?? 'soft-gradient'];
+  const painter = styleDef.painter(spec.palette, 'probe');
+  // A form with hold-then-snap timing remaps the clock the same way a stepped style does.
+  const snapped = !!anatomy.usesForm && (styleDef.form?.motion?.snap ?? 0) > 0;
   let styleStep = 0;
   for (let t = 1; t <= 300; t++) if (painter.time(t) > 0) { styleStep = painter.time(t); break; }
   const step = styleStep > 1000 / 30 ? styleStep : 1000 / 30;
@@ -121,8 +124,9 @@ const MAX_STEP = 22;
     // A pop: one part moves far more in one frame than it does in the frames around it.
     // Fast motion is fine; a part teleporting is not. Stepped styles (stop-motion, pixel) skip
     // it: the motion underneath is the same in every style and is checked in the smooth ones,
-    // and a fast move landing in one step is what stop-motion looks like.
-    let popped = styleStep > 34;
+    // and a fast move landing in one step is what stop-motion looks like. Forms with
+    // hold-then-snap timing (form.motion.snap) skip it for the same reason.
+    let popped = styleStep > 34 || snapped;
     for (const steps of moves) {
       if (popped || !steps) continue;
       for (let i = 0; i < steps.length; i++) {

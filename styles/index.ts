@@ -25,6 +25,10 @@ import { stainedGlass } from './stained-glass/index.js';
 import { knit } from './knit/index.js';
 import { neon } from './neon/index.js';
 import { blueprint } from './blueprint/index.js';
+import { anime } from './anime/index.js';
+import { celAnime80s } from './cel-anime-80s/index.js';
+import { manga } from './manga/index.js';
+import { bauhaus } from './bauhaus/index.js';
 
-export const styles: Style[] = [softGradient, flat, sticker, glass, lowPoly, lineArt, ink, pencil, crayon, watercolor, chalkboard, riso, comic, woodblock, screenprint, pixel, oneBit, rubberHose, synthwave, clay, papercut, stainedGlass, knit, neon, blueprint];
+export const styles: Style[] = [softGradient, flat, sticker, glass, lowPoly, lineArt, ink, pencil, crayon, watercolor, chalkboard, riso, comic, woodblock, screenprint, manga, bauhaus, pixel, oneBit, rubberHose, anime, celAnime80s, synthwave, clay, papercut, stainedGlass, knit, neon, blueprint];
 export const styleById: Record<string, Style> = Object.fromEntries(styles.map((s) => [s.id, s]));

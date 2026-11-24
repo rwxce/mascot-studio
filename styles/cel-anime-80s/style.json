@@ -1,0 +1,38 @@
+{
+  "id": "cel-anime-80s",
+  "title": "Cel Anime 80s",
+  "family": "Animation",
+  "look": "Hand-painted 1980s cels: a coloured line, a hard shadow and a highlight band, on 12 fps.",
+  "bg": "#3B2F57",
+  "axes": {
+    "line": "colored",
+    "fill": "cel-highlight",
+    "texture": "none",
+    "palette": "dusk",
+    "eyes": "almond",
+    "stage": "sunset",
+    "rhythm": "twelve-fps"
+  },
+  "form": {
+    "proportions": { "head": 0.96, "aspect": 1.14, "limbLength": 1.2, "limbThickness": 0.72 },
+    "corners": 0.5,
+    "taper": 0.45,
+    "eyes": "almond-80s",
+    "mouth": "small",
+    "brows": "thin",
+    "face": { "scale": 1.22, "y": 0.1, "spacing": 1.1, "mouth": 1.05 },
+    "motion": { "snap": 0.2, "overshoot": 0.2 }
+  },
+  "doc": {
+    "essence": "A frame from a late-1980s anime film painted on acetate: a taller, leaner character, sharp almond eyes, every colour cut into a lit band, a base and a shadow, in front of a dusk sky.",
+    "notIt": "Not anime (taller, leaner, almond eyes, three tones with a highlight, 12 fps), not synthwave (painted cel, no neon).",
+    "shapes": "A taller egg-shaped head, longer thin limbs that taper, a coloured line darker than the body.",
+    "colour": "Three hard tones per area: a pale highlight crescent at the top left, the base colour and a plum-tinted shadow. Slightly warm, dusky palette.",
+    "eyes": "Almond eyes with a heavy upper line that sweeps past the outer corner, a thin lower line, a small iris with one slanted highlight. Long thin brows.",
+    "motion": "12 fps, with a little overshoot on the arms.",
+    "pitfalls": [
+      "The 12 fps step plus a slight snap can feel slow on short actions.",
+      "Long limbs reach the edge of the frame on big poses: keep limb length modest."
+    ]
+  }
+}

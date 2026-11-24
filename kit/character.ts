@@ -3,6 +3,7 @@
 // follow, the director playing data actions, props, hover/click reactions, reduced motion.
 import type { FrameMode } from './clock.js';
 import { Director } from './director.js';
+import { resolveForm, snapTime, type Form } from './form.js';
 import { bindReactions, gazeTarget } from './interact.js';
 import { container, type Mascot } from './mascot.js';
 import { lerp, seeded, track } from './motion.js';
@@ -31,13 +32,18 @@ export interface Anatomy {
   builtins: ActionSpec[];
   /** Channels smoothed by a spring (follow-through), with their spring. */
   springs: Record<string, SpringParams>;
-  build(spec: MascotSpec, paint: Painter): Built;
+  /** True when the anatomy builds from a style's form. Others get the default form, so a
+   *  style's form (geometry and motion) never reaches an anatomy that was not built for it. */
+  usesForm?: boolean;
+  /** Build the drawing. `form` is the style's construction (kit/form.ts); the default form
+   *  must reproduce the anatomy as authored. */
+  build(spec: MascotSpec, paint: Painter, form: Form): Built;
   /** Idle life written onto the pose every frame (breath, sway, small fidgets). */
   idle(p: Pose, t: number): void;
   /** Channels computed from others after the actions (e.g. an antenna that lags the head). */
   derive?(p: Pose, t: number): void;
   /** Draw the pose. `gaze` is already smoothed, -1..1. */
-  render(rig: Rig, p: Pose, gaze: { x: number; y: number }, t: number, paint: Painter): void;
+  render(rig: Rig, p: Pose, gaze: { x: number; y: number }, t: number, paint: Painter, form: Form): void;
 }
 
 export function mergeActions(builtins: ActionSpec[], own: ActionSpec[] = []): ActionSpec[] {
@@ -67,7 +73,8 @@ export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style
   // A mascot may tune its palette for styles without an outline ("@no-outline") and per style.
   const noOutline = !style.painter(spec.palette, 'probe').outline(1);
   const paint = style.painter({ ...spec.palette, ...(noOutline ? spec.palettes?.['@no-outline'] ?? {} : {}), ...(spec.palettes?.[style.id] ?? {}) }, `m${(instances++).toString(36)}${spec.name.slice(0, 3)}`);
-  const built = anatomy.build(spec, paint);
+  const form = anatomy.usesForm ? resolveForm(style.form) : resolveForm(undefined);
+  const built = anatomy.build(spec, paint, form);
   const anchors = spec.props ?? {};
   const [sx, sy, sr] = built.stage;
   const layers: Layer[] = [
@@ -98,8 +105,11 @@ export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style
   rig.svg.dataset.style = style.id;
   const actions = mergeActions(anatomy.builtins, spec.actions);
   const director = new Director(toActions(actions), { salt: salt + 11, gap: spec.life?.gap ?? [1200, 3000] });
-  const gaze = new Spring2({ freq: 2.6, damping: 0.75 });
-  const springs = Object.fromEntries(Object.entries(anatomy.springs).map(([ch, p]) => [ch, new Spring1(p, anatomy.defaults[ch] ?? 0)]));
+  // A form's overshoot loosens every spring (follow-through that swings past and settles).
+  const loose = (p: SpringParams): SpringParams => (form.motion.overshoot ? { ...p, damping: Math.max(0.12, p.damping * (1 - 0.6 * form.motion.overshoot)) } : p);
+  const gaze = new Spring2(loose({ freq: 2.6, damping: 0.75 }));
+  const springs = Object.fromEntries(Object.entries(anatomy.springs).map(([ch, p]) => [ch, new Spring1(loose(p), anatomy.defaults[ch] ?? 0)]));
+  const bounce = form.motion.bounce && 'body.y' in anatomy.defaults ? form.motion.bounce : 0;
   const props = propsAnimator(anchors);
   const blinkEvery = spec.life?.blinkEvery ?? 4000;
   let lastT = 0;
@@ -108,11 +118,12 @@ export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style
 
   function update(time: number, dt: number, mode: FrameMode) {
     lastT = time;
-    const t = paint.time(time);
+    const t = snapTime(paint.time(time), form.motion.snap);
     const still = !!mode.still;
     const p: Pose = { ...anatomy.defaults, ...PROP_DEFAULTS };
     if (!still) {
       anatomy.idle(p, t);
+      if (bounce) p['body.y'] -= bounce * Math.abs(Math.sin((t / 420) * Math.PI));
       p['eyes.open'] = 1 - blinkAt(t, salt, blinkEvery);
       director.update(p, t);
       anatomy.derive?.(p, t);
@@ -128,7 +139,7 @@ export function createCharacter(spec: MascotSpec, anatomy: Anatomy, style: Style
     }
     rig.boil(time);
     paint.frame?.(time, rig.svg);
-    anatomy.render(rig, p, { x: gaze.x.value, y: gaze.y.value }, t, paint);
+    anatomy.render(rig, p, { x: gaze.x.value, y: gaze.y.value }, t, paint, form);
     props.update(rig, p, dt, still, t);
   }
 

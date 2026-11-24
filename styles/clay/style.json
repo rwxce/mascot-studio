@@ -9,17 +9,38 @@
     "fill": "radial",
     "texture": "fingerprint",
     "palette": "character",
-    "eyes": "oval-shine",
+    "eyes": "bead",
     "stage": "desk",
     "rhythm": "stop-motion"
+  },
+  "form": {
+    "proportions": {
+      "head": 1.04,
+      "aspect": 0.88,
+      "body": 1.08,
+      "limbLength": 0.72,
+      "limbThickness": 1.55
+    },
+    "corners": 0.9,
+    "eyes": "bead",
+    "mouth": "default",
+    "hands": "mitten",
+    "face": {
+      "scale": 0.95,
+      "y": 0.15,
+      "mouth": 0.85
+    },
+    "motion": {
+      "overshoot": 0.15
+    }
   },
   "doc": {
     "essence": "A stop-motion puppet in plasticine: lit from the top left, every frame posed by hand.",
     "notIt": "Not soft-gradient (radial light, contact shadow, stop-motion).",
-    "shapes": "No outline; a soft offset contact shadow.",
+    "shapes": "No outline; a soft offset contact shadow. A chunky, squat puppet: blobby corners, short thick limbs, mitten hands.",
     "colour": "Radial highlight to a darker rim.",
-    "eyes": "Glossy with a shine.",
-    "motion": "8 fps with a tiny wobble.",
+    "eyes": "Small glossy beads with a shine.",
+    "motion": "8 fps with a tiny wobble and a little overshoot.",
     "pitfalls": [
       "Fast actions look jerky at 8 fps on purpose."
     ]

@@ -1,0 +1,37 @@
+{
+  "id": "bauhaus",
+  "title": "Bauhaus",
+  "family": "Graphic",
+  "look": "Circles, squares and three primaries on cream, moving like a machine.",
+  "bg": "#EAE2CF",
+  "axes": {
+    "line": "none",
+    "fill": "flat",
+    "texture": "none",
+    "palette": "primary",
+    "eyes": "circle",
+    "stage": "composition",
+    "rhythm": "mechanical"
+  },
+  "form": {
+    "proportions": { "limbThickness": 1.25 },
+    "corners": 0,
+    "eyes": "dot",
+    "mouth": "geo",
+    "hands": "knob",
+    "feet": "block",
+    "face": { "scale": 1.05, "spacing": 1.1 },
+    "motion": { "snap": 0.6 }
+  },
+  "doc": {
+    "essence": "A character built the way a 1920s design school poster is: from circles, squares and bars, in red, yellow, blue and black on cream.",
+    "notIt": "Not flat (primaries only, sharp corners, a geometric composition behind, mechanical timing), not screenprint (no grain, no posterized character colour).",
+    "shapes": "Sharp corners everywhere, round knobs for hands, block feet. No outline: the shapes meet edge to edge.",
+    "colour": "The body takes the nearest primary, the details black, the accent the next primary. Eyes are black, or yellow on a black visor.",
+    "eyes": "A perfect dot that becomes a bar on a blink and a half disc when happy; the mouth is a half disc or a circle.",
+    "motion": "Mechanical: 10 fps steps that hold, then jump ahead together, like a machine indexing.",
+    "pitfalls": [
+      "Characters whose colour sits between two primaries can flip to an unexpected one: set a per-style palette in the mascot."
+    ]
+  }
+}

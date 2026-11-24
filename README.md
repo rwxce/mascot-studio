@@ -26,14 +26,21 @@ A mascot here is not a video: it is a live SVG that breathes, blinks, looks at y
 | **Light** | each SVG is a few KB; the whole kit has no runtime dependencies |
 | **Polite** | pauses off screen and in hidden tabs; reduced motion holds a still pose |
 
-## One mascot, 25 styles
+## One mascot, 29 styles
 
-<img src="docs/media/styles-nodi.png" alt="Nodi drawn in each of the 25 styles" width="100%">
+<img src="docs/media/styles-nodi.png" alt="Nodi drawn in each of the 29 styles" width="100%">
 
 A style decides how a mascot is drawn — line, fill, texture, palette, eyes, stage and rhythm.
 Anatomies never pick colours: they ask the style for a role (`body`, `belly`, `eye`…), so every
 mascot works in every style. **No two styles share more than 3 of those 7 axes** (a test checks
 it), and a visual check renders every style and fails if two look alike.
+
+Some styles also carry a **form** (`kit/form.ts`, the `"form"` block of `style.json`): how the
+character is constructed, not just painted — proportions, corners, limb taper and noodle arms,
+hands and feet, and an eye, mouth and brow model from `kit/faces/` (anime, almond-80s, manga,
+comic, pie, bead, pixel, dot). Anime, Cel Anime 80s, Manga, Comic, Rubber Hose, Clay, Pixel and
+Bauhaus redraw Nodi and the robot in their own shape language; the channels never change, so
+every action plays in every style. A style without a form draws the anatomy exactly as authored.
 
 **Try them all:** `pnpm dev` and open `/styles.html` — pick a mascot, watch it in every style,
 open one to play its actions. `pnpm build:gallery` makes the same page as one HTML file.

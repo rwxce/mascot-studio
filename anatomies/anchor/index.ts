@@ -4,11 +4,15 @@
 // A handle can sketch a curve in the air, a selection box can appear around it, and a dot grid
 // can show when it snaps. Example: mascots/nodi.
 import type { Anatomy, Built } from '../../kit/character.js';
-import { eyePart, eyePoses, FACE_DEFAULTS, renderEyes } from '../../kit/face.js';
-import { blendPaths, mapPoints, parse, type PathSpec } from '../../kit/morph.js';
+import { FACE_DEFAULTS } from '../../kit/face.js';
+import { browSet, eyeModel, faceInks, mouthSet, type BrowSet, type EyeSet, type MouthSet } from '../../kit/faces/index.js';
+import { mirror } from '../../kit/faces/geom.js';
+import { markParts, renderMarks } from '../../kit/faces/marks.js';
+import { DEFAULT_FORM, isDefaultForm, scales, snapTo, type Form } from '../../kit/form.js';
+import { blendPaths, parse, toD, type PathSpec } from '../../kit/morph.js';
 import { lerp, wave } from '../../kit/motion.js';
 import type { Part, Shape } from '../../kit/rig.js';
-import { roundRect } from '../../kit/shapes.js';
+import { ellipse, roundRect } from '../../kit/shapes.js';
 import type { AnatomyContract, MascotSpec } from '../../kit/spec.js';
 import type { Painter } from '../../kit/style.js';
 import type { ActionSpec } from '../../kit/timeline.js';
@@ -32,27 +36,25 @@ function closedCurve(pts: [number, number][]): PathSpec {
 }
 
 /** Sample a polar radius function clockwise from the top. */
-const polar = (r: (th: number) => number) =>
-  closedCurve(Array.from({ length: N }, (_, i) => {
+const polarPts = (r: (th: number) => number) =>
+  Array.from({ length: N }, (_, i) => {
     const th = (i / N) * Math.PI * 2;
     return [Math.sin(th) * r(th), -Math.cos(th) * r(th)] as [number, number];
-  }));
+  });
+const polar = (r: (th: number) => number) => closedCurve(polarPts(r));
 
 /** The rest shape: a rounded square, like an anchor point on a canvas. */
 const SQUARE = polar((th) => 31 / (Math.abs(Math.cos(th)) ** 5 + Math.abs(Math.sin(th)) ** 5) ** (1 / 5));
 const CIRCLE = polar(() => 32);
 const STAR = polar((th) => 24 + 19 * ((Math.cos(5 * th) + 1) / 2) ** 2.2);
-const HEART = closedCurve(Array.from({ length: N }, (_, i) => {
+const HEART_PTS = Array.from({ length: N }, (_, i) => {
   const t = (i / N) * Math.PI * 2;
   const x = 16 * Math.sin(t) ** 3;
   const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
   return [x * 2.15, (y + 2.5) * 2.15] as [number, number];
-}));
+});
+const HEART = closedCurve(HEART_PTS);
 
-const EYES = eyePoses(5, 7);
-const MOUTH = eyePoses(3.4, 4).open;
-const MOUTH_BIG = eyePoses(6, 7.5).open;
-const MOUTH_SMILE = mapPoints(eyePoses(5, 5.5).happy, (_, x, y) => [x, -y + 1]);
 
 /** Where the drawing handle goes while it sketches: angle (deg) and length along progress u. */
 const drawAngle = (u: number) => -15 - 150 * u;
@@ -236,16 +238,116 @@ export const builtins: ActionSpec[] = [
   },
 ];
 
-function build(spec: MascotSpec, paint: Painter): Built {
+/** Geometry for a form: the default form gives exactly the authored numbers. */
+interface Geo {
+  hs: number;
+  shapes: { square: PathSpec; circle: PathSpec; star: PathSpec; heart: PathSpec };
+  stick: number;
+  thick: number;
+  eyesAt: [number, number];
+  eyeX: number;
+  mouthAt: [number, number];
+  cheek: [number, number];
+}
+
+function geometry(form: Form): Geo {
+  if (isDefaultForm(form)) {
+    return {
+      hs: 1, shapes: { square: SQUARE, circle: CIRCLE, star: STAR, heart: HEART }, stick: 50, thick: 2.2,
+      eyesAt: [0, -5], eyeX: 11, mouthAt: [0, 10], cheek: [19, 6],
+    };
+  }
+  const S = scales(form);
+  // Nodi is all head: the head scale is the body; a grid snaps its half size to whole pixels.
+  const hs = snapTo(form, 31 * S.head) / 31;
+  const sx = hs, sy = hs * S.aspect;
+  const fit = (pts: [number, number][]) => closedCurve(pts.map(([x, y]) => [x * sx, y * sy] as [number, number]));
+  const n = form.corners <= 0.5 ? 5 + (0.5 - form.corners) * 30 : 5 - (form.corners - 0.5) * 5.2;
+  const ry = 7 * hs * form.face.scale;
+  const fy = form.face.y * ry;
+  return {
+    hs,
+    shapes: {
+      square: fit(polarPts((th) => 31 / (Math.abs(Math.cos(th)) ** n + Math.abs(Math.sin(th)) ** n) ** (1 / n))),
+      circle: fit(polarPts(() => 32)),
+      star: fit(polarPts((th) => 24 + 19 * ((Math.cos(5 * th) + 1) / 2) ** 2.2)),
+      heart: fit(HEART_PTS),
+    },
+    stick: Math.floor(Math.min(50 * S.arm, REACH - handReach(form.hands, 2.2 * S.thick)) / (form.grid || 0.01)) * (form.grid || 0.01),
+    thick: 2.2 * S.thick,
+    eyesAt: [0, -5 * sy + fy],
+    eyeX: snapTo(form, 11 * hs * form.face.spacing),
+    mouthAt: [0, 10 * sy + fy * 0.55],
+    cheek: [19 * hs, 6 * sy + fy * 0.55],
+  };
+}
+
+/** How far a hand reaches past the end of its stick. */
+function handReach(kind: Form['hands'], thick: number): number {
+  const k = Math.sqrt(thick / 2.2);
+  return kind === 'glove' ? 16 * k : kind === 'mitten' ? 13 * k : kind === 'none' ? thick : 7.5 * k;
+}
+/** The farthest a handle (stick + hand) may reach from the centre and still keep every action in frame. */
+const REACH = 56;
+
+/** Per character: its geometry and face models (keyed by the character's painter). */
+interface Instance { geo: Geo; eyes: EyeSet; mouth: MouthSet; brows: BrowSet; noodle: boolean; marks: Form['marks'] }
+const instances = new WeakMap<Painter, Instance>();
+
+/** A stick from the centre out along +x, `t` thick at the root, thinning by `taper`. */
+function stickPath(len: number, t: number, taper: number): string {
+  if (!taper) return roundRect(0, -t, len, t, t);
+  const e = t * (1 - 0.75 * taper);
+  return `M0 ${r2(-t)}L${r2(len)} ${r2(-e)}Q${r2(len + e * 1.3)} 0 ${r2(len)} ${r2(e)}L0 ${r2(t)}Q${r2(-t * 1.3)} 0 0 ${r2(-t)}Z`;
+}
+
+/** The hand at the end of a handle (right side; mirrored with m = −1). */
+function hand(kind: Form['hands'], m: number, thick: number, paint: Painter): Shape[] {
+  const k = Math.sqrt(thick / 2.2);
+  if (kind === 'none') return [];
+  if (kind === 'glove') {
+    const g = paint.flat('shine');
+    return [
+      { d: roundRect(m > 0 ? -3 : -1, -5.5 * k, m > 0 ? 1 : 3, 5.5 * k, 1.5), fill: g },
+      { d: ellipse(6.5 * m * k, 0, 6.4 * k, 6 * k), fill: g },
+      { d: ellipse(12 * m * k, -3.8 * k, 3 * k, 2.4 * k), fill: g },
+      { d: ellipse(13 * m * k, 0.4 * k, 3 * k, 2.4 * k), fill: g },
+      { d: ellipse(11.6 * m * k, 4.4 * k, 2.8 * k, 2.3 * k), fill: g },
+      { d: ellipse(5 * m * k, -6.4 * k, 2.4 * k, 2.6 * k), fill: g },
+    ];
+  }
+  if (kind === 'mitten') {
+    return [
+      { d: ellipse(5.5 * m * k, 0.5 * k, 7.4 * k, 6 * k), fill: paint.fill('accent') },
+      { d: ellipse(3.4 * m * k, -5.6 * k, 2.8 * k, 3 * k), fill: paint.fill('accent') },
+    ];
+  }
+  const r = 7.5 * k;
+  return [{ d: ellipse(0, 0, r, r), fill: paint.fill('accent') }];
+}
+
+function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Built {
+  const g = geometry(form);
   const out = paint.outline(0.55);
   const root = (children: Part[]): Part => ({ id: 'root', at: [80, 84], children });
+  const custom = !isDefaultForm(form);
+  const noodle = form.limbs === 'noodle';
   const handle = (side: 'L' | 'R'): Part => {
     const s = side === 'L' ? -1 : 1;
+    const stick: Shape = noodle
+      ? { pathRef: `stick${side}`, stroke: paint.flat('body-dark'), width: g.thick * 2 }
+      : custom
+        ? { d: s > 0 ? stickPath(g.stick, g.thick, form.taper) : mirrorD(stickPath(g.stick, g.thick, form.taper)), fill: paint.fill('body-dark') }
+        : { d: s > 0 ? roundRect(0, -2.2, 50, 2.2, 2.2) : roundRect(-50, -2.2, 0, 2.2, 2.2), fill: paint.fill('body-dark') };
     return {
       id: `handle${side}`,
       children: [
-        { id: `stick${side}`, shapes: [{ d: s > 0 ? roundRect(0, -2.2, 50, 2.2, 2.2) : roundRect(-50, -2.2, 0, 2.2, 2.2), fill: paint.fill('body-dark') }] },
-        { id: `knob${side}`, shapes: [{ d: 'M0 -7.5C4.14 -7.5 7.5 -4.14 7.5 0C7.5 4.14 4.14 7.5 0 7.5C-4.14 7.5 -7.5 4.14 -7.5 0C-7.5 -4.14 -4.14 -7.5 0 -7.5Z', fill: paint.fill('accent') }] },
+        { id: `stick${side}`, shapes: [stick] },
+        {
+          id: `knob${side}`, shapes: form.hands === 'default'
+            ? [{ d: 'M0 -7.5C4.14 -7.5 7.5 -4.14 7.5 0C7.5 4.14 4.14 7.5 0 7.5C-4.14 7.5 -7.5 4.14 -7.5 0C-7.5 -4.14 -4.14 -7.5 0 -7.5Z', fill: paint.fill('accent') }]
+            : hand(form.hands, s, g.thick, paint),
+        },
       ],
     };
   };
@@ -255,6 +357,24 @@ function build(spec: MascotSpec, paint: Painter): Built {
   }
   const ink = paint.flat('accent');
   const corner = (x: number, y: number) => det({ el: { tag: 'rect', attrs: { x: x - 3.5, y: y - 3.5, width: 7, height: 7, fill: '#FFFFFF', stroke: ink, 'stroke-width': 1.6 } } });
+
+  // Face: the style's eye, mouth and brow models (the default form keeps the original face).
+  const fs = custom ? g.hs * form.face.scale : 1;
+  const eyes = eyeModel(form.eyes).make(5 * fs, 7 * fs, paint);
+  const mouth = mouthSet(form.mouth, custom ? g.hs * form.face.mouth : 1);
+  const brows = browSet(form.brows, eyes.rx, eyes.ry, faceInks(paint).line);
+  const browY = -eyes.ry * 1.42 - 1.5;
+  const browParts = (['L', 'R'] as const).map((sd) => brows.part(sd, [(sd === 'L' ? -1 : 1) * g.eyeX, browY])).filter((x): x is Part => !!x);
+  // Big, low eyes push the cheeks down and out so the blush sits under the eyes, not on them.
+  if (custom) g.cheek = [Math.max(g.cheek[0], g.eyeX + eyes.rx * 0.5), Math.max(g.cheek[1], g.eyesAt[1] + eyes.ry * 0.95)];
+  const half = 31 * g.hs;
+  const marks = markParts(form.marks, {
+    sweat: [half * 0.78, -half * 0.62 * (form.proportions.aspect), 4.6 * g.hs],
+    cheeks: [[-g.cheek[0], g.cheek[1]], [g.cheek[0], g.cheek[1]]],
+    speed: [half * 0.7, half + 8],
+  }, paint);
+  instances.set(paint, { geo: g, eyes, mouth, brows, noodle, marks: form.marks });
+
   return {
     viewBox: '0 -6 160 166',
     rootAt: [80, 148],
@@ -270,7 +390,7 @@ function build(spec: MascotSpec, paint: Painter): Built {
             el: { tag: 'path', attrs: { d: TRAIL, fill: 'none', stroke: paint.flat('accent'), 'stroke-width': 3, 'stroke-linecap': 'round', pathLength: 1, 'stroke-dasharray': 1, 'stroke-dashoffset': 1 } },
             ref: 'trail',
           })],
-        }] }]),
+        }, ...marks.behind] }]),
       },
       { outline: out, root: root([{ id: 'body', children: [handle('L'), handle('R')] }]) },
       {
@@ -278,14 +398,15 @@ function build(spec: MascotSpec, paint: Painter): Built {
         root: root([{
           id: 'body', shapes: [{ pathRef: 'shape', fill: paint.fill('body') }],
           children: [
-            { id: 'eyes', at: [0, -5], children: [eyePart('L', [-11, 0], EYES, paint), eyePart('R', [11, 0], EYES, paint)] },
-            { at: [0, 10], shapes: [det({ pathRef: 'mouth', fill: paint.flat('eye') })] },
+            { id: 'eyes', at: g.eyesAt, children: [eyes.part('L', [-g.eyeX, 0]), eyes.part('R', [g.eyeX, 0]), ...browParts] },
+            mouth.part(g.mouthAt, paint.flat('eye')),
             {
               shapes: [
-                det({ el: { tag: 'ellipse', attrs: { cx: -19, cy: 6, rx: 4.5, ry: 2.8, fill: paint.flat('cheek') } }, ref: 'blush' }),
-                det({ el: { tag: 'ellipse', attrs: { cx: 19, cy: 6, rx: 4.5, ry: 2.8, fill: paint.flat('cheek') } }, ref: 'blush' }),
+                det({ el: { tag: 'ellipse', attrs: { cx: -g.cheek[0], cy: g.cheek[1], rx: 4.5, ry: 2.8, fill: paint.flat('cheek') } }, ref: 'blush' }),
+                det({ el: { tag: 'ellipse', attrs: { cx: g.cheek[0], cy: g.cheek[1], rx: 4.5, ry: 2.8, fill: paint.flat('cheek') } }, ref: 'blush' }),
               ],
             },
+            ...marks.face,
           ],
         }]),
       },
@@ -305,8 +426,22 @@ function build(spec: MascotSpec, paint: Painter): Built {
   };
 }
 
+/** Mirror an authored path left↔right. */
+const mirrorD = (dd: string) => toD(mirror(parse(dd)));
+
+/** A noodle arm: a curve that sags under gravity, in the handle's own frame. */
+function noodlePath(len: number, angDeg: number, side: 1 | -1, thick: number): PathSpec {
+  const a = (angDeg * Math.PI) / 180;
+  // gravity (0, 1) seen from the handle's rotated frame
+  const gx = Math.sin(a), gy = Math.cos(a);
+  const sag = len * 0.22;
+  const cx = (side * len) / 2 + gx * sag * 0.4, cy = gy * sag;
+  return [['M', 0, 0], ['Q', cx, cy, side * len, -thick * 0.2]];
+}
+
 export const anchor: Anatomy = {
   contract,
+  usesForm: true,
   defaults: DEFAULTS,
   builtins,
   springs: {
@@ -331,24 +466,33 @@ export const anchor: Anatomy = {
     if (s) p.handleL = lerp(p.handleL, -p.handleR * 0.6, s);
   },
   render(rig, p, gaze, _t, paint) {
+    const I = instances.get(paint)!;
+    const g = I.geo;
     rig.set('root', { x: p['body.x'] + gaze.x * 2, y: p['body.y'] });
     rig.set('body', { rot: p['body.rot'], sx: p['body.sx'], sy: p['body.sy'] });
     const lift = Math.max(0, -p['body.y']);
     rig.set('shadow', { sx: 1 - lift * 0.012, sy: 1 - lift * 0.012 });
     rig.attr('shadow', 'opacity', Math.max(0.2, 1 - lift * 0.02));
     const clamp = (v: number) => Math.max(0, Math.min(1.2, v));
-    rig.path('shape', blendPaths(SQUARE, [[CIRCLE, clamp(p['shape.circle'])], [STAR, clamp(p['shape.star'])], [HEART, clamp(p['shape.heart'])]]));
+    const sh = g.shapes;
+    rig.path('shape', blendPaths(sh.square, [[sh.circle, clamp(p['shape.circle'])], [sh.star, clamp(p['shape.star'])], [sh.heart, clamp(p['shape.heart'])]]));
     // Handles: rest a little below horizontal; negative raises. The drawing pose overrides the right one.
     const dw = Math.max(0, Math.min(1, p['draw.w']));
     const du = Math.max(0, Math.min(1, p.draw));
+    const L = g.stick;
     const angR = lerp(14 + p.handleR, drawAngle(du), dw);
-    const lenR = lerp(50 + p['handleR.len'], drawLen(du), dw);
+    const lenR = lerp(L + p['handleR.len'], drawLen(du), dw);
     const angL = 14 + p.handleL;
-    const lenL = 50 + p['handleL.len'];
+    const lenL = L + p['handleL.len'];
     rig.set('handleR', { rot: angR });
     rig.set('handleL', { rot: -angL });
-    rig.set('stickR', { sx: Math.max(0.1, lenR / 50) });
-    rig.set('stickL', { sx: Math.max(0.1, lenL / 50) });
+    if (I.noodle) {
+      rig.path('stickR', noodlePath(Math.max(2, lenR), angR, 1, g.thick));
+      rig.path('stickL', noodlePath(Math.max(2, lenL), -angL, -1, g.thick));
+    } else {
+      rig.set('stickR', { sx: Math.max(0.1, lenR / L) });
+      rig.set('stickL', { sx: Math.max(0.1, lenL / L) });
+    }
     rig.set('knobR', { x: lenR });
     rig.set('knobL', { x: -lenL });
     rig.attr('trail', 'stroke-dashoffset', p.draw < 0 ? 1 : 1 - du);
@@ -357,9 +501,10 @@ export const anchor: Anatomy = {
     rig.opacity('selBox', Math.max(0, Math.min(1, p.select)));
     rig.set('selScale', { sx: p['body.sx'], sy: p['body.sy'] });
     rig.set('eyes', { x: gaze.x * 4, y: gaze.y * 3 });
-    renderEyes(rig, p, EYES);
-    const open = Math.max(0, Math.min(1, p['mouth.open']));
-    rig.path('mouth', blendPaths(MOUTH, [[MOUTH_BIG, open], [MOUTH_SMILE, Math.min(1, p['mouth.smile']) * (1 - open)]]));
+    I.eyes.render(rig, p, gaze);
+    I.brows.render(rig, p);
+    I.mouth.render(rig, p);
+    renderMarks(rig, p, I.marks, lift);
     rig.attr('blush', 'opacity', Math.max(paint.cheekRest, Math.min(1, p['face.blush']) * 0.9));
   },
 };
