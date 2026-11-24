@@ -23,9 +23,13 @@ pnpm typecheck
 
 ## Branches and releases
 
-- `dev` is the default branch: every PR targets it and it keeps the full history.
-- `main` only receives one squashed `release: vX.Y.Z` commit per release, made by the **Release** workflow (manual dispatch with a bump, or weekly). Changes that touch only tooling, tests or top-level docs don't release.
+- `main` (default) holds one `release: vX.Y.Z` commit per release, made by the **Release** workflow.
+- `dev` holds every commit; pull requests always target `dev`. Details in [BRANCHING.md](BRANCHING.md).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), the [Code of Conduct](CODE_OF_CONDUCT.md) and the [security policy](SECURITY.md).
 
 ## License
 
-MIT. The motion engine is derived from rossark-motion-skill (MIT): see `NOTICE`.
+MIT. The motion engine is derived from rossark-motion-skill (MIT): see `NOTICE` and [THIRD_PARTY.md](THIRD_PARTY.md).
