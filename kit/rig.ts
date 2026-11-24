@@ -165,7 +165,8 @@ export class Rig {
       el.setAttribute('stroke-linejoin', 'round');
       el.setAttribute('stroke-linecap', 'round');
     } else {
-      el.setAttribute('fill', s.fill ?? 'none');
+      // Non-path elements keep the fill they were authored with unless one is given.
+      if (s.fill !== undefined || !s.el) el.setAttribute('fill', s.fill ?? 'none');
       if (s.stroke) {
         el.setAttribute('stroke', s.stroke);
         el.setAttribute('stroke-width', String(s.width ?? 2));
