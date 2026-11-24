@@ -4,7 +4,7 @@
 // The release commit is built with plumbing (tree of dev, parent origin/main), which is what a squash
 // merge produces when main has no commits of its own, and needs no checkout of main.
 import { execFileSync } from 'node:child_process'
-import { readFileSync, writeFileSync } from 'node:fs'
+import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 
 export const VERSION_FILE = 'package.json'
@@ -92,6 +92,8 @@ function run(argv) {
   git('push', 'origin', `${first ? '+' : ''}${release}:refs/heads/main`, `refs/tags/${plan.tag}`)
   git('merge', '--no-ff', ...(first ? ['--allow-unrelated-histories', '-X', 'theirs'] : []), '-m', `chore: back-merge ${plan.tag} into dev`, release)
   git('push', 'origin', 'HEAD:refs/heads/dev')
+  // Hand the tag to the workflow, which publishes the GitHub release.
+  if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `tag=${plan.tag}\n`)
   console.log(`Released ${plan.tag} (${release.slice(0, 7)}).`)
 }
 
