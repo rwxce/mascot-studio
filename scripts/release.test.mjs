@@ -19,7 +19,7 @@ describe('bumpVersion', () => {
 describe('canSkip', () => {
   it('skips tooling, CI and top-level docs only', () => {
     assert.equal(canSkip(['scripts/release.mjs', '.github/workflows/ci.yml', 'README.md', 'tests/motion.test.ts']), true)
-    assert.equal(canSkip(['README.md', 'mascots/cartas-secretas/README.md']), false)
+    assert.equal(canSkip(['README.md', 'mascots/secret-letter/README.md']), false)
     assert.equal(canSkip(['kit/rig.ts']), false)
   })
 })
