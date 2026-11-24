@@ -11,7 +11,8 @@
     "build": "vite build playground --outDir ../dist",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:scripts": "node --test scripts/*.test.mjs"
+    "test:scripts": "node --test scripts/*.test.mjs",
+    "check": "node tools/check.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.65.1",
