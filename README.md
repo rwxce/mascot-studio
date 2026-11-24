@@ -4,9 +4,16 @@
 
 **Original SVG mascots that feel alive** — real rigs, clean lines, 60 fps motion, zero dependencies.
 
-<img src="docs/media/secret-letter.gif" alt="The Secret Letter mascot, an envelope shaped like a puzzle piece, waves, has an idea, opens its flap to reveal a small pink envelope, sends a heart and hops" width="440">
+<table>
+<tr>
+<td align="center"><img src="docs/media/secret-letter.gif" width="230" alt="Secret Letter, an envelope shaped like a puzzle piece, waves, gets an idea and opens its flap"><br><sub><b>Secret Letter</b> · object-limbs · ink</sub></td>
+<td align="center"><img src="docs/media/robot.gif" width="200" alt="A robot scans with its visor, dances and thinks"><br><sub><b>Robot</b> · biped · soft gradient</sub></td>
+<td align="center"><img src="docs/media/fox.gif" width="200" alt="A fox wags its tail, pounces and flicks an ear"><br><sub><b>Fox</b> · quadruped · soft gradient</sub></td>
+<td align="center"><img src="docs/media/ghost.gif" width="200" alt="A ghost loops the loop, says boo, giggles and vanishes"><br><sub><b>Ghost</b> · floater · soft gradient</sub></td>
+</tr>
+</table>
 
-<sub>Secret Letter — an envelope that is also a puzzle piece. Every frame is drawn and animated in code.</sub>
+<sub>Every frame is drawn and animated in code. Same mascot, any style: the anatomy says what is drawn, the style how.</sub>
 
 </div>
 
@@ -24,9 +31,22 @@ A mascot here is not a video: it is a live SVG that breathes, blinks, looks at y
 | **Light** | each SVG is a few KB; the whole kit has no runtime dependencies |
 | **Polite** | pauses off screen and in hidden tabs; reduced motion holds a still pose |
 
+## One mascot, any style
+
+<img src="docs/media/matrix.png" alt="Each mascot drawn in each style" width="100%">
+
+A style decides how a mascot is drawn: outline or none, flat or gradient fills, eyes, the stage
+behind it, its rhythm. Anatomies never pick colours — they ask the style for a role (`body`,
+`belly`, `eye`…). A mascot can tune its palette per style (`palettes` in its `mascot.json`).
+
+| Style | Look |
+|---|---|
+| [Soft Gradient](styles/soft-gradient/STYLE.md) | No outline, a vertical gradient on every piece, a glow behind, eyes with a shine |
+| [Ink](styles/ink/STYLE.md) | A heavy black line around every shape, flat paper colours, one accent |
+
 ## How it works
 
-1. **One master drawing** with named parts (body, flap, tabs, eyes) and real pivots.
+1. **An anatomy** — the skeleton: parts, real pivots, channels, built-in life and actions (`anatomies/`).
 2. **A seamless rig** — each layer is drawn twice, outlines first and fills on top, so where parts meet there is no seam (`kit/rig.ts`).
 3. **One clock** and the motion engine ported from [rossark-motion-skill](https://github.com/rossark0/rossark-motion-skill): smooth paths through key poses, never stopping dead at each one (`kit/motion.ts`).
 4. **Springs for follow-through** — tabs, props and the gaze trail the body a beat later (`kit/spring.ts`).
@@ -61,20 +81,24 @@ a good rest pose, budget). Green means it ships.
 ```bash
 pnpm install
 pnpm dev                                   # playground: every mascot, a button per action
-pnpm check                                 # every rule, every mascot, every frame
+pnpm check                                 # every rule, every mascot, every style, every frame
 node tools/render.mjs secret-letter \
   --reel wave,idea,reveal --ms 12000       # deterministic MP4 + GIF export
 node tools/grid.mjs secret-letter wave:1300,idea:1400   # labelled stills
+node tools/matrix.mjs                      # every mascot in every style
 ```
 
-## Mascots
+## Mascots and anatomies
 
-| Mascot | Look | Status |
-|---|---|---|
-| [Secret Letter](mascots/secret-letter/) | heavy black line, white paper, one accent | ✅ |
-| Robot (biped, elbows) | modern flat | next |
-| Fox (quadruped, tail) | retro cartoon | next |
-| Cloud (floater) | hand-drawn | next |
+| Mascot | Anatomy | Default style | Its own actions |
+|---|---|---|---|
+| [Secret Letter](mascots/secret-letter/mascot.json) | [object-limbs](anatomies/object-limbs/ANATOMY.md) | ink | thumbs-up, idea, heart, reveal, sleepy, shy |
+| [Robot](mascots/robot/mascot.json) | [biped](anatomies/biped/ANATOMY.md) | soft-gradient | scan, dance, think, nap |
+| [Fox](mascots/fox/mascot.json) | [quadruped](anatomies/quadruped/ANATOMY.md) | soft-gradient | wag, ear-flick, pounce, curl-up |
+| [Ghost](mascots/ghost/mascot.json) | [floater](anatomies/floater/ANATOMY.md) | soft-gradient | loop, boo, vanish, giggle, sleepy |
+
+Every anatomy also brings `wave`, `hop`, `look-around`, `stretch` and the reactions `notice`
+(hover) and `surprise` (click).
 
 ## Branches and releases
 

@@ -1,0 +1,8 @@
+{
+  "id": "soft-gradient",
+  "title": "Soft Gradient",
+  "family": "Clean vector",
+  "look": "No outline: every piece has a vertical gradient, a glow of the character's colour behind it, eyes with a shine.",
+  "bg": "#15121F",
+  "axes": { "line": "none", "fill": "gradient", "texture": "none", "palette": "character", "eyes": "oval-shine", "stage": "glow", "rhythm": "smooth" }
+}

@@ -1,0 +1,8 @@
+{
+  "id": "ink",
+  "title": "Ink",
+  "family": "Drawn by hand",
+  "look": "A heavy black line around every shape, flat paper colours, one accent.",
+  "bg": "#FAF8F4",
+  "axes": { "line": "ink", "fill": "flat", "texture": "none", "palette": "character", "eyes": "solid", "stage": "paper", "rhythm": "smooth" }
+}

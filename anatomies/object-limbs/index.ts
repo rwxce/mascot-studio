@@ -5,6 +5,7 @@ import type { Anatomy, Built } from '../../kit/character.js';
 import { blendPaths, mapPoints, parse, type PathSpec } from '../../kit/morph.js';
 import { wave } from '../../kit/motion.js';
 import type { Part, Shape } from '../../kit/rig.js';
+import type { Painter } from '../../kit/style.js';
 import type { AnatomyContract, MascotSpec } from '../../kit/spec.js';
 import type { ActionSpec } from '../../kit/timeline.js';
 
@@ -36,8 +37,9 @@ export const contract: AnatomyContract = {
     'look.x', 'look.y', 'look.w', 'eyes.open', 'eyes.happy', 'eyes.scale',
     'lid', 'inner', 'inner.look', 'face.blush',
   ],
-  palette: ['ink', 'body', 'inside', 'accent', 'cheek', 'prop', 'glow'],
-  contrastPairs: [['ink', 'body']],
+  palette: ['ink', 'body', 'inside', 'accent', 'cheek', 'prop', 'glow', 'eye', 'line'],
+  required: ['body'],
+  contrastPairs: [['eye', 'body']],
   body: { width: 'number', height: 'number', notch: 'number', crossLines: 'boolean', inner: 'boolean', line: 'number' },
   builtins: ['wave', 'hop', 'look-around', 'stretch', 'notice', 'surprise'],
 };
@@ -114,12 +116,11 @@ export const builtins: ActionSpec[] = [
   },
 ];
 
-function build(spec: MascotSpec): Built {
+function build(spec: MascotSpec, paint: Painter): Built {
   const b = spec.body ?? {};
   const W = (b.width as number) ?? 148, H = (b.height as number) ?? 96;
-  const notch = (b.notch as number) ?? 17, line = (b.line as number) ?? 5.5;
+  const notch = (b.notch as number) ?? 17, line = ((b.line as number) ?? 5.5) / 5.5;
   const cross = b.crossLines !== false, hasInner = b.inner !== false;
-  const P = spec.palette;
   const hw = W / 2, top = -8 - H, bot = -8, vy = top + H * 0.583, flapH = vy - top;
   const midY = (top + bot) / 2 - 2;
   const k = W / 148;
@@ -130,30 +131,37 @@ function build(spec: MascotSpec): Built {
   const flap = `M${-hw} 0L${hw} 0L0 ${r(flapH)}Z`;
   const cx = hw * 0.35, cy = top + flapH * (1 - cx / hw);
   const root = (children: Part[]): Part => ({ id: 'root', at: [rootX, rootY], children });
-  const ink = { color: P.ink, width: line };
-  const eye = (side: 'L' | 'R'): Part => ({ id: `eye${side}`, at: [side === 'L' ? -13 * k : 13 * k, 0], shapes: [det({ pathRef: `eye${side}`, fill: P.ink })] });
+  const ink = paint.outline(line);
+  const lw = paint.lineWidth(5.5 * line);
+  const eye = (side: 'L' | 'R'): Part => ({
+    id: `eye${side}`, at: [side === 'L' ? -13 * k : 13 * k, 0], shapes: [
+      det({ pathRef: `eye${side}`, fill: paint.flat('eye') }),
+      ...(paint.shine ? [det({ el: { tag: 'circle', attrs: { cx: -1.8, cy: -3.4, r: 2, fill: paint.flat('shine') } }, ref: 'shine' })] : []),
+    ],
+  });
 
   return {
     viewBox: `0 ${vbTop} ${vbW} ${220 - vbTop}`,
     rootAt: [rootX, rootY],
+    stage: [rootX, rootY + top / 2, W * 0.62],
     label: `${spec.title} mascot`,
     layers: [
-      { outline: null, root: { id: 'shadow', at: [rootX, rootY + 4], shapes: [det({ el: { tag: 'ellipse', attrs: { rx: hw - 2, ry: 6, fill: 'rgba(20,20,20,.12)' } }, ref: 'shadow' })] } },
+      { outline: null, root: { id: 'shadow', at: [rootX, rootY + 4], shapes: [det({ el: { tag: 'ellipse', attrs: { rx: hw - 2, ry: 6, fill: paint.shadow } }, ref: 'shadow' })] } },
       {
         outline: ink,
         root: root([
-          { shapes: [{ d: `M${-hw} ${top}L${hw} ${top}L0 ${r(vy)}Z`, fill: P.inside }] },
-          { id: 'lidB', at: [0, top], shapes: [{ d: flap, fill: P.inside }] },
+          { shapes: [{ d: `M${-hw} ${top}L${hw} ${top}L0 ${r(vy)}Z`, fill: paint.fill('inside') }] },
+          { id: 'lidB', at: [0, top], shapes: [{ d: flap, fill: paint.fill('inside') }] },
         ]),
       },
       ...(hasInner ? [{
-        outline: { color: P.ink, width: Math.max(2.5, line * 0.64) },
+        outline: paint.outline(line * 0.64),
         root: root([{
           id: 'inner', at: [0, top + 44 * (H / 96)], children: [{
             id: 'innerBody', shapes: [
-              { d: INNER, fill: P.accent, ref: 'inner' },
-              det({ el: { tag: 'ellipse', attrs: { cx: -6, cy: 1, rx: 3, ry: 4.5, fill: P.ink } }, ref: 'innerEye' }),
-              det({ el: { tag: 'ellipse', attrs: { cx: 6, cy: 1, rx: 3, ry: 4.5, fill: P.ink } }, ref: 'innerEye' }),
+              { d: INNER, fill: paint.fill('accent'), ref: 'inner' },
+              det({ el: { tag: 'ellipse', attrs: { cx: -6, cy: 1, rx: 3, ry: 4.5, fill: paint.flat('eye') } }, ref: 'innerEye' }),
+              det({ el: { tag: 'ellipse', attrs: { cx: 6, cy: 1, rx: 3, ry: 4.5, fill: paint.flat('eye') } }, ref: 'innerEye' }),
             ],
           }],
         }]),
@@ -161,14 +169,14 @@ function build(spec: MascotSpec): Built {
       {
         outline: ink,
         root: root([
-          { id: 'armL', at: [-hw, midY], shapes: [{ pathRef: 'armL', fill: P.body }] },
-          { id: 'armR', at: [hw, midY], shapes: [{ pathRef: 'armR', fill: P.body }] },
+          { id: 'armL', at: [-hw, midY], shapes: [{ pathRef: 'armL', fill: paint.fill('body') }] },
+          { id: 'armR', at: [hw, midY], shapes: [{ pathRef: 'armR', fill: paint.fill('body') }] },
           {
             shapes: [
-              { d: pocket, fill: P.body },
-              ...(cross ? [det({ d: `M${-hw} ${bot}L${r(-cx)} ${r(cy)}`, stroke: P.ink, width: line }), det({ d: `M${hw} ${bot}L${r(cx)} ${r(cy)}`, stroke: P.ink, width: line })] : []),
-              det({ el: { tag: 'ellipse', attrs: { cx: r(-hw * 0.6), cy: r(bot - H * 0.333), rx: 9, ry: 5, fill: P.cheek } }, ref: 'blush' }),
-              det({ el: { tag: 'ellipse', attrs: { cx: r(hw * 0.6), cy: r(bot - H * 0.333), rx: 9, ry: 5, fill: P.cheek } }, ref: 'blush' }),
+              { d: pocket, fill: paint.fill('body') },
+              ...(cross ? [det({ d: `M${-hw} ${bot}L${r(-cx)} ${r(cy)}`, stroke: paint.flat('line'), width: lw }), det({ d: `M${hw} ${bot}L${r(cx)} ${r(cy)}`, stroke: paint.flat('line'), width: lw })] : []),
+              det({ el: { tag: 'ellipse', attrs: { cx: r(-hw * 0.6), cy: r(bot - H * 0.333), rx: 9, ry: 5, fill: paint.flat('cheek') } }, ref: 'blush' }),
+              det({ el: { tag: 'ellipse', attrs: { cx: r(hw * 0.6), cy: r(bot - H * 0.333), rx: 9, ry: 5, fill: paint.flat('cheek') } }, ref: 'blush' }),
             ],
           },
         ]),
@@ -176,7 +184,11 @@ function build(spec: MascotSpec): Built {
       {
         outline: ink,
         root: root([{
-          id: 'lidF', at: [0, top], shapes: [{ d: flap, fill: P.body }],
+          id: 'lidF', at: [0, top], shapes: [
+            { d: flap, fill: paint.fill('body') },
+            // without an outline the lid's edges would vanish into the pocket: draw them
+            ...(ink ? [] : [det({ d: `M${-hw} 0L0 ${r(flapH)}L${hw} 0`, stroke: paint.flat('line'), width: lw })]),
+          ],
           children: [{ id: 'eyes', at: [0, r(flapH * 0.34)], children: [eye('L'), eye('R')] }],
         }]),
       },
@@ -207,7 +219,7 @@ export const objectLimbs: Anatomy = {
     p['armR.rot'] = 5 * wave(t, 2600, 0.15);
     p['armL.rot'] = 5 * wave(t, 2600, 0.42);
   },
-  render(rig, p, gaze) {
+  render(rig, p, gaze, _t, paint) {
     rig.set('root', { x: p['body.x'], y: p['body.y'], rot: p['body.rot'], sx: p['body.sx'], sy: p['body.sy'] });
     const y = p['body.y'];
     rig.set('shadow', { sx: 1 + y * 0.006, sy: 1 + y * 0.006 });
@@ -238,6 +250,7 @@ export const objectLimbs: Anatomy = {
     rig.attr('inner', 'opacity', inner > 0.02 ? 1 : 0);
     rig.attr('innerEye', 'opacity', inner > 0.02 ? 1 : 0);
     rig.set('innerBody', { x: p['inner.look'] * 4, rot: p['inner.look'] * 6 });
-    rig.attr('blush', 'opacity', Math.min(1, p['face.blush']) * 0.9);
+    rig.attr('blush', 'opacity', Math.max(paint.cheekRest, Math.min(1, p['face.blush']) * 0.9));
+    rig.attr('shine', 'opacity', happy > 0.3 || shut > 0.5 ? 0 : 1);
   },
 };

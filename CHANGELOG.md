@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Styles: anatomies paint by role and a style answers (`kit/style.ts`, `styles/`). Two styles:
+  Soft Gradient (the look of plate 004) and Ink. A mascot can tune its palette per style.
+- Three new anatomies — `biped` (shoulders and elbows, an antenna on a loose spring),
+  `quadruped` (a tail whose tip bends a beat later, twitching ears) and `floater` (a hem that
+  ripples, spins, fades) — and three mascots: Robot, Fox and Ghost.
+- `pnpm check` runs every mascot in every style; the jump rule now tracks each part, so fast
+  motion passes and only real pops fail.
+- `tools/matrix.mjs` (mascot × style stills); GIF exports with a full palette and dithering.
+
+## 0.3.0
+
 - Mascots are data: `mascot.json` (anatomy + palette + body + props + actions as keyframes on
   channels). Secret Letter is now only its `mascot.json`.
 - `pnpm check`: static rules (spec vs anatomy, contrast, channels, keys, jumps) and rendered rules

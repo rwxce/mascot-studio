@@ -19,6 +19,7 @@ const width = Number(opt('width', 520));
 const out = opt('out', `out/${id}`);
 const stills = opt('stills', '') ? opt('stills', '').split(',').map(Number) : [];
 const sheet = Number(opt('sheet', 0));
+const style = opt('style', '');
 
 const server = await createServer({ root: 'playground', server: { port: 0 }, logLevel: 'error' });
 await server.listen();
@@ -27,7 +28,7 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: width + 40, height: 600 }, deviceScaleFactor: 2 });
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
-await page.goto(`${url}?export&only=${id}`);
+await page.goto(`${url}?export&only=${id}${style ? `&style=${style}` : ''}`);
 await page.waitForFunction(() => window.__mascots);
 await page.addStyleTag({ content: `body.export .card { width: ${width}px }` });
 await page.evaluate(([id, reel]) => window.__reset(id, reel), [id, reel]);
@@ -50,7 +51,7 @@ if (errors.length) console.error('page errors:', errors);
 const ff = (...a) => execFileSync('ffmpeg', ['-loglevel', 'error', '-y', ...a]);
 const input = ['-framerate', String(fps), '-i', join(frames, '%05d.png')];
 ff(...input, '-vf', 'scale=trunc(iw/2)*2:trunc(ih/2)*2', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', `${out}.mp4`);
-ff(...input, '-vf', `fps=${Math.min(fps, 30)},scale=${width}:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=64:stats_mode=diff[p];[b][p]paletteuse=dither=none:diff_mode=rectangle`, `${out}.gif`);
+ff(...input, '-vf', `fps=${Math.min(fps, 30)},scale=${width}:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=256:stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle`, `${out}.gif`);
 if (sheet) {
   const every = Math.max(1, Math.round(n / sheet));
   ff(...input, '-vf', `select='not(mod(n\\,${every}))',scale=260:-1,tile=${Math.min(sheet, 6)}x${Math.ceil(sheet / 6)}`, '-frames:v', '1', `${out}-sheet.png`);
