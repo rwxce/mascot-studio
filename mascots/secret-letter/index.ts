@@ -1,7 +1,6 @@
-// Cartas Secretas: an envelope that is also a puzzle piece. The side tabs are its arms, the
+// Secret Letter: an envelope that is also a puzzle piece. The side tabs are its arms, the
 // bottom notch is where another piece would fit, and the flap opens to show the secret inside
-// (a small pink envelope-piece). Drawn from the founder's sketches: heavy black line, white
-// paper, one accent colour.
+// (a small pink envelope-piece). Heavy black line, white paper, one accent colour.
 import { Director, type Action } from '../../kit/director.js';
 import { gazeTarget, bindReactions } from '../../kit/interact.js';
 import { container, type Mascot } from '../../kit/mascot.js';
@@ -218,12 +217,12 @@ const det = (s: Shape): Shape => ({ ...s, kind: 'detail' });
 
 export const ACTIONS = actions.map((a) => a.name);
 
-export function cartasSecretas(opts: { salt?: number } = {}): Mascot {
+export function secretLetter(opts: { salt?: number } = {}): Mascot {
   const salt = opts.salt ?? 0;
   const root = (children: Part[]): Part => ({ id: 'root', at: [130, 184], children });
   const rig = new Rig({
     viewBox: '0 -24 260 244',
-    label: 'Cartas Secretas mascot: an envelope shaped like a puzzle piece',
+    label: 'Secret Letter mascot: an envelope shaped like a puzzle piece',
     layers: [
       { outline: null, root: { id: 'shadow', at: [130, 188], shapes: [det({ el: { tag: 'ellipse', attrs: { rx: 72, ry: 6, fill: 'rgba(20,20,20,.12)' } }, ref: 'shadow' })] } },
       // back: the dark inside of the envelope and the flap when it is open
@@ -308,7 +307,7 @@ export function cartasSecretas(opts: { salt?: number } = {}): Mascot {
   const bulb = new Spring1({ freq: 3.6, damping: 0.38 });
   const heartPop = new Spring1({ freq: 3.4, damping: 0.4 });
   let lastT = 0;
-  const el = container(rig.svg, 'cartas-secretas');
+  const el = container(rig.svg, 'secret-letter');
 
   bindReactions(el, () => director.play('notice', lastT), () => director.play('surprise', lastT));
 
@@ -405,7 +404,7 @@ export function cartasSecretas(opts: { salt?: number } = {}): Mascot {
   }
 
   return {
-    name: 'cartas-secretas',
+    name: 'secret-letter',
     el,
     actions: ACTIONS,
     play: (name) => director.play(name, lastT),
