@@ -1,0 +1,27 @@
+{
+  "id": "clay",
+  "title": "Clay",
+  "family": "Materials",
+  "look": "Plasticine: round soft highlights, a contact shadow, stop-motion at 8 fps.",
+  "bg": "#D8D2C8",
+  "axes": {
+    "line": "none",
+    "fill": "radial",
+    "texture": "fingerprint",
+    "palette": "character",
+    "eyes": "oval-shine",
+    "stage": "desk",
+    "rhythm": "stop-motion"
+  },
+  "doc": {
+    "essence": "A stop-motion puppet in plasticine: lit from the top left, every frame posed by hand.",
+    "notIt": "Not soft-gradient (radial light, contact shadow, stop-motion).",
+    "shapes": "No outline; a soft offset contact shadow.",
+    "colour": "Radial highlight to a darker rim.",
+    "eyes": "Glossy with a shine.",
+    "motion": "8 fps with a tiny wobble.",
+    "pitfalls": [
+      "Fast actions look jerky at 8 fps on purpose."
+    ]
+  }
+}

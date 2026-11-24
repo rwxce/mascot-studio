@@ -1,0 +1,27 @@
+{
+  "id": "low-poly",
+  "title": "Low Poly",
+  "family": "Clean vector",
+  "look": "Faceted shading in hard diagonal bands, like a low-polygon model.",
+  "bg": "#D3E4F4",
+  "axes": {
+    "line": "none",
+    "fill": "facets",
+    "texture": "none",
+    "palette": "shaded",
+    "eyes": "square",
+    "stage": "sky",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "Four hard bands of the same hue across every shape, lit from the top left, read as facets.",
+    "notIt": "Not soft-gradient: no smooth ramps, no glow.",
+    "shapes": "No outline.",
+    "colour": "Each area gets lighter / light / base / darker bands.",
+    "eyes": "Flat.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Very small parts show one band only: that is fine."
+    ]
+  }
+}

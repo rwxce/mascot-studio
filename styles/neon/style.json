@@ -1,0 +1,27 @@
+{
+  "id": "neon",
+  "title": "Neon",
+  "family": "Light and plan",
+  "look": "Glass tubes of light on a dark wall: no fill, a bright core and a glow, a flicker.",
+  "bg": "#0B0714",
+  "axes": {
+    "line": "neon",
+    "fill": "none",
+    "texture": "none",
+    "palette": "neon",
+    "eyes": "glow",
+    "stage": "dark",
+    "rhythm": "flicker"
+  },
+  "doc": {
+    "essence": "A neon sign of the character: bent glass tubes along every edge, a soft glow, the odd flicker.",
+    "notIt": "Not synthwave (no fill, no sun), not blueprint (glowing colour on black).",
+    "shapes": "A wide translucent glow under a thin bright tube.",
+    "colour": "The body colour as the glow, a pale core.",
+    "eyes": "Pale glowing.",
+    "motion": "Smooth, with a two-frame flicker now and then.",
+    "pitfalls": [
+      "Thick stroke limbs read as solid bars of light."
+    ]
+  }
+}

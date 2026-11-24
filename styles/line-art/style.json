@@ -1,0 +1,27 @@
+{
+  "id": "line-art",
+  "title": "Line Art",
+  "family": "Clean vector",
+  "look": "A single thin line around every piece on white paper; colour only in the eyes.",
+  "bg": "#FFFFFF",
+  "axes": {
+    "line": "hollow",
+    "fill": "none",
+    "texture": "none",
+    "palette": "mono",
+    "eyes": "dot",
+    "stage": "paper",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "An architect's line drawing of the character: every shape edged by one even thin line, filled with paper.",
+    "notIt": "Not ink (thin, even, and every inner shape is outlined too).",
+    "shapes": "Every body shape gets a thin edge in the fill pass.",
+    "colour": "Black on white, pink cheeks only.",
+    "eyes": "Black dots.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Thick stroke limbs show as filled bars."
+    ]
+  }
+}

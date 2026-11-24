@@ -1,0 +1,28 @@
+{
+  "id": "pixel",
+  "title": "Pixel",
+  "family": "Retro screen",
+  "look": "Big pixels, a limited palette and motion that steps at 8 fps.",
+  "bg": "#1E1B33",
+  "axes": {
+    "line": "dark-pixel",
+    "fill": "pixels",
+    "texture": "none",
+    "palette": "limited",
+    "eyes": "pixel",
+    "stage": "dark",
+    "rhythm": "steps"
+  },
+  "doc": {
+    "essence": "A sprite from an old console: chunky pixels, few colours, steps instead of tweens.",
+    "notIt": "Not one-bit (colour), not flat (pixelated, stepped).",
+    "shapes": "The whole drawing goes through a pixelate filter (4 px blocks).",
+    "colour": "Channels quantised to 4 levels.",
+    "eyes": "Pixel blocks.",
+    "motion": "Time steps at 8 fps.",
+    "pitfalls": [
+      "SVG filters cost more than plain shapes: check the budget on phones.",
+      "Check Safari: filters render differently."
+    ]
+  }
+}

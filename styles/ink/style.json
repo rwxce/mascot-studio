@@ -4,5 +4,24 @@
   "family": "Drawn by hand",
   "look": "A heavy black line around every shape, flat paper colours, one accent.",
   "bg": "#FAF8F4",
-  "axes": { "line": "ink", "fill": "flat", "texture": "none", "palette": "character", "eyes": "solid", "stage": "paper", "rhythm": "smooth" }
+  "axes": {
+    "line": "ink",
+    "fill": "flat",
+    "texture": "none",
+    "palette": "character",
+    "eyes": "solid",
+    "stage": "paper",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A sticker-clean cartoon on paper: one heavy, even black line around every silhouette, flat colours inside, one accent.",
+    "notIt": "Not a sketch (the line never wobbles) and not a comic (no shading, no halftone).",
+    "shapes": "The outline is its own pass under the fills, so touching parts fuse with no seam. ~5.5 px at Secret Letter's scale; anatomies scale it.",
+    "colour": "Flat fills straight from the palette on paper (#FAF8F4). Body colour, one accent, ink.",
+    "eyes": "Solid ink, no shine; cheeks only when blushing.",
+    "motion": "Smooth, 60 fps.",
+    "pitfalls": [
+      "Thin limbs drawn as strokes need their outline too: the rig draws a wider stroke underneath."
+    ]
+  }
 }

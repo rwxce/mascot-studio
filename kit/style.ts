@@ -3,7 +3,7 @@
 // answers with a fill (flat, gradient, pattern…), an outline or none, eye shines, a stage
 // behind the character and a ground shadow. Swapping the style redraws the same rig.
 import { darken, lighten } from './color.js';
-import type { Part, Shape } from './rig.js';
+import type { Part, RigLook, Shape } from './rig.js';
 
 export type Role =
   | 'body' | 'body-dark' | 'belly' | 'inside' | 'accent' | 'eye' | 'shine'
@@ -61,6 +61,10 @@ export interface Painter {
   overlay?(box: [number, number, number, number]): Part[];
   /** SVG filter id applied to the whole drawing, if any. */
   filter?: string;
+  /** Rig-level look: hollow outlines, edge strokes, offset drop pass. */
+  look?: RigLook;
+  /** Called every frame (flicker, scanline drift). */
+  frame?(t: number, svg: SVGSVGElement): void;
 }
 
 export interface Style extends StyleMeta {

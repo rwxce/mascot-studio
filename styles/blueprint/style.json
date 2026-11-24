@@ -1,0 +1,27 @@
+{
+  "id": "blueprint",
+  "title": "Blueprint",
+  "family": "Light and plan",
+  "look": "White technical lines on blueprint blue over a grid.",
+  "bg": "#1D4E89",
+  "axes": {
+    "line": "white-thin",
+    "fill": "none",
+    "texture": "grid",
+    "palette": "mono",
+    "eyes": "line",
+    "stage": "blueprint",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "The character's engineering drawing: thin white lines, faint fills, a grid behind.",
+    "notIt": "Not line art (white on blue, grid), not neon (no glow).",
+    "shapes": "Thin white edges on every piece.",
+    "colour": "Only white on blue.",
+    "eyes": "White.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Thick stroke limbs show as solid white bars."
+    ]
+  }
+}

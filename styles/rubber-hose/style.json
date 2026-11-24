@@ -1,0 +1,27 @@
+{
+  "id": "rubber-hose",
+  "title": "Rubber Hose",
+  "family": "Retro screen",
+  "look": "A 1930s cartoon: sepia, a fat black line, film grain, on twos.",
+  "bg": "#E9DCC0",
+  "axes": {
+    "line": "ink",
+    "fill": "flat",
+    "texture": "film",
+    "palette": "sepia",
+    "eyes": "pie",
+    "stage": "paper",
+    "rhythm": "twos"
+  },
+  "doc": {
+    "essence": "An early sound cartoon: sepia stock, fat black line, flickering projector, animated on twos.",
+    "notIt": "Not ink (sepia, grain, flicker, on twos).",
+    "shapes": "Fat black outline.",
+    "colour": "Every colour mapped to sepia.",
+    "eyes": "Black.",
+    "motion": "On twos with a faint projector flicker.",
+    "pitfalls": [
+      "Flicker must stay subtle (±6 %)."
+    ]
+  }
+}
