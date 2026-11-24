@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-- Cartas Secretas mascot, drawn from the founder's sketches: an envelope that is also a puzzle
+- The first mascot is now called Secret Letter (`mascots/secret-letter/`).
+
+## 0.2.0
+
+- Secret Letter mascot: an envelope that is also a puzzle
   piece, with 12 actions (wave, thumbs-up, idea, heart, reveal, look-around, stretch, sleepy, shy,
   hop, notice, surprise), idle life and hover/click reactions.
 - Director (`kit/director.ts`), pointer reactions (`kit/interact.ts`), playground, deterministic
