@@ -4,9 +4,9 @@
 
 **Original SVG mascots that feel alive** — real rigs, clean lines, 60 fps motion, zero dependencies.
 
-<img src="docs/media/cartas-secretas.gif" alt="The Cartas Secretas mascot, an envelope shaped like a puzzle piece, waves, has an idea, opens its flap to reveal a small pink envelope, sends a heart and hops" width="440">
+<img src="docs/media/secret-letter.gif" alt="The Secret Letter mascot, an envelope shaped like a puzzle piece, waves, has an idea, opens its flap to reveal a small pink envelope, sends a heart and hops" width="440">
 
-<sub>Cartas Secretas — an envelope that is also a puzzle piece. Every frame is drawn and animated in code.</sub>
+<sub>Secret Letter — an envelope that is also a puzzle piece. Every frame is drawn and animated in code.</sub>
 
 </div>
 
@@ -14,7 +14,7 @@
 
 A mascot here is not a video: it is a live SVG that breathes, blinks, looks at your pointer, says hi when you hover it and jumps when you click it. Between those moments it picks what to do next on its own — never the same thing twice in a row.
 
-<img src="docs/media/cartas-secretas-actions.png" alt="Twelve stills of the Cartas Secretas mascot: wave, thumbs-up, idea, heart, reveal, look-around, stretch, sleepy, shy, hop, notice and surprise" width="100%">
+<img src="docs/media/secret-letter-actions.png" alt="Twelve stills of the Secret Letter mascot: wave, thumbs-up, idea, heart, reveal, look-around, stretch, sleepy, shy, hop, notice and surprise" width="100%">
 
 | | |
 |---|---|
@@ -38,16 +38,16 @@ A mascot here is not a video: it is a live SVG that breathes, blinks, looks at y
 ```bash
 pnpm install
 pnpm dev                                   # playground: every mascot, a button per action
-node tools/render.mjs cartas-secretas \
+node tools/render.mjs secret-letter \
   --reel wave,idea,reveal --ms 12000       # deterministic MP4 + GIF export
-node tools/grid.mjs cartas-secretas wave:1300,idea:1400   # labelled stills
+node tools/grid.mjs secret-letter wave:1300,idea:1400   # labelled stills
 ```
 
 ## Mascots
 
 | Mascot | Look | Status |
 |---|---|---|
-| [Cartas Secretas](mascots/cartas-secretas/) | heavy black line, white paper, one accent | ✅ |
+| [Secret Letter](mascots/secret-letter/) | heavy black line, white paper, one accent | ✅ |
 | Robot (biped, elbows) | modern flat | next |
 | Fox (quadruped, tail) | retro cartoon | next |
 | Cloud (floater) | hand-drawn | next |
