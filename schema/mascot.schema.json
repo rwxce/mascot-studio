@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "mascot.json",
+  "description": "A mascot for mascot-studio. The full rules live in kit/spec.ts and run with `pnpm check`.",
+  "type": "object",
+  "required": ["name", "title", "anatomy", "palette"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$" },
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "anatomy": { "enum": ["object-limbs"] },
+    "style": { "type": "string" },
+    "palette": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$" } },
+    "body": { "type": "object", "additionalProperties": { "type": ["number", "boolean", "string"] } },
+    "props": {
+      "type": "object",
+      "properties": {
+        "bulb": { "$ref": "#/$defs/point" }, "heart": { "$ref": "#/$defs/point" }, "zzz": { "$ref": "#/$defs/point" },
+        "note": { "$ref": "#/$defs/point" }, "question": { "$ref": "#/$defs/point" }, "exclaim": { "$ref": "#/$defs/point" },
+        "sparkles": { "type": "array", "items": { "$ref": "#/$defs/point" } }
+      },
+      "additionalProperties": false
+    },
+    "life": { "type": "object", "properties": { "blinkEvery": { "type": "number" }, "gap": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 } } },
+    "actions": { "type": "array", "items": { "$ref": "#/$defs/action" } }
+  },
+  "$defs": {
+    "point": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+    "action": {
+      "type": "object",
+      "required": ["name", "duration"],
+      "properties": {
+        "name": { "type": "string" },
+        "duration": { "type": "number", "exclusiveMinimum": 0, "maximum": 15000 },
+        "weight": { "type": "number", "minimum": 0 },
+        "fade": { "type": "number", "minimum": 1 },
+        "jumps": { "type": "array", "items": { "type": "object", "required": ["at", "air", "height"], "properties": { "at": { "type": "number" }, "air": { "type": "number" }, "height": { "type": "number" }, "startle": { "type": "boolean" } } } },
+        "tracks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["ch"],
+            "properties": {
+              "ch": { "type": "string" },
+              "keys": { "type": "array", "items": { "type": "array", "minItems": 2, "maxItems": 3 } },
+              "op": { "enum": ["add", "mul", "set", "min", "max"] },
+              "curve": { "enum": ["flow", "track", "linear"] },
+              "env": { "type": "boolean" },
+              "osc": { "type": "object", "required": ["amp", "period"], "properties": { "amp": { "type": "number" }, "period": { "type": "number" }, "phase": { "type": "number" }, "abs": { "type": "boolean" }, "window": { "type": "array", "minItems": 2, "maxItems": 2 } } }
+            }
+          }
+        }
+      }
+    }
+  }
+}
