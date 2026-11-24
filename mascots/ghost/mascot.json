@@ -1,0 +1,79 @@
+{
+  "$schema": "../../schema/mascot.schema.json",
+  "name": "ghost",
+  "title": "Ghost",
+  "description": "A shy ghost that floats, ripples at the hem, loops the loop, says boo and fades away.",
+  "anatomy": "floater",
+  "style": "soft-gradient",
+  "palette": {
+    "body": "#9A7BFF",
+    "body-dark": "#B79BFF",
+    "eye": "#1E1240",
+    "cheek": "#FF7AA8",
+    "glow": "#A98BFF",
+    "accent": "#8FF0D1"
+  },
+  "props": {
+    "exclaim": [50, -100],
+    "zzz": [30, -88],
+    "heart": [-50, -84],
+    "sparkles": [[-54, -100], [54, -96], [-46, -126], [48, -130]]
+  },
+  "actions": [
+    {
+      "name": "loop", "duration": 2000, "weight": 2,
+      "tracks": [
+        { "ch": "body.rot", "op": "set", "keys": [[0, 0], [300, -10], [1400, 360], [2000, 360]] },
+        { "ch": "body.y", "env": false, "keys": [[0, 0], [300, 4], [850, -26], [1400, 0], [2000, 0]] },
+        { "ch": "hem", "op": "mul", "keys": [[0, 1], [400, 2], [1400, 2], [2000, 1]] },
+        { "ch": "eyes.happy", "keys": [[0, 1], [2000, 1]] },
+        { "ch": "mouth.smile", "keys": [[0, 1], [2000, 1]] },
+        { "ch": "prop.sparkles", "op": "set", "curve": "linear", "keys": [[0, -1], [1199, -1], [1200, 0], [2000, 1]] }
+      ]
+    },
+    {
+      "name": "boo", "duration": 2200, "weight": 2,
+      "tracks": [
+        { "ch": "body.sx", "op": "mul", "keys": [[0, 1], [300, 0.9], [550, 1.22], [1500, 1.22], [1900, 1], [2200, 1]] },
+        { "ch": "body.sy", "op": "mul", "keys": [[0, 1], [300, 0.92], [550, 1.2], [1500, 1.2], [1900, 1], [2200, 1]] },
+        { "ch": "mouth.open", "keys": [[0, 0], [450, 0], [600, 1], [1400, 1], [1700, 0], [2200, 0]] },
+        { "ch": "armL", "keys": [[0, 0], [450, 0], [600, -140], [1400, -140], [1800, 0], [2200, 0]] },
+        { "ch": "armR", "keys": [[0, 0], [450, 0], [600, -140], [1400, -140], [1800, 0], [2200, 0]] },
+        { "ch": "hem", "op": "mul", "keys": [[0, 1], [550, 2.4], [1500, 2.4], [2200, 1]] },
+        { "ch": "prop.exclaim", "op": "set", "curve": "linear", "keys": [[0, 0], [549, 0], [550, 1], [1500, 1], [1501, 0], [2200, 0]] }
+      ]
+    },
+    {
+      "name": "vanish", "duration": 2800, "weight": 1.5,
+      "tracks": [
+        { "ch": "fade", "op": "set", "keys": [[0, 1], [700, 0.08], [1700, 0.08], [2400, 1], [2800, 1]] },
+        { "ch": "body.y", "keys": [[0, 0], [700, -10], [1700, -10], [2400, 0], [2800, 0]] },
+        { "ch": "eyes.happy", "keys": [[0, 0], [2000, 0], [2400, 1], [2800, 1]] },
+        { "ch": "prop.sparkles", "op": "set", "curve": "linear", "keys": [[0, -1], [399, -1], [400, 0], [1400, 1], [1401, -1], [1900, -1], [1901, 0], [2800, 1]] }
+      ]
+    },
+    {
+      "name": "giggle", "duration": 2200, "weight": 2,
+      "tracks": [
+        { "ch": "body.rot", "osc": { "amp": 5, "period": 190, "window": [200, 2000] } },
+        { "ch": "body.y", "osc": { "amp": 2, "period": 190, "window": [200, 2000] } },
+        { "ch": "eyes.happy", "keys": [[0, 1], [2200, 1]] },
+        { "ch": "mouth.smile", "keys": [[0, 1], [2200, 1]] },
+        { "ch": "face.blush", "op": "max", "keys": [[0, 0], [300, 1], [1900, 1], [2200, 0]] },
+        { "ch": "armL", "keys": [[0, 0], [300, 30], [1900, 30], [2200, 0]] },
+        { "ch": "armR", "keys": [[0, 0], [300, 30], [1900, 30], [2200, 0]] },
+        { "ch": "prop.heart", "op": "set", "curve": "linear", "keys": [[0, -1], [299, -1], [300, 0], [2200, 1]] }
+      ]
+    },
+    {
+      "name": "sleepy", "duration": 4600, "weight": 1, "fade": 500,
+      "tracks": [
+        { "ch": "eyes.open", "op": "min", "curve": "track", "keys": [[0, 1], [1200, 0.05], [3800, 0.05], [4100, 1], [4600, 1]] },
+        { "ch": "body.y", "keys": [[0, 0], [1200, 10], [3800, 10], [4100, 0], [4600, 0]] },
+        { "ch": "body.rot", "keys": [[0, 0], [1200, 8], [3800, 8], [4100, 0], [4600, 0]] },
+        { "ch": "hem", "op": "mul", "keys": [[0, 1], [1200, 0.4], [3800, 0.4], [4100, 1], [4600, 1]] },
+        { "ch": "prop.zzz", "op": "set", "curve": "linear", "keys": [[0, -1], [1099, -1], [1100, 0], [3800, 1], [3801, -1], [4600, -1]] }
+      ]
+    }
+  ]
+}

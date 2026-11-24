@@ -46,6 +46,8 @@ export interface Layer {
   root: Part;
   /** Line colour and width for this layer's outline pass; null = no outline. */
   outline: { color: string; width: number } | null;
+  /** Marks the layer's groups with data-<tag> (e.g. "stage", "props"). */
+  tag?: string;
 }
 
 export interface RigOptions {
@@ -96,8 +98,14 @@ export class Rig {
     this.svg.setAttribute('shape-rendering', 'geometricPrecision');
     if (opts.defs) this.svg.innerHTML = `<defs>${opts.defs}</defs>`;
     for (const layer of opts.layers) {
-      if (layer.outline) this.svg.append(this.build(layer.root, 'outline', layer.outline));
-      this.svg.append(this.build(layer.root, 'fill', layer.outline));
+      const groups = [
+        ...(layer.outline ? [this.build(layer.root, 'outline', layer.outline)] : []),
+        this.build(layer.root, 'fill', layer.outline),
+      ];
+      for (const g of groups) {
+        if (layer.tag) g.setAttribute(`data-${layer.tag}`, '');
+        this.svg.append(g);
+      }
     }
   }
 
@@ -158,7 +166,14 @@ export class Rig {
         if (entry) entry.els.push(el); else this.paths.set(s.pathRef, { els: [el], spec: null });
       }
     }
-    if (pass === 'outline' && outline) {
+    if (pass === 'outline' && outline && s.stroke && (!s.fill || s.fill === 'none')) {
+      // a limb drawn as a thick stroke: its outline is a wider stroke underneath
+      el.setAttribute('fill', 'none');
+      el.setAttribute('stroke', outline.color);
+      el.setAttribute('stroke-width', String((s.width ?? 2) + outline.width * 2));
+      el.setAttribute('stroke-linejoin', 'round');
+      el.setAttribute('stroke-linecap', 'round');
+    } else if (pass === 'outline' && outline) {
       el.setAttribute('fill', outline.color);
       el.setAttribute('stroke', outline.color);
       el.setAttribute('stroke-width', String(outline.width * 2));
@@ -185,6 +200,14 @@ export class Rig {
     if (!els) return;
     const s = transformString(t);
     for (const el of els) el.setAttribute('transform', s);
+  }
+
+  /** Fade a whole part (all passes). */
+  opacity(id: string, v: number) {
+    const els = this.parts.get(id);
+    if (!els) return;
+    const o = String(Math.round(Math.max(0, Math.min(1, v)) * 1000) / 1000);
+    for (const el of els) el.setAttribute('opacity', o);
   }
 
   /** Set a morphing shape's path. */
