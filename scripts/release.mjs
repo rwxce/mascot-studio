@@ -9,7 +9,7 @@ import { pathToFileURL } from 'node:url'
 
 export const VERSION_FILE = 'package.json'
 
-const NOISE = /^(chore: back-merge|chore: bump version)/
+const NOISE = /^(chore: back-merge|chore: bump version|chore: initial commit)/
 
 /** Files that never justify a release on their own: release tooling, CI and top-level docs. */
 export function canSkip(changedFiles) {
@@ -60,31 +60,37 @@ function run(argv) {
       throw new Error('HEAD does not contain origin/dev; update first')
     }
   }
-  let base
+  // First release: main holds no release yet (only the placeholder commit that let `dev` be
+  // created). The release is then an orphan commit that replaces it, so main has releases only.
+  let base = null
   try {
     base = git('describe', '--tags', '--abbrev=0', '--match', 'v*', 'origin/main')
-  } catch {
-    base = 'origin/main'
-  }
-  const changedFiles = git('diff', '--name-only', base, 'HEAD').split('\n').filter(Boolean)
+  } catch {}
+  const first = base === null
+  const changedFiles = first
+    ? git('ls-tree', '-r', '--name-only', 'HEAD').split('\n').filter(Boolean)
+    : git('diff', '--name-only', base, 'HEAD').split('\n').filter(Boolean)
   // main holds only release commits, so `base..HEAD` would list all of dev's history every time:
   // restrict the notes to commits made after the base release.
-  const since = git('log', '-1', '--format=%cI', base)
-  const subjects = git('log', '--no-merges', '--format=%s', `--since=${since}`, `${base}..HEAD`).split('\n').filter(Boolean)
+  const subjects = first
+    ? git('log', '--no-merges', '--format=%s', 'HEAD').split('\n').filter(Boolean)
+    : git('log', '--no-merges', '--format=%s', `--since=${git('log', '-1', '--format=%cI', base)}`, `${base}..HEAD`).split('\n').filter(Boolean)
   const manifest = JSON.parse(readFileSync(VERSION_FILE, 'utf8'))
   const plan = planRelease({ version: manifest.version, bump, changedFiles, subjects })
   if (plan.skip) return console.log(`No release: ${plan.reason}.`)
-  console.log(`${dryRun ? 'Would release' : 'Releasing'} ${plan.tag} (${changedFiles.length} files changed since ${base})\n\n${plan.releaseMessage}`)
+  console.log(`${dryRun ? 'Would release' : 'Releasing'} ${plan.tag} (${changedFiles.length} files ${first ? 'in the first release' : `changed since ${base}`})\n\n${plan.releaseMessage}`)
   if (dryRun) return
 
   manifest.version = plan.version
   writeFileSync(VERSION_FILE, `${JSON.stringify(manifest, null, 2)}\n`)
   git('add', VERSION_FILE)
   git('commit', '-m', plan.bumpMessage)
-  const release = git('commit-tree', 'HEAD^{tree}', '-p', 'origin/main', '-m', plan.releaseMessage)
+  const parents = first ? [] : ['-p', 'origin/main']
+  const release = git('commit-tree', 'HEAD^{tree}', ...parents, '-m', plan.releaseMessage)
   git('tag', plan.tag, release)
-  git('push', 'origin', `${release}:refs/heads/main`, `refs/tags/${plan.tag}`)
-  git('merge', '--no-ff', '-m', `chore: back-merge ${plan.tag} into dev`, release)
+  // Only the first release rewrites main (it drops the placeholder); later ones fast-forward.
+  git('push', 'origin', `${first ? '+' : ''}${release}:refs/heads/main`, `refs/tags/${plan.tag}`)
+  git('merge', '--no-ff', ...(first ? ['--allow-unrelated-histories', '-X', 'theirs'] : []), '-m', `chore: back-merge ${plan.tag} into dev`, release)
   git('push', 'origin', 'HEAD:refs/heads/dev')
   console.log(`Released ${plan.tag} (${release.slice(0, 7)}).`)
 }

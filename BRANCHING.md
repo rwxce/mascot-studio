@@ -24,6 +24,10 @@ run (Mondays) do a patch. The workflow (`.github/workflows/release.yml`, `script
 
 Use **dry run** to see the plan without releasing.
 
+**First release.** Until the first tag, `main` only holds the placeholder commit that let `dev` be
+created. The first release is an orphan `release: v0.1.0` commit that replaces it (the only time the
+workflow force-updates `main`), so from then on `main` contains releases and nothing else.
+
 ## Fixing a release
 
 There are no hotfix branches. Fix on `dev` and cut a patch release. Since each release copies
