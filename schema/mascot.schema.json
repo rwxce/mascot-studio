@@ -9,9 +9,10 @@
     "name": { "type": "string", "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$" },
     "title": { "type": "string" },
     "description": { "type": "string" },
-    "anatomy": { "enum": ["object-limbs"] },
+    "anatomy": { "enum": ["object-limbs", "biped", "quadruped", "floater"] },
     "style": { "type": "string" },
     "palette": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$" } },
+    "palettes": { "type": "object", "additionalProperties": { "type": "object", "additionalProperties": { "type": "string", "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$" } } },
     "body": { "type": "object", "additionalProperties": { "type": ["number", "boolean", "string"] } },
     "props": {
       "type": "object",

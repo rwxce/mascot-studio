@@ -5,7 +5,10 @@ import { chromium } from '@playwright/test';
 import { gzipSync } from 'node:zlib';
 import { createServer } from 'vite';
 
-const want = process.argv.slice(2);
+// pnpm check [mascot…] [--style id|all]  (default: every mascot in its own style and in every style)
+const argv = process.argv.slice(2);
+const styleArg = argv.includes('--style') ? argv[argv.indexOf('--style') + 1] : 'all';
+const want = argv.filter((a, i) => a !== '--style' && argv[i - 1] !== '--style');
 const server = await createServer({ root: 'playground', server: { port: 0 }, logLevel: 'error' });
 await server.listen();
 const browser = await chromium.launch();
@@ -15,10 +18,11 @@ page.on('pageerror', (e) => errors.push(e.message));
 await page.goto(`${server.resolvedUrls.local[0]}check.html`);
 await page.waitForFunction(() => window.__check);
 const names = want.length ? want : await page.evaluate(() => window.__names());
+const styleIds = styleArg === 'all' ? await page.evaluate(() => window.__styles()) : [styleArg];
 let failed = 0;
-for (const name of names) {
+for (const name of names) for (const style of styleIds) {
   await page.evaluate(() => { document.getElementById('stage').innerHTML = ''; document.getElementById('twin').innerHTML = ''; });
-  const res = await page.evaluate((n) => window.__check(n), name);
+  const res = await page.evaluate(([n, s]) => window.__check(n, s), [name, style]);
   const issues = [...res.issues];
   if (res.stats) {
     const svg = await page.evaluate(() => document.querySelector('#stage svg').outerHTML);
@@ -29,7 +33,7 @@ for (const name of names) {
   if (errors.length) issues.push({ rule: 'no-errors', where: 'page', message: errors.splice(0).join(' | ') });
   const ok = issues.length === 0;
   if (!ok) failed++;
-  console.log(`${ok ? '✓' : '✗'} ${name}${res.stats ? `  (${res.stats.actions} actions, ${res.stats.frames} frames, ${res.stats.avgMs} ms/frame, ${res.stats.svgGzipKB} KB)` : ''}`);
+  console.log(`${ok ? '✓' : '✗'} ${name} · ${style}${res.stats ? `  (${res.stats.actions} actions, ${res.stats.frames} frames, ${res.stats.avgMs} ms/frame, ${res.stats.svgGzipKB} KB)` : ''}`);
   for (const i of issues) console.log(`    ${i.rule}  ${i.where}: ${i.message}`);
 }
 await browser.close();
