@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Mascots are data: `mascot.json` (anatomy + palette + body + props + actions as keyframes on
+  channels). Secret Letter is now only its `mascot.json`.
+- `pnpm check`: static rules (spec vs anatomy, contrast, channels, keys, jumps) and rendered rules
+  (every action frame by frame: in frame, no jumps, rest pose, unique ids, JS and size budget).
+- `CRAFT.md`, `anatomies/object-limbs/ANATOMY.md`, `schema/mascot.schema.json`, generic props
+  (`kit/props.ts`), the character runtime (`kit/character.ts`) and data timelines (`kit/timeline.ts`).
+- CI runs `pnpm check`.
+
+## 0.2.1
+
 - The first mascot is now called Secret Letter (`mascots/secret-letter/`).
 
 ## 0.2.0

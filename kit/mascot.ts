@@ -9,6 +9,8 @@ export interface Mascot extends Subject {
   actions: string[];
   /** Play an action now. */
   play(action: string): void;
+  /** The action playing now, or null while idle. */
+  playing(): string | null;
   /** Deterministic start for exports: clear state, optionally queue a showreel. */
   reset(showreel?: string[]): void;
   update(t: number, dt: number, mode: FrameMode): void;
