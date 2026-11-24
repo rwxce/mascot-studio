@@ -1,7 +1,7 @@
 # object-limbs
 
 An object with puzzle-tab arms, a face on a lid that opens, and an optional secret inside.
-Example: `mascots/secret-letter`.
+Any `mascot.json` with `"anatomy": "object-limbs"` uses it.
 
 ## Body parameters (`body`)
 

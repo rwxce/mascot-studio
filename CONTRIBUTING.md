@@ -16,7 +16,7 @@ problem they fix: a seam at a joint, a pose that stops dead, a frame that drops.
 ## Commit messages
 
 [Conventional Commits](https://www.conventionalcommits.org/) in English: `type(scope): summary`,
-for example `feat(secret-letter): thumbs-up morph` or `fix(rig): seam at the shoulder`. Types:
+for example `feat(nodi): star morph` or `fix(rig): seam at the shoulder`. Types:
 `feat`, `fix`, `docs`, `chore`, `test`. Explain the why in the body when it is not obvious.
 
 ## Running the checks

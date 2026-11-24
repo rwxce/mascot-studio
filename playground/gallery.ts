@@ -8,7 +8,7 @@ import { styleById, styles } from '../styles/index';
 
 const app = document.getElementById('app')!;
 const params = new URLSearchParams(location.search);
-let current = specs.find((s) => s.name === params.get('mascot')) ?? specs.find((s) => s.name === 'robot') ?? specs[0];
+let current = specs.find((s) => s.name === params.get('mascot')) ?? specs[0];
 const clock = createClock();
 let live: Mascot[] = [];
 
