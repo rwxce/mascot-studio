@@ -31,18 +31,51 @@ A mascot here is not a video: it is a live SVG that breathes, blinks, looks at y
 | **Light** | each SVG is a few KB; the whole kit has no runtime dependencies |
 | **Polite** | pauses off screen and in hidden tabs; reduced motion holds a still pose |
 
-## One mascot, any style
+## One mascot, 25 styles
 
-<img src="docs/media/matrix.png" alt="Each mascot drawn in each style" width="100%">
+<img src="docs/media/styles-robot.png" alt="The robot drawn in each of the 25 styles" width="100%">
 
-A style decides how a mascot is drawn: outline or none, flat or gradient fills, eyes, the stage
-behind it, its rhythm. Anatomies never pick colours — they ask the style for a role (`body`,
-`belly`, `eye`…). A mascot can tune its palette per style (`palettes` in its `mascot.json`).
+A style decides how a mascot is drawn — line, fill, texture, palette, eyes, stage and rhythm.
+Anatomies never pick colours: they ask the style for a role (`body`, `belly`, `eye`…), so every
+mascot works in every style. **No two styles share more than 3 of those 7 axes** (a test checks
+it), and a visual check renders every style and fails if two look alike.
 
-| Style | Look |
-|---|---|
-| [Soft Gradient](styles/soft-gradient/STYLE.md) | No outline, a vertical gradient on every piece, a glow behind, eyes with a shine |
-| [Ink](styles/ink/STYLE.md) | A heavy black line around every shape, flat paper colours, one accent |
+**Try them all:** `pnpm dev` and open `/styles.html` — pick a mascot, watch it in every style,
+open one to play its actions. `pnpm build:gallery` makes the same page as one HTML file.
+
+<img src="docs/media/matrix.png" alt="Each mascot in six of the styles" width="100%">
+
+| Family | Style | Look |
+|---|---|---|
+| Clean vector | [Soft Gradient](styles/soft-gradient/STYLE.md) | No outline: every piece has a vertical gradient, a glow of the character's colour behind it, eyes with a shine. |
+|  | [Flat](styles/flat/STYLE.md) | Solid colours, no outline, no gradient: shapes and nothing else. |
+|  | [Sticker](styles/sticker/STYLE.md) | A thick white border and a hard shadow, like a die-cut sticker on a dotted page. |
+|  | [Glass](styles/glass/STYLE.md) | Translucent tinted glass with a bright edge, over colourful blurred blobs. |
+|  | [Low Poly](styles/low-poly/STYLE.md) | Faceted shading in hard diagonal bands, like a low-polygon model. |
+|  | [Line Art](styles/line-art/STYLE.md) | A single thin line around every piece on white paper; colour only in the eyes. |
+| Drawn by hand | [Ink](styles/ink/STYLE.md) | A heavy black line around every shape, flat paper colours, one accent. |
+|  | [Pencil](styles/pencil/STYLE.md) | Graphite on paper: hatched shading, a soft boiling line, on twos. |
+|  | [Crayon](styles/crayon/STYLE.md) | Waxy crayon that spills past a wobbly dark line, on twos. |
+|  | [Watercolor](styles/watercolor/STYLE.md) | Pale washes that bleed past their edges, a faint darker rim, paper grain. |
+|  | [Chalkboard](styles/chalkboard/STYLE.md) | Chalk on a green board: dusty hatching, a light boiling line, a wooden frame. |
+| Print | [Riso](styles/riso/STYLE.md) | Two-ink risograph: halftone fills in pink and blue, slightly misregistered, grainy paper. |
+|  | [Comic](styles/comic/STYLE.md) | Bold ink line, Ben-Day dots and a sunburst behind, like a comic panel. |
+|  | [Woodblock](styles/woodblock/STYLE.md) | A woodblock print: muted flat colours with wood grain, a fine dark key line. |
+|  | [Screenprint](styles/screenprint/STYLE.md) | Flat posterised colours with an accent plate printed off register. |
+| Retro screen | [Pixel](styles/pixel/STYLE.md) | Big pixels, a limited palette and motion that steps at 8 fps. |
+|  | [One-bit](styles/one-bit/STYLE.md) | Black and white only, with ordered dither for grey, like an early Mac. |
+|  | [Rubber Hose](styles/rubber-hose/STYLE.md) | A 1930s cartoon: sepia, a fat black line, film grain, on twos. |
+|  | [Synthwave](styles/synthwave/STYLE.md) | Pink-to-purple gradients, a cyan neon edge, scanlines, a striped sun and a grid. |
+| Materials | [Clay](styles/clay/STYLE.md) | Plasticine: round soft highlights, a contact shadow, stop-motion at 8 fps. |
+|  | [Papercut](styles/papercut/STYLE.md) | Layers of cut paper casting shadows on each other, stop-motion. |
+|  | [Stained Glass](styles/stained-glass/STYLE.md) | Jewel-coloured glass in heavy lead came, glowing from behind. |
+|  | [Knit](styles/knit/STYLE.md) | A knitted plush: V-stitch texture in every colour, a soft darker seam. |
+| Light and plan | [Neon](styles/neon/STYLE.md) | Glass tubes of light on a dark wall: no fill, a bright core and a glow, a flicker. |
+|  | [Blueprint](styles/blueprint/STYLE.md) | White technical lines on blueprint blue over a grid. |
+
+A mascot can tune its palette per style (`palettes` in `mascot.json`, by style id or
+`"@no-outline"` for every style without an outline). The style catalogue takes inspiration from
+[Lemo-Opuscar](https://github.com/lemomo-ai/lemo-opuscar)'s film styles (see THIRD_PARTY.md).
 
 ## How it works
 
@@ -86,6 +119,7 @@ node tools/render.mjs secret-letter \
   --reel wave,idea,reveal --ms 12000       # deterministic MP4 + GIF export
 node tools/grid.mjs secret-letter wave:1300,idea:1400   # labelled stills
 node tools/matrix.mjs                      # every mascot in every style
+pnpm check:styles                          # no two styles may look alike
 ```
 
 ## Mascots and anatomies

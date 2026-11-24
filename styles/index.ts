@@ -1,7 +1,30 @@
-// Every style, by id. A mascot picks one with "style"; the gallery shows them all.
+// Every style, by id, in gallery order (grouped by family). A mascot picks one with "style".
 import type { Style } from '../kit/style.js';
-import { ink } from './ink/index.js';
 import { softGradient } from './soft-gradient/index.js';
+import { flat } from './flat/index.js';
+import { sticker } from './sticker/index.js';
+import { glass } from './glass/index.js';
+import { lowPoly } from './low-poly/index.js';
+import { lineArt } from './line-art/index.js';
+import { ink } from './ink/index.js';
+import { pencil } from './pencil/index.js';
+import { crayon } from './crayon/index.js';
+import { watercolor } from './watercolor/index.js';
+import { chalkboard } from './chalkboard/index.js';
+import { riso } from './riso/index.js';
+import { comic } from './comic/index.js';
+import { woodblock } from './woodblock/index.js';
+import { screenprint } from './screenprint/index.js';
+import { pixel } from './pixel/index.js';
+import { oneBit } from './one-bit/index.js';
+import { rubberHose } from './rubber-hose/index.js';
+import { synthwave } from './synthwave/index.js';
+import { clay } from './clay/index.js';
+import { papercut } from './papercut/index.js';
+import { stainedGlass } from './stained-glass/index.js';
+import { knit } from './knit/index.js';
+import { neon } from './neon/index.js';
+import { blueprint } from './blueprint/index.js';
 
-export const styles: Style[] = [softGradient, ink];
+export const styles: Style[] = [softGradient, flat, sticker, glass, lowPoly, lineArt, ink, pencil, crayon, watercolor, chalkboard, riso, comic, woodblock, screenprint, pixel, oneBit, rubberHose, synthwave, clay, papercut, stainedGlass, knit, neon, blueprint];
 export const styleById: Record<string, Style> = Object.fromEntries(styles.map((s) => [s.id, s]));

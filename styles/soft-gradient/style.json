@@ -4,5 +4,25 @@
   "family": "Clean vector",
   "look": "No outline: every piece has a vertical gradient, a glow of the character's colour behind it, eyes with a shine.",
   "bg": "#15121F",
-  "axes": { "line": "none", "fill": "gradient", "texture": "none", "palette": "character", "eyes": "oval-shine", "stage": "glow", "rhythm": "smooth" }
+  "axes": {
+    "line": "none",
+    "fill": "gradient",
+    "texture": "none",
+    "palette": "character",
+    "eyes": "oval-shine",
+    "stage": "glow",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "Friendly product-mascot vector lit from above: no outline, every piece a vertical gradient, a glow of the character's colour behind it on a dark stage.",
+    "notIt": "Not glassy (no reflections), not 3D (no shading beyond the gradient).",
+    "shapes": "No outline: edges come from colour contrast, so neighbouring parts need different roles. Details that would vanish (an envelope's lid edges) are drawn as thin lines.",
+    "colour": "Volume roles get a gradient from 34 % lighter (12 % for belly) down to the role colour. Stage #15121F with a radial glow; ink-coloured props turn light.",
+    "eyes": "Dark ovals with a white shine; cheeks always faintly visible (0.45).",
+    "motion": "Smooth; the ground shadow narrows as the character rises.",
+    "pitfalls": [
+      "Gradients on thin strokes break (zero-width box): stroke limbs use flat colours.",
+      "A paper-white body looks unfinished here: tune it with palettes['@no-outline']."
+    ]
+  }
 }

@@ -1,0 +1,27 @@
+{
+  "id": "woodblock",
+  "title": "Woodblock",
+  "family": "Print",
+  "look": "A woodblock print: muted flat colours with wood grain, a fine dark key line.",
+  "bg": "#EFE6D2",
+  "axes": {
+    "line": "thin-dark",
+    "fill": "flat",
+    "texture": "wood",
+    "palette": "muted",
+    "eyes": "line",
+    "stage": "paper",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A hand-pulled woodblock print: soft muted colour, the grain of the block, a fine key line.",
+    "notIt": "Not ink (thin brown line, muted colour, grain).",
+    "shapes": "A fine dark-brown outline.",
+    "colour": "Desaturated and warmed towards umber.",
+    "eyes": "Dark brown.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Grain is per area; small parts show little of it."
+    ]
+  }
+}

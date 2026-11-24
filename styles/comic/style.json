@@ -1,0 +1,27 @@
+{
+  "id": "comic",
+  "title": "Comic",
+  "family": "Print",
+  "look": "Bold ink line, Ben-Day dots and a sunburst behind, like a comic panel.",
+  "bg": "#FFF6D6",
+  "axes": {
+    "line": "ink",
+    "fill": "halftone",
+    "texture": "dots",
+    "palette": "bright",
+    "eyes": "oval-shine",
+    "stage": "burst",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A pulp comic panel: saturated colour printed with Ben-Day dots, a heavy ink line, a sunburst.",
+    "notIt": "Not ink (dots and burst), not riso (black line, saturated process colour).",
+    "shapes": "Heavy black outline pass.",
+    "colour": "Saturated +25 %, darker dots over each area.",
+    "eyes": "Ovals with a shine.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Dots alias at tiny sizes."
+    ]
+  }
+}

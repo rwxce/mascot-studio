@@ -1,0 +1,27 @@
+{
+  "id": "screenprint",
+  "title": "Screenprint",
+  "family": "Print",
+  "look": "Flat posterised colours with an accent plate printed off register.",
+  "bg": "#F2B66D",
+  "axes": {
+    "line": "none",
+    "fill": "posterized",
+    "texture": "grain",
+    "palette": "posterized",
+    "eyes": "dot",
+    "stage": "color",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A gig-poster screenprint: a few posterised flat inks and an accent plate that slipped.",
+    "notIt": "Not riso (flat, not halftone), not flat (posterised, offset plate, grain).",
+    "shapes": "No outline; an accent-coloured offset copy of each silhouette.",
+    "colour": "Each channel quantised to 3 levels.",
+    "eyes": "Dots.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Posterising can push two roles to the same colour."
+    ]
+  }
+}

@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- 25 styles in 6 families (clean vector, drawn by hand, print, retro screen, materials, light and
+  plan), each a plugin with `style.json` (7 axes + docs) and a generated `STYLE.md`.
+- The style gallery (`playground/styles.html`, `pnpm build:gallery` for one HTML file): pick a
+  mascot, see it alive in every style, open one to play its actions; shareable URLs.
+- Diversity is enforced: no two styles share more than 3 axes (`pnpm test`), and
+  `pnpm check:styles` fails when two styles render alike.
+- Rig: hollow outlines, edge strokes, an offset drop pass (hard shadows, paper layers,
+  misregistration), per-frame style hooks, a pixelate filter in viewBox space.
+- `pnpm check` covers every mascot × style (100 combinations); stepped styles are sampled at
+  their own rhythm. `@no-outline` palettes; light eyes stay light on dark visors.
+
+## 0.4.0
+
 - Styles: anatomies paint by role and a style answers (`kit/style.ts`, `styles/`). Two styles:
   Soft Gradient (the look of plate 004) and Ink. A mascot can tune its palette per style.
 - Three new anatomies — `biped` (shoulders and elbows, an antenna on a loose spring),

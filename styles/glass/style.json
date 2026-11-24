@@ -1,0 +1,27 @@
+{
+  "id": "glass",
+  "title": "Glass",
+  "family": "Clean vector",
+  "look": "Translucent tinted glass with a bright edge, over colourful blurred blobs.",
+  "bg": "#0E1430",
+  "axes": {
+    "line": "thin-white",
+    "fill": "translucent",
+    "texture": "none",
+    "palette": "cool",
+    "eyes": "glow",
+    "stage": "blobs",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "Frosted, tinted glass: you see the coloured stage through the body, edged with light.",
+    "notIt": "Not soft-gradient (the body is see-through and edged), not stained glass (no lead).",
+    "shapes": "A thin white hollow edge around each silhouette; fills fade from a bright corner.",
+    "colour": "The palette cooled 25 % towards cyan. Stage: three soft colour blobs on navy.",
+    "eyes": "Bright with a shine.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Overlapping translucent parts look darker where they overlap: that is part of the look."
+    ]
+  }
+}
