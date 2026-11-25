@@ -1,11 +1,12 @@
 // Build the style gallery as ONE self-contained HTML file (CSS and JS inline): for GitHub Pages,
 // for sharing, or to embed anywhere.   node tools/build-gallery.mjs [--out dist/gallery/index.html]
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { build } from 'vite';
 
 const args = process.argv.slice(2);
 const out = args.includes('--out') ? args[args.indexOf('--out') + 1] : 'dist/gallery/index.html';
+const styleCount = readdirSync('styles').filter((d) => existsSync(`styles/${d}/style.json`)).length;
 const res = await build({
   configFile: false,
   logLevel: 'error',
@@ -23,7 +24,7 @@ const html = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>mascot-studio — styles</title>
-<meta name="description" content="Original SVG mascots in 25 styles, alive in your browser.">
+<meta name="description" content="Original SVG mascots in ${styleCount} styles, alive in your browser.">
 <style>${css}</style>
 </head>
 <body>
