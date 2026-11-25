@@ -1,6 +1,7 @@
 name: Pages
 
-# Publishes the style gallery (`pnpm build:gallery`, one self-contained HTML file) to GitHub Pages.
+# Publishes the site to GitHub Pages (`pnpm build:site`: landing page at / and the live style gallery
+# at /gallery/).
 # It follows releases: the Release workflow pushes main with the workflow token, and pushes made
 # with that token never start other workflows, so this one listens for Release to finish instead.
 
@@ -40,7 +41,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm build:gallery --out _site/index.html
+      - run: pnpm build:site --out _site
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
