@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+**1.0: the format is now stable.** What a mascot, a style and an anatomy look like on disk is the
+public interface from here on.
+
+- Stable from 1.0: the `mascot.json` format (`schema/mascot.schema.json`), the `style.json` format
+  (7 axes, docs and the optional `form` block), the five anatomies (`anchor`, `biped`,
+  `quadruped`, `floater`, `object-limbs`) and their built-in actions, and the `pnpm check` rules a
+  mascot must pass. A mascot or style written for 1.0 keeps rendering the same in every 1.x.
+- Breaking changes to any of these wait for 2.0 and are announced here first.
+- What 1.0 holds: 50 styles in 6 families, the form layer, Nodi and the plate 004 cast, the live
+  style gallery, and the landing page in English, Spanish and Catalan.
+- Fix: the cast images on the landing no longer overflow the page at 320-340 px.
+
 ## 0.10.0
 
 ## 0.9.0
