@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Landing page in English, Spanish (`/es/`) and Catalan (`/ca/`), with a language switcher, hreflang, a logo and favicon, social cards and Lenis smooth scrolling (vendored, MIT). The nav collapses into the menu below 1020 px so the longer Spanish and Catalan labels never overflow.
+
 ## 0.8.0
 
 - Landing page on GitHub Pages (`pnpm build:site`): the project story, the 50 styles, the cast and how to make your own; the live gallery moves to `/gallery/` and accepts `?style=`.
