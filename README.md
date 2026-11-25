@@ -4,9 +4,9 @@
 
 **Original SVG mascots that feel alive** — real rigs, clean lines, 60 fps motion, zero dependencies.
 
-<img src="docs/media/nodi.webp" width="420" alt="Nodi, a vector anchor point with Bézier handles for arms, waves, sketches a curve in the air, morphs into a star and a heart, gets selected and snaps to a grid">
+<img src="docs/media/nodi.webp" width="420" alt="Nodi, a vector anchor point with Bézier handles for arms, waves, sketches a curve in the air, morphs, gets selected and snaps to a grid while its style changes from sticker to ink, low poly, bauhaus and anime">
 
-<sub><b>Nodi</b>, the mascot-studio mascot · anchor · soft gradient · transparent, on any background</sub>
+<sub><b>Nodi</b>, the mascot-studio mascot · anchor · sticker → ink → low poly → bauhaus → anime · transparent, on any background</sub>
 
 <sub>Every frame is drawn and animated in code. Same mascot, any style: the anatomy says what is drawn, the style how.</sub>
 

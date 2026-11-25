@@ -18,7 +18,7 @@ export function extract(html) {
   const body = strip(html);
   for (const m of body.matchAll(/>([^<>]+)</g)) {
     const t = norm(m[1].replace(/&amp;/g, '&'));
-    if (t && !SKIP.test(t) && !/^pnpm /.test(t)) out.add(t);
+    if (t && !SKIP.test(t) && !/^(pnpm|git|cd) /.test(t)) out.add(t);
   }
   for (const m of body.matchAll(/\s(?:alt|aria-label)="([^"]+)"/g)) out.add(norm(m[1]));
   out.add(norm(html.match(/<title>([^<]+)<\/title>/)[1]));
@@ -41,7 +41,7 @@ export function localise(html, dict) {
       return chunk
         .replace(/>([^<>]+)</g, (m, text) => {
           const key = norm(text.replace(/&amp;/g, '&'));
-          if (!key || SKIP.test(key) || /^pnpm /.test(key)) return m;
+          if (!key || SKIP.test(key) || /^(pnpm|git|cd) /.test(key)) return m;
           const lead = text.match(/^\s*/)[0];
           const trail = text.match(/\s*$/)[0];
           return `>${lead}${t(text)}${trail}<`;
