@@ -12,6 +12,8 @@
 
 </div>
 
+**[Browse the gallery](https://rwxce.github.io/mascot-studio/)**: every mascot in every style, live.
+
 ## What it does
 
 A mascot here is not a video: it is a live SVG that breathes, blinks, looks at your pointer, says hi when you hover it and jumps when you click it. Between those moments it picks what to do next on its own — never the same thing twice in a row.
@@ -133,6 +135,8 @@ a palette, proportions, props and its own actions as keyframes on named channels
   ]
 }
 ```
+
+An agent can do this end to end with the [`create-mascot` skill](.claude/skills/create-mascot/SKILL.md).
 
 Then `pnpm check my-mascot` runs every rule in [CRAFT.md](CRAFT.md): the spec against its
 [anatomy](anatomies/anchor/ANATOMY.md), and every action frame by frame (in frame, no jumps,
