@@ -15,7 +15,8 @@
     "check": "node tools/check.mjs",
     "check:styles": "node tools/distinct.mjs",
     "docs:styles": "node scripts/style-docs.mjs",
-    "build:gallery": "node tools/build-gallery.mjs"
+    "build:gallery": "node tools/build-gallery.mjs",
+    "build:site": "node tools/build-site.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.65.1",
