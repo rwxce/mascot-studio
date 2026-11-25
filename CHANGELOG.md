@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- The README and landing Nodi now changes style as it moves: sticker, ink, low poly, bauhaus and anime,
+  crossfading on the same pose (`docs/media/nodi.webp`, transparent).
+- `tools/render.mjs --styles a,b,c [--every ms] [--fade ms]`: one render that changes style over time;
+  every style replays the same deterministic timeline, so the pose carries across each change.
+- `pnpm build:embed` (`playground/embed.ts`): a self-contained live Nodi script (~23 KB gz) that
+  follows the pointer and cycles styles in any `[data-nodi-live]` element; the rwxce site uses it.
+
 ## 1.0.0
 
 **1.0: the format is now stable.** What a mascot, a style and an anatomy look like on disk is the

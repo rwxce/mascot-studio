@@ -6,9 +6,12 @@
 // an animated WebP with a real alpha channel (soft edges on light and dark pages; needs img2webp
 // from libwebp: `brew install webp`). The GIF keeps
 // 1-bit transparency: soft pixels (the floor shadow, the glow) drop out.
+// --styles a,b,c [--every 3000] [--fade 400] changes style over time: every style replays the same
+// deterministic timeline, so the pose carries across each change, and consecutive styles crossfade
+// for --fade ms (composited by the browser, so soft alpha edges stay clean).
 import { chromium } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readdirSync, rmSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { createServer } from 'vite';
 
@@ -25,6 +28,9 @@ const stills = opt('stills', '') ? opt('stills', '').split(',').map(Number) : []
 const sheet = Number(opt('sheet', 0));
 const style = opt('style', '');
 const transparent = args.includes('--transparent');
+const styles = opt('styles', '') ? opt('styles', '').split(',') : [];
+const every = Number(opt('every', 3000));
+const fade = Number(opt('fade', 400));
 
 const server = await createServer({ root: 'playground', server: { port: 0 }, logLevel: 'error' });
 await server.listen();
@@ -33,21 +39,67 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: width + 40, height: 600 }, deviceScaleFactor: 2 });
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
-await page.goto(`${url}?export&only=${id}${style ? `&style=${style}` : ''}`);
-await page.waitForFunction(() => window.__mascots);
-await page.addStyleTag({ content: `body.export .card { width: ${width}px }${transparent ? ' body.export, body.export .card { background: transparent !important } [data-stage] { display: none }' : ''}` });
-await page.evaluate(([id, reel]) => window.__reset(id, reel), [id, reel]);
-const card = await page.$(`#card-${id}`);
 const frames = join(dirname(out), `.frames-${id}`);
 rmSync(frames, { recursive: true, force: true });
 mkdirSync(frames, { recursive: true });
 const step = 1000 / fps;
-const n = Math.round(ms / step);
-for (let i = 0; i < n; i++) {
-  await page.evaluate(([t, dt]) => window.__render(t, dt), [i * step, step]);
-  await card.screenshot({ path: join(frames, `${String(i).padStart(5, '0')}.png`), omitBackground: transparent });
-  const t = Math.round(i * step);
-  if (stills.some((s) => Math.abs(s - t) < step / 2)) await card.screenshot({ path: `${out}-${t}.png` });
+let n = Math.round(ms / step);
+const frameName = (i) => join(frames, `${String(i).padStart(5, '0')}.png`);
+
+// Open the export page in one style, reset it to frame 0 and return the card's box.
+async function open(st) {
+  await page.goto(`${url}?export&only=${id}${st ? `&style=${st}` : ''}`);
+  await page.waitForFunction(() => window.__mascots);
+  await page.addStyleTag({ content: `body.export .card { width: ${width}px }${transparent ? ' body.export, body.export .card { background: transparent !important } [data-stage] { display: none }' : ''}` });
+  await page.evaluate(([id, reel]) => window.__reset(id, reel), [id, reel]);
+  return page.$(`#card-${id}`);
+}
+
+if (!styles.length) {
+  const card = await open(style);
+  for (let i = 0; i < n; i++) {
+    await page.evaluate(([t, dt]) => window.__render(t, dt), [i * step, step]);
+    await card.screenshot({ path: frameName(i), omitBackground: transparent });
+    const t = Math.round(i * step);
+    if (stills.some((s) => Math.abs(s - t) < step / 2)) await card.screenshot({ path: `${out}-${t}.png` });
+  }
+} else {
+  // Style k owns frames [k*every, (k+1)*every) and also captures the next --fade ms, which the
+  // next style crossfades over. The last style fades into the first (frames 0..fade), so the
+  // loop seam is hidden under a crossfade too.
+  const per = Math.round(every / step), fadeN = Math.round(fade / step);
+  const total = per * styles.length;
+  n = total;
+  const tails = join(frames, 'tails');
+  mkdirSync(tails, { recursive: true });
+  let clip;
+  for (let k = 0; k < styles.length; k++) {
+    const card = await open(styles[k]);
+    clip ??= await card.boundingBox();
+    const from = k * per, to = from + per + fadeN;
+    for (let i = 0; i < to; i++) {
+      await page.evaluate(([t, dt]) => window.__render(t, dt), [i * step, step]);
+      if (i < from) continue;
+      const path = i < from + per ? frameName(i) : join(tails, `${String(i % total).padStart(5, '0')}.png`);
+      await page.screenshot({ path, clip, omitBackground: transparent });
+    }
+  }
+  // Crossfade: frame j of the head of style k+1 over the tail of style k, composited in the page.
+  if (fadeN) {
+    const data = (p) => `data:image/png;base64,${readFileSync(p).toString('base64')}`;
+    const comp = await browser.newPage({ viewport: { width: Math.ceil(clip.width), height: Math.ceil(clip.height) }, deviceScaleFactor: 2 });
+    for (let k = 0; k < styles.length; k++) {
+      const head = ((k + 1) % styles.length) * per;
+      for (let j = 0; j < fadeN; j++) {
+        const i = (head + j) % total;
+        const tail = join(tails, `${String(i).padStart(5, '0')}.png`);
+        const w = (j + 1) / (fadeN + 1);
+        await comp.setContent(`<style>html,body{margin:0;background:transparent}img{position:absolute;inset:0;width:${clip.width}px;height:${clip.height}px}</style><img src="${data(tail)}" style="opacity:${1 - w}"><img src="${data(frameName(i))}" style="opacity:${w}">`);
+        await comp.screenshot({ path: frameName(i), clip: { x: 0, y: 0, width: clip.width, height: clip.height }, omitBackground: transparent });
+      }
+    }
+  }
+  rmSync(tails, { recursive: true, force: true });
 }
 await browser.close();
 await server.close();

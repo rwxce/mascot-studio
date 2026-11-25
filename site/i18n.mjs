@@ -9,7 +9,7 @@ const same = [
   'idea, heart, sleepy, draw, morph, select, snap, spin', 'scan, dance, think, nap',
   'wag, ear-flick, pounce, curl-up', 'loop, boo, vanish, giggle, sleepy',
   'Wave, draw, morph, select, stretch, snap, idea, heart, spin, sleepy, hop, surprise.',
-  'Nodi · anchor · soft gradient · transparent', 'Changelog',
+  'Nodi · anchor · sticker → ink → low poly → bauhaus → anime', 'Changelog',
 ];
 
 export const es = {
@@ -52,7 +52,7 @@ export const es = {
   'mascot-studio · MIT license · motion engine derived from rossark-motion-skill': 'mascot-studio · licencia MIT · motor de movimiento derivado de rossark-motion-skill',
   'Security': 'Seguridad', 'License': 'Licencia',
   'Open menu': 'Abrir menú', 'At a glance': 'De un vistazo', 'Style families': 'Familias de estilos', 'Footer': 'Pie de página',
-  'Nodi, a vector anchor point with Bézier handles for arms, waves, sketches a curve, morphs into a star and a heart and snaps to a grid': 'Nodi, un punto de ancla vectorial con tiradores Bézier por brazos, saluda, dibuja una curva, se transforma en una estrella y un corazón y se ajusta a una cuadrícula',
+  'Nodi, a vector anchor point with Bézier handles for arms, waves, sketches a curve, morphs and snaps to a grid while its style changes: sticker, ink, low poly, bauhaus and anime': 'Nodi, un punto de ancla vectorial con tiradores Bézier por brazos, saluda, dibuja una curva, se transforma y se ajusta a una cuadrícula mientras cambia de estilo: sticker, tinta, low poly, bauhaus y anime',
   'Twelve stills of Nodi: wave, draw, morph, select, stretch, snap, idea, heart, spin, sleepy, hop and surprise': 'Doce imágenes de Nodi: wave, draw, morph, select, stretch, snap, idea, heart, spin, sleepy, hop y surprise',
   'Nodi drawn in each of the 50 styles': 'Nodi dibujado en cada uno de los 50 estilos',
   'Nodi, the robot, the fox and the ghost redrawn by each style that carries a form': 'Nodi, el robot, el zorro y el fantasma redibujados por cada estilo que trae una forma',
@@ -101,7 +101,7 @@ export const ca = {
   'mascot-studio · MIT license · motion engine derived from rossark-motion-skill': 'mascot-studio · llicència MIT · motor de moviment derivat de rossark-motion-skill',
   'Security': 'Seguretat', 'License': 'Llicència',
   'Open menu': 'Obrir menú', 'At a glance': 'D’una ullada', 'Style families': 'Famílies d’estils', 'Footer': 'Peu de pàgina',
-  'Nodi, a vector anchor point with Bézier handles for arms, waves, sketches a curve, morphs into a star and a heart and snaps to a grid': 'Nodi, un punt d’ancoratge vectorial amb nanses Bézier per braços, saluda, dibuixa una corba, es transforma en una estrella i un cor i s’ajusta a una quadrícula',
+  'Nodi, a vector anchor point with Bézier handles for arms, waves, sketches a curve, morphs and snaps to a grid while its style changes: sticker, ink, low poly, bauhaus and anime': 'Nodi, un punt d’ancoratge vectorial amb nanses Bézier per braços, saluda, dibuixa una corba, es transforma i s’ajusta a una quadrícula mentre canvia d’estil: sticker, tinta, low poly, bauhaus i anime',
   'Twelve stills of Nodi: wave, draw, morph, select, stretch, snap, idea, heart, spin, sleepy, hop and surprise': 'Dotze imatges de Nodi: wave, draw, morph, select, stretch, snap, idea, heart, spin, sleepy, hop i surprise',
   'Nodi drawn in each of the 50 styles': 'Nodi dibuixat en cadascun dels 50 estils',
   'Nodi, the robot, the fox and the ghost redrawn by each style that carries a form': 'Nodi, el robot, la guineu i el fantasma redibuixats per cada estil que porta una forma',
