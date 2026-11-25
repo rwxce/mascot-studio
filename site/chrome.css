@@ -1,0 +1,30 @@
+/* Shared site header: used by the landing (linked) and the gallery (inlined at build time).
+   Needs a `.ms` ancestor: the menu breakpoints are container queries on it. */
+.ms{container-type:inline-size;width:100%}
+.ms *{box-sizing:border-box}
+.wrap{width:100%;max-width:1200px;margin:0 auto;padding-inline:40px}
+.navlinks{display:flex;gap:28px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:12px;font-weight:600;font-size:16px;text-decoration:none;border:0;cursor:pointer;font-family:'Inter',sans-serif}
+/* Must come AFTER .btn: both have the same specificity, so the later one wins. */
+.menubtn{display:none}
+.mobonly{display:none}
+[hidden]{display:none!important}
+/* Desktop language switch: its own block, set apart from the links by a divider. */
+.langs{display:flex;align-items:center;gap:12px;padding-left:28px;border-left:1px solid #34344A;font-family:'JetBrains Mono',monospace;font-size:14px}
+.lang{display:inline-flex;align-items:center;justify-content:center;min-width:32px;min-height:32px;padding:0 4px;border-radius:8px;color:#8E8DA0;text-decoration:none}
+a.lang:hover{color:#F4F2EC;background:#1B1B27}
+.lang[aria-current]{color:#F4F2EC;background:#23232F}
+/* Mobile language section, inside the menu. */
+.mlangs{display:flex;flex-direction:column;gap:10px;margin-top:12px;padding-top:16px;border-top:1px solid #23232F}
+.mlabel{margin:0;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#8E8DA0}
+.mpills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid #34344A;color:#F4F2EC;text-decoration:none;font-size:16px}
+.pill[aria-current]{background:#F4F2EC;color:#0F0F17;border-color:#F4F2EC}
+@container (max-width: 1020px){
+ .navlinks{display:none}
+ .menubtn{display:inline-flex}
+ .mobonly{display:flex}
+}
+@container (max-width: 640px){
+ .wrap{padding-inline:20px}
+}

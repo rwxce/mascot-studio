@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const ROOT = join(__dirname, '..');
-const SKIP = new Set(['node_modules', '.git', 'dist', 'out', 'mascots', 'CHANGELOG.md', 'pnpm-lock.yaml']);
+const SKIP = new Set(['node_modules', '.git', 'dist', 'out', '_site', 'mascots', 'CHANGELOG.md', 'pnpm-lock.yaml']);
 const README = readFileSync(join(ROOT, 'README.md'), 'utf8');
 const REMOVABLE = readdirSync(join(ROOT, 'mascots')).filter((n) => statSync(join(ROOT, 'mascots', n)).isDirectory() && !README.includes(`mascots/${n}/`));
 
