@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.9.0
+
 - Landing page in English, Spanish (`/es/`) and Catalan (`/ca/`), with a language switcher, hreflang, a logo and favicon, social cards and Lenis smooth scrolling (vendored, MIT). The nav collapses into the menu below 1020 px so the longer Spanish and Catalan labels never overflow.
 
 ## 0.8.0
