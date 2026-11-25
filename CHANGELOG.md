@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.0
+
 - Landing page on GitHub Pages (`pnpm build:site`): the project story, the 50 styles, the cast and how to make your own; the live gallery moves to `/gallery/` and accepts `?style=`.
 
 ## 0.7.0
