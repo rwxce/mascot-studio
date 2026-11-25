@@ -25,7 +25,10 @@ const MAX_STEP = 22;
   const stage = document.getElementById('stage')!;
   const twin = document.getElementById('twin')!;
   const clock = createClock();
-  const m = makeMascot(spec, { style });
+  // Hold-then-snap forms jump on purpose; the rules run on the continuous timeline underneath,
+  // so the geometry is still checked frame by frame and only the intended snap is ignored.
+  const snapForm = !!anatomy.usesForm && (styleById[style ?? spec.style ?? 'soft-gradient']?.form?.motion?.snap ?? 0) > 0;
+  const m = makeMascot(spec, { style, unsnapped: snapForm });
   const m2 = makeMascot(spec, { salt: 1, style });
   stage.append(m.el); twin.append(m2.el);
   clock.add(m); clock.add(m2);
@@ -85,7 +88,8 @@ const MAX_STEP = 22;
 
   // Stepped styles (stop-motion, pixel) hold each pose for a step: sample at their rhythm, and
   // allow the distance a part travels in one of their steps.
-  const painter = styleById[style ?? spec.style ?? 'soft-gradient'].painter(spec.palette, 'probe');
+  const styleDef = styleById[style ?? spec.style ?? 'soft-gradient'];
+  const painter = styleDef.painter(spec.palette, 'probe');
   let styleStep = 0;
   for (let t = 1; t <= 300; t++) if (painter.time(t) > 0) { styleStep = painter.time(t); break; }
   const step = styleStep > 1000 / 30 ? styleStep : 1000 / 30;
@@ -121,7 +125,8 @@ const MAX_STEP = 22;
     // A pop: one part moves far more in one frame than it does in the frames around it.
     // Fast motion is fine; a part teleporting is not. Stepped styles (stop-motion, pixel) skip
     // it: the motion underneath is the same in every style and is checked in the smooth ones,
-    // and a fast move landing in one step is what stop-motion looks like.
+    // and a fast move landing in one step is what stop-motion looks like. Forms with
+    // hold-then-snap timing are checked unsnapped (see makeMascot above), so they keep the rule.
     let popped = styleStep > 34;
     for (const steps of moves) {
       if (popped || !steps) continue;

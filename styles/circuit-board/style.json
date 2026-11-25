@@ -1,0 +1,28 @@
+{
+  "id": "circuit-board",
+  "title": "Circuit Board",
+  "family": "Sensors and circuits",
+  "look": "A chip on a green PCB: black epoxy body edged in tin, copper traces and pads all round, LED eyes.",
+  "bg": "#0E5A32",
+  "axes": {
+    "line": "tin",
+    "fill": "epoxy",
+    "texture": "solder-mask",
+    "palette": "pcb",
+    "eyes": "led",
+    "stage": "traces",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "The character as a component soldered to a printed circuit board: its body a black chip package, its limbs copper traces, its hands tinned pads, its eyes two lit LEDs.",
+    "notIt": "Not blueprint (a populated board in copper and green, not a white plan), not pixel (no grid snapping), not hologram (solid parts, no light).",
+    "shapes": "A thin tin edge on every part; the body carries a faint laser-etched dot grid like a chip's surface.",
+    "colour": "Body black epoxy, bellies a lighter die grey, limbs copper, accents tinned silver, props a red LED, all on solder-mask green.",
+    "eyes": "Amber LEDs, lit.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Copper limbs on copper traces merge: the traces stay out of the character's centre.",
+      "The black body needs its tin edge on dark pages."
+    ]
+  }
+}

@@ -89,8 +89,11 @@ export const pat = {
 
 /** Pixelate everything drawn through it (block size in px). The character runtime sets the
  *  filter region to the viewBox (userSpaceOnUse) and moves the sample point inside it. */
+// One 1-unit sample per block, grown into the block. feMorphology dilate keeps the per-channel
+// maximum, so if a grown sample reaches past its block the lighter neighbour wins and dark details
+// (eyes, mouths) shrink to slivers. Sample (1) + 2 × radius must equal the block exactly.
 export const pixelateFilter = (id: string, block = 4) =>
-  `<filter id="${id}" data-block="${block}" filterUnits="userSpaceOnUse" x="0" y="0" width="1" height="1"><feFlood x="${block / 2}" y="${block / 2}" height="1" width="1"/><feComposite width="${block}" height="${block}"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="${block / 2}"/></filter>`;
+  `<filter id="${id}" data-block="${block}" filterUnits="userSpaceOnUse" x="0" y="0" width="1" height="1"><feFlood x="${(block - 1) / 2}" y="${(block - 1) / 2}" height="1" width="1"/><feComposite width="${block}" height="${block}"/><feTile result="a"/><feComposite in="SourceGraphic" in2="a" operator="in"/><feMorphology operator="dilate" radius="${(block - 1) / 2}"/></filter>`;
 
 // ---------------------------------------------------------------- stages
 export const stages = {

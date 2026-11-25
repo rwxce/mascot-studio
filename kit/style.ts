@@ -3,6 +3,7 @@
 // answers with a fill (flat, gradient, pattern…), an outline or none, eye shines, a stage
 // behind the character and a ground shadow. Swapping the style redraws the same rig.
 import { darken, lighten } from './color.js';
+import type { FormSpec } from './form.js';
 import type { Part, RigLook, Shape } from './rig.js';
 
 export type Role =
@@ -68,6 +69,8 @@ export interface Painter {
 }
 
 export interface Style extends StyleMeta {
+  /** How the style constructs a character (kit/form.ts); absent = the anatomy as authored. */
+  form?: FormSpec;
   painter(palette: Palette, uid: string): Painter;
 }
 

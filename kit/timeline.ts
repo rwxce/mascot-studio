@@ -60,7 +60,8 @@ export function jump(u: number, j: JumpSpec): [number, number] {
     const p = (u - at) / air;
     y = -height * 4 * p * (1 - p);
   }
-  const pre: [number, number][] = j.startle ? [[0, 1], [at, 1]] : [[0, 1], [at - 180, 1], [at - 20, 0.88]];
+  // A startle at 0 ms has no lead-in key: two keys at the same time would divide by zero (NaN).
+  const pre: [number, number][] = j.startle ? (at > 0 ? [[0, 1], [at, 1]] : [[at, 1]]) : [[0, 1], [at - 180, 1], [at - 20, 0.88]];
   const sy = flow(u, [...pre, [at + 60, 1.1], [at + air * 0.5, 1.02], [at + air - 30, 1.05], [at + air + 60, 0.86], [at + air + 260, 1.04], [at + air + 520, 1], [at + air + 2000, 1]]);
   return [y, sy];
 }

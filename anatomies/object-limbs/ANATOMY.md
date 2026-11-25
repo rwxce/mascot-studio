@@ -43,3 +43,21 @@ Springs smooth `armR.rot`, `armL.rot` and `inner.look`.
 
 `wave`, `hop`, `look-around`, `stretch`, and the reactions `notice` (hover) and `surprise`
 (click). A mascot overrides one by declaring an action with the same name.
+
+## Form
+
+The anatomy uses a style's `form` (`kit/form.ts`); without one it draws exactly as authored.
+
+- **Envelope.** It stays inside its authored box, so prop anchors never land on it: `aspect` > 1
+  narrows it, < 1 lowers it. `head` (and `chibi`) shows as bigger features and shorter arms.
+  `corners` above 0.5 round the outer corners; at or below 0.5 they stay sharp. `grid` snaps
+  its size. `body` and `feet` are ignored (no torso, no legs).
+- **Arms.** `hands: default` keeps the puzzle tab: its neck follows `limbLength`, its thickness
+  `limbThickness`, and `taper` thins it towards the end. Any other hand turns the tab into a
+  straight arm (or a hose with `limbs: noodle`) with that hand; `armX.long` stretches it and
+  `armX.thumb` grows a thumb on the hand. The reach stays near the authored one, so every action
+  stays in frame.
+- **Face.** The form's eye, brow and mouth models sit on the lid, pushed down when big eyes or
+  brows need room. There are no mouth channels: the mouth smiles with `eyes.happy` and opens
+  when `eyes.scale` goes up. Marks: sweat by the top right corner, blush lines on the cheeks,
+  speed lines under the body.

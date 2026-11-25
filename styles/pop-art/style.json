@@ -1,0 +1,34 @@
+{
+  "id": "pop-art",
+  "title": "Pop Art",
+  "family": "Graphic",
+  "look": "A 1960s pop canvas: giant Ben-Day dots, flat primaries, a thick black line and a white speech burst on cyan.",
+  "bg": "#FF5AA5",
+  "axes": {
+    "line": "heavy-black",
+    "fill": "big-dots",
+    "texture": "none",
+    "palette": "primary-pop",
+    "eyes": "solid",
+    "stage": "speech-burst",
+    "rhythm": "smooth"
+  },
+  "form": {
+    "corners": 0.38,
+    "brows": "bold",
+    "mouth": "wide",
+    "face": { "scale": 1.1 }
+  },
+  "doc": {
+    "essence": "A comic frame blown up to gallery size and repainted by hand: the printing dots become huge and deliberate, the colours are straight from the tube, and a jagged white balloon shouts behind.",
+    "notIt": "Not comic (dots on a white ground, only primaries, flat cyan and pink grounds, a speech balloon instead of a sunburst), not riso (black line, no misregistration), not bauhaus (dots, line, a balloon).",
+    "shapes": "A thick black line on every part, squarer corners, bold brows and a wide mouth.",
+    "colour": "Areas snap to red, yellow, blue, pink, green or white. The body is printed as big coloured dots on white; the rest is flat.",
+    "eyes": "Solid black with a white glint.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Big dots behind small eyes flicker at small sizes: the dot screen stays coarser than the eyes.",
+      "Body and accent snapping to the same primary merge: the line keeps them apart."
+    ]
+  }
+}

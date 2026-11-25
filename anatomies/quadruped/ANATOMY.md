@@ -29,3 +29,13 @@ Ears twitch on their own at seeded moments.
 ## Built-in actions
 
 `wave`, `hop`, `look-around`, `stretch` (a play bow), `notice`, `surprise`.
+
+## Form
+
+Opts into the form layer (`kit/form.ts`): a style without a `form` block draws the fox exactly as
+authored. With one, the head, ears and body scale with the proportions (chibi included); corners
+below 0.4 swap the curved head, mask and body for rounded polygons, above 0.5 they round the ear
+tips; legs follow `limbLength`/`limbThickness`, `taper` and `limbs: noodle`; paws follow `feet`
+(`shoe`, `block`); eyes and brows come from the form's models, the nose takes the shape of the
+form's mouth model (the fox has no mouth channels), and marks sit at the temple, cheeks and
+under the body. `hands` does not apply: the paws are the feet.

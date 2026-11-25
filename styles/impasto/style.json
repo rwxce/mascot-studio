@@ -1,0 +1,28 @@
+{
+  "id": "impasto",
+  "title": "Impasto",
+  "family": "Fine art",
+  "look": "Oil paint laid on thick: ridged brush strokes in warm colour on a canvas weave.",
+  "bg": "#7A4A2E",
+  "axes": {
+    "line": "brush",
+    "fill": "strokes",
+    "texture": "canvas",
+    "palette": "warm-oil",
+    "eyes": "solid",
+    "stage": "daub",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A small oil sketch painted wet into wet: every area is a crowd of short, loaded strokes with a light ridge on each, over a canvas you can still feel.",
+    "notIt": "Not watercolor (opaque, thick, warm, no paper showing), not crayon (strokes are wide and ridged, not waxy scribbles), not clay (texture is the brush, not the thumb).",
+    "shapes": "A dark umber contour painted with a loaded brush that wobbles a little. Inside, short curved strokes in three values of the area's colour.",
+    "colour": "Every colour warmed towards ochre and pushed a touch more saturated. Eyes and line in burnt umber.",
+    "eyes": "Solid umber, like a last dab of dark paint.",
+    "motion": "Smooth, with a faint boil so the painted edge never sits perfectly still.",
+    "pitfalls": [
+      "Stroke patterns behind the eyes compete with the face: keep the stroke values close to the base colour.",
+      "Very dark palettes lose the ridges: the highlight stroke must stay visible."
+    ]
+  }
+}

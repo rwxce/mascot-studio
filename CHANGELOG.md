@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+- **Forms**: a style can now construct the character, not only paint it (`kit/form.ts`, the
+  `"form"` block of `style.json`): proportions, corners, taper, noodle limbs, hands, feet, a grid,
+  hold-then-snap timing and eye, mouth and brow models (`kit/faces/`). Every anatomy reads it:
+  anchor, biped, quadruped, floater and object-limbs. A style without a form renders exactly as
+  before.
+- 25 new styles (50 in all): Anime, Cel Anime 80s, Manga, Bauhaus, Impasto, Ukiyo-e, Ink Wash,
+  Shadow Puppet, Gilded, Engraving, Scratchboard, Pop Art, Art Deco, Pictogram, Mid-century,
+  Silent Film, CRT ASCII, Hologram, Circuit Board, Firefly Pointillism, Brick Toy, Memphis,
+  Thermal, X-ray and Marker. Comic, Rubber Hose, Clay and Pixel gain a form.
+- Nodi: smooth morphs (every shape sampled at the same angles; star to heart goes through the
+  circle), the wave beside the head, Pixel faces that survive any tilt.
+- Pixel: 3 px blocks and a pixelate filter whose dilation fits the block, so dark details no
+  longer shrink to slivers.
+- `tools/render.mjs --transparent`: an animated WebP with alpha and a transparent GIF. The README
+  heroes are transparent WebPs.
+- Fix: a startle jump at 0 ms gave a NaN squash for one frame.
+- `pnpm check`: hold-then-snap forms are checked on the continuous timeline instead of skipping
+  the no-jumps rule.
+- README: how to report a vulnerability privately.
+
+## 0.6.0
+
 - Nodi, the mascot-studio mascot: a vector anchor point whose Bézier handles are its arms. A new
   anatomy, `anchor`, with a body that morphs between a rounded square, a circle, a star and a
   heart, and five built-in actions: draw (sketches a curve in the air), morph, select (a

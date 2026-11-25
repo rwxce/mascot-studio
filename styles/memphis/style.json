@@ -1,0 +1,28 @@
+{
+  "id": "memphis",
+  "title": "Memphis",
+  "family": "Graphic",
+  "look": "1980s Memphis design: pastel blocks, black squiggles and confetti, a dotted belly and a striped accent.",
+  "bg": "#F6E3EC",
+  "axes": {
+    "line": "black-mid",
+    "fill": "patterned",
+    "texture": "confetti",
+    "palette": "memphis",
+    "eyes": "solid",
+    "stage": "squiggles",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A loud postmodern print: sugary pastels and black, every surface its own pattern, the background a party of squiggles, zigzags, triangles and dots thrown around at odd angles.",
+    "notIt": "Not crayon (printed, crisp patterns, black squiggles), not bauhaus (pastels and playful clutter, no strict primaries), not flat (patterns on every area, a busy stage).",
+    "shapes": "A medium black outline on every part.",
+    "colour": "Areas snap to pink, mint, yellow, lilac or cyan. The body stays flat; the belly gets black dots and the accent black stripes.",
+    "eyes": "Solid black.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "A busy stage can swallow the character: the stage stays at the edges.",
+      "Patterned areas behind the face are kept off the body."
+    ]
+  }
+}
