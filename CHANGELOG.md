@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.0
+
 - **Forms**: a style can now construct the character, not only paint it (`kit/form.ts`, the
   `"form"` block of `style.json`): proportions, corners, taper, noodle limbs, hands, feet, a grid,
   hold-then-snap timing and eye, mouth and brow models (`kit/faces/`). Every anatomy reads it:
