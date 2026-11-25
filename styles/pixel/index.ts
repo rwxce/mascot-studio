@@ -13,7 +13,7 @@ export const pixel: Style = {
     shine: true,
     shadow: 'rgba(0,0,0,.4)',
     step: 125,
-    filter: (book) => book.use('px', (id) => pixelateFilter(id, 4)),
+    filter: (book) => book.use('px', (id) => pixelateFilter(id, 3)),
   }),
 };
 

@@ -1,0 +1,35 @@
+{
+  "id": "shadow-puppet",
+  "title": "Shadow Puppet",
+  "family": "Materials",
+  "look": "A dark leather puppet with punched-out holes, pressed against a lamp-lit screen.",
+  "bg": "#2A1208",
+  "axes": {
+    "line": "none",
+    "fill": "silhouette",
+    "texture": "perforated",
+    "palette": "lamp",
+    "eyes": "hole",
+    "stage": "screen",
+    "rhythm": "smooth"
+  },
+  "form": {
+    "proportions": { "limbThickness": 0.75, "limbLength": 1.08 },
+    "corners": 0.25,
+    "taper": 0.55,
+    "eyes": "dot",
+    "mouth": "small"
+  },
+  "doc": {
+    "essence": "Shadow theatre: a flat figure cut from dark hide, its decoration punched through so the lamp shines out of it, held against a glowing paper screen.",
+    "notIt": "Not papercut (one dark colour, light coming through holes, a lit screen), not one-bit (warm glow, no dither), not neon (solid silhouette).",
+    "shapes": "No outline: the silhouette is the drawing. Sharper corners and thinner limbs that taper to points, like jointed leather pieces. A second, softer shadow falls beside the figure on the screen.",
+    "colour": "Every area becomes near-black hide. The body is punched with a lattice of small holes and the belly with slots, both showing the warm lamp light.",
+    "eyes": "Small round holes the lamp shines through, and a small cut mouth.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Without the screen behind it the silhouette disappears on dark pages: keep the stage.",
+      "Holes behind the eyes compete with them: the lattice is kept sparse."
+    ]
+  }
+}

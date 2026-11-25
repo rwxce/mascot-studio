@@ -1,0 +1,37 @@
+{
+  "id": "pictogram",
+  "title": "Pictogram",
+  "family": "Graphic",
+  "look": "A public sign: one white silhouette of rounded geometric parts, knocked out of a green plate.",
+  "bg": "#E6EAEC",
+  "axes": {
+    "line": "none",
+    "fill": "one-colour",
+    "texture": "none",
+    "palette": "signage",
+    "eyes": "knockout",
+    "stage": "sign-plate",
+    "rhythm": "smooth"
+  },
+  "form": {
+    "proportions": { "head": 1.05, "limbThickness": 1.35 },
+    "corners": 0.85,
+    "taper": 0,
+    "hands": "knob",
+    "feet": "block",
+    "eyes": "dot",
+    "mouth": "geo"
+  },
+  "doc": {
+    "essence": "The figure on a wayfinding sign: a single flat colour, no line, built from fat round-ended bars and circles so it reads from across a station.",
+    "notIt": "Not bauhaus (one colour only, rounded, a sign plate), not flat (no second colour, no shading, signage green), not line-art (filled, no line).",
+    "shapes": "No outline. Round corners, thick limbs of even width, round knob hands and block feet: every part reads as a simple geometric piece.",
+    "colour": "Every part is the same white; eyes, mouth and details are knocked out in the plate's green.",
+    "eyes": "Round dots punched out of the silhouette and a geometric mouth.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Parts that overlap merge into one shape: that is the point, but the face must stay inside the head.",
+      "Props in white on white parts disappear: they sit over the green plate."
+    ]
+  }
+}

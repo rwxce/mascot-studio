@@ -1,0 +1,28 @@
+{
+  "id": "marker",
+  "title": "Marker",
+  "family": "Drawn by hand",
+  "look": "Felt-tip marker on a whiteboard: a thick contour, streaky fills in four marker colours, ghosts of erased drawings.",
+  "bg": "#F7F8F6",
+  "axes": {
+    "line": "felt",
+    "fill": "streaks",
+    "texture": "none",
+    "palette": "four-markers",
+    "eyes": "solid",
+    "stage": "whiteboard",
+    "rhythm": "twos"
+  },
+  "doc": {
+    "essence": "A quick drawing in a meeting room: chisel-tip markers in black, blue, red and green, a bold contour, areas filled with side-by-side strokes that darken where they overlap, faint ghosts of what was wiped off before.",
+    "notIt": "Not crayon (smooth wet ink, streaks not wax, a white board), not line-art (thick line, coloured fills), not ink (four colours, streaky fills, boil).",
+    "shapes": "A thick black marker contour that wobbles slightly. Areas are filled with broad parallel strokes that leave thin darker seams.",
+    "colour": "Only four marker colours and the board's white. Light areas stay white.",
+    "eyes": "Solid black marker.",
+    "motion": "On twos, with a small boil on the line.",
+    "pitfalls": [
+      "Characters whose colours all snap to one marker read as one colour: the contour separates the parts.",
+      "Erased ghosts stay faint and away from the face."
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "id": "ink-wash",
+  "title": "Ink Wash",
+  "family": "Drawn by hand",
+  "look": "Chinese ink wash: grey ink pooling at the edges, a dry-brush contour, empty paper and a red seal.",
+  "bg": "#F3EFE6",
+  "axes": {
+    "line": "dry-brush",
+    "fill": "wash-grey",
+    "texture": "rice-paper",
+    "palette": "ink-grey",
+    "eyes": "solid",
+    "stage": "seal",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A brush painting in one stick of ink diluted to many greys: soft wet areas that darken where the water dried, a quick contour, most of the sheet left empty, and the painter's red seal.",
+    "notIt": "Not ink (no colour, wet grey washes and a seal), not pencil (brush and wash, not graphite hatching), not ukiyo-e (no colour, no carved key line, no composed stage).",
+    "shapes": "A dark contour that sits a little transparent, and a pale grey copy of the silhouette offset beside it, the way ink bleeds into damp paper.",
+    "colour": "Every colour becomes a grey of the same lightness. Areas are lighter in the middle and pool darker at their edges. Only the seal is red.",
+    "eyes": "Solid black ink.",
+    "motion": "Smooth, with a slight boil on the brush line.",
+    "pitfalls": [
+      "Characters whose colours share a lightness turn into one grey: the contour separates them.",
+      "Keep the stage sparse: the empty paper is part of the look."
+    ]
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "mid-century",
+  "title": "Mid-century",
+  "family": "Animation",
+  "look": "A 1950s modern cartoon: a loose ink line with one flat colour block printed out of register, on textured paper.",
+  "bg": "#F2E8D5",
+  "axes": {
+    "line": "offset",
+    "fill": "off-register",
+    "texture": "grain",
+    "palette": "limited-mod",
+    "eyes": "dot",
+    "stage": "flat-shapes",
+    "rhythm": "limited"
+  },
+  "form": {
+    "proportions": { "limbThickness": 0.8 },
+    "corners": 0.2,
+    "taper": 0.3,
+    "eyes": "dot",
+    "mouth": "small",
+    "brows": "thin",
+    "motion": { "snap": 0.35 }
+  },
+  "doc": {
+    "essence": "A modernist cartoon of the fifties: the drawing is a light, angular ink line, and the colour is a separate flat shape that does not quite land on it, over a couple of abstract background shapes.",
+    "notIt": "Not screenprint (the colour sits off the line, not under it; one colour, a line), not line-art (a colour block and paper), not rubber-hose (angular, thin line, limited animation instead of a bounce).",
+    "shapes": "The line traces every part's edge without filling it. Sharper corners, thinner tapering limbs, dot eyes and thin brows.",
+    "colour": "One flat colour, the body's, snapped to mustard, teal, coral, olive or sky, printed a few pixels off the line. The page shows through every other area.",
+    "eyes": "Small ink dots, a small mouth and thin brows.",
+    "motion": "Limited animation: poses hold, then move quickly to the next.",
+    "pitfalls": [
+      "Overlapping parts show every edge, because nothing is filled: keep line weight light.",
+      "The colour block must stay offset by less than the line's gap to the next part, or it reads as a second character."
+    ]
+  }
+}

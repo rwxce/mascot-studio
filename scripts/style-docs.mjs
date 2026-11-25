@@ -5,6 +5,12 @@ import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+/** Flatten a form block into [field, value] rows (nested objects become dotted fields). */
+export function formRows(f, prefix = '') {
+  return Object.entries(f).flatMap(([k, v]) =>
+    v && typeof v === 'object' && !Array.isArray(v) ? formRows(v, `${prefix}${k}.`) : [[`${prefix}${k}`, Array.isArray(v) ? v.join(', ') : String(v)]]);
+}
+
 export function render(s) {
   const a = s.axes;
   const d = s.doc;
@@ -34,7 +40,14 @@ ${d.eyes}
 ## Motion
 ${d.motion}
 
-## Pitfalls
+${s.form ? `## Form
+How this style constructs the character (\`kit/form.ts\`); every other field keeps the anatomy as authored.
+
+| field | value |
+|---|---|
+${formRows(s.form).map(([k, v]) => `| ${k} | ${v} |`).join('\n')}
+
+` : ''}## Pitfalls
 ${d.pitfalls.map((p) => `- ${p}`).join('\n')}
 
 ## Checklist

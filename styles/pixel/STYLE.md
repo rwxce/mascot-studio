@@ -13,16 +13,28 @@ A sprite from an old console: chunky pixels, few colours, steps instead of tween
 Not one-bit (colour), not flat (pixelated, stepped).
 
 ## Shapes and line
-The whole drawing goes through a pixelate filter (4 px blocks).
+The whole drawing goes through a pixelate filter (3 px blocks); sizes snap to the 3 px grid, corners are nearly square, hands are round knobs and feet are blocks.
 
 ## Colour
 Channels quantised to 4 levels.
 
 ## Eyes and face
-Pixel blocks.
+Eyes and mouth are built from 3 px blocks, every stroke two blocks thick, so the pixelate filter never drops them.
 
 ## Motion
 Time steps at 8 fps.
+
+## Form
+How this style constructs the character (`kit/form.ts`); every other field keeps the anatomy as authored.
+
+| field | value |
+|---|---|
+| corners | 0.12 |
+| grid | 3 |
+| eyes | pixel |
+| mouth | pixel |
+| hands | knob |
+| feet | block |
 
 ## Pitfalls
 - SVG filters cost more than plain shapes: check the budget on phones.

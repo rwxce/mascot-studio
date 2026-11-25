@@ -1,0 +1,28 @@
+{
+  "id": "gilded",
+  "title": "Gilded",
+  "family": "Fine art",
+  "look": "An illuminated manuscript: lapis, vermilion and malachite on vellum, a lozenge diaper, gold leaf all round.",
+  "bg": "#EFE2C2",
+  "axes": {
+    "line": "gold",
+    "fill": "diaper",
+    "texture": "vellum",
+    "palette": "lapis-gold",
+    "eyes": "solid",
+    "stage": "initial",
+    "rhythm": "smooth"
+  },
+  "doc": {
+    "essence": "A figure from a book of hours, painted into the bowl of an illuminated initial: deep mineral colours tiled with a fine gold diaper, framed in burnished gold leaf on vellum.",
+    "notIt": "Not stained glass (opaque mineral colours on a pale page, gold not lead), not art-deco (medieval: diaper and vine ornament, no fans), not screenprint (no grain, gold).",
+    "shapes": "A gold contour with a fine brown line inside it, like gold leaf laid next to an ink rule.",
+    "colour": "Areas snap to lapis blue, vermilion, malachite green, pale vellum or gold. Gold areas are a burnished leaf gradient; the rest carry a gold lozenge grid with a dot at every crossing.",
+    "eyes": "Brown ink on pale areas, pale vellum on dark ones.",
+    "motion": "Smooth.",
+    "pitfalls": [
+      "Dark mineral colours swallow dark eyes: the eye colour follows the body's lightness.",
+      "The diaper must stay finer than the face."
+    ]
+  }
+}

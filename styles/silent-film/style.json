@@ -1,0 +1,28 @@
+{
+  "id": "silent-film",
+  "title": "Silent Film",
+  "family": "Retro screen",
+  "look": "A 1920s reel: silver greys with a sepia tint, grain and scratches, a dark vignette, flicker, 16 fps.",
+  "bg": "#4A443B",
+  "axes": {
+    "line": "grey-thin",
+    "fill": "silver",
+    "texture": "scratches",
+    "palette": "silver-sepia",
+    "eyes": "solid",
+    "stage": "vignette",
+    "rhythm": "sixteen-fps"
+  },
+  "doc": {
+    "essence": "A frame of silent-era film projected a century later: soft orthochromatic greys toned warm, dust and scratches on the print, the corners burned dark, the light pulsing and the motion a little jerky.",
+    "notIt": "Not rubber-hose (no fat black line, no sepia paper: silver greys, a vignette and scratches, no bounce), not pencil (projected light, not graphite), not one-bit (continuous greys).",
+    "shapes": "A thin dark grey contour; areas softly lit from the upper left.",
+    "colour": "Every colour becomes a silver grey of the same lightness, tinted warm.",
+    "eyes": "Solid near-black.",
+    "motion": "Steps at 16 fps, the old hand-cranked rate, with an uneven projector flicker.",
+    "pitfalls": [
+      "Flicker must stay gentle (no more than 15 %) and never strobe.",
+      "The vignette sits over the character: keep its centre fully clear."
+    ]
+  }
+}

@@ -13,7 +13,7 @@ export const specs: MascotSpec[] = Object.values(found)
   .map((m) => m.default as unknown as MascotSpec)
   .sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name));
 
-export function makeMascot(spec: MascotSpec, opts: { salt?: number; style?: string } = {}): Mascot {
+export function makeMascot(spec: MascotSpec, opts: { salt?: number; style?: string; unsnapped?: boolean } = {}): Mascot {
   const anatomy = anatomies[spec.anatomy];
   if (!anatomy) throw new Error(`unknown anatomy "${spec.anatomy}" in ${spec.name}`);
   const style = styleById[opts.style ?? spec.style ?? 'soft-gradient'];

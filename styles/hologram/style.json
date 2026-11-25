@@ -1,0 +1,28 @@
+{
+  "id": "hologram",
+  "title": "Hologram",
+  "family": "Sensors and circuits",
+  "look": "A sci-fi projection: cyan translucent light with scanline fill, HUD brackets, a projector base and the odd glitch.",
+  "bg": "#06121C",
+  "axes": {
+    "line": "hud-cyan",
+    "fill": "scan-fill",
+    "texture": "interlace",
+    "palette": "cyan",
+    "eyes": "glow",
+    "stage": "hud",
+    "rhythm": "glitch"
+  },
+  "doc": {
+    "essence": "The character as a projected hologram: made of cyan light you can see through, drawn in horizontal scan bands, hovering above a projector inside a targeting HUD, glitching now and then.",
+    "notIt": "Not neon (a scan-line fill you can see through, one cyan, a HUD and a projector), not glass (no colour blobs, no tint of the character's own colour), not x-ray (one hue, light not density).",
+    "shapes": "A soft wide cyan glow under a crisp thin edge on every part.",
+    "colour": "Only cyan: a faint translucent fill crossed by brighter scan lines.",
+    "eyes": "Near-white cyan, the brightest thing in the frame.",
+    "motion": "Smooth, with a two-frame horizontal glitch every few seconds.",
+    "pitfalls": [
+      "The glitch is a short shift, never longer than two frames, so it reads as a fault, not a jump.",
+      "Translucent overlapping parts add up: the face sits on top so it stays readable."
+    ]
+  }
+}
