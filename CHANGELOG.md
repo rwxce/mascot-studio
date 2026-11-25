@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0
+
 **1.0: the format is now stable.** What a mascot, a style and an anatomy look like on disk is the
 public interface from here on.
 
