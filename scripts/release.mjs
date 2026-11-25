@@ -4,10 +4,11 @@
 // The release commit is built with plumbing (tree of dev, parent origin/main), which is what a squash
 // merge produces when main has no commits of its own, and needs no checkout of main.
 import { execFileSync } from 'node:child_process'
-import { appendFileSync, readFileSync, writeFileSync } from 'node:fs'
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 
 export const VERSION_FILE = 'package.json'
+export const CHANGELOG_FILE = 'CHANGELOG.md'
 
 const NOISE = /^(chore: back-merge|chore: bump version|chore: initial commit)/
 
@@ -44,6 +45,15 @@ export function planRelease({ version, bump = 'patch', changedFiles, subjects })
     bumpMessage: `chore: bump version to ${next}`,
     releaseMessage: `release: v${next}\n\n${body}`.trimEnd(),
   }
+}
+
+/**
+ * Give the changelog's `## Unreleased` section the released version, and open a new empty one
+ * above it. Returns the text unchanged when there is no Unreleased section.
+ */
+export function stampChangelog(text, version) {
+  if (!/^## Unreleased[ \t]*$/m.test(text)) return text
+  return text.replace(/^## Unreleased[ \t]*$/m, `## Unreleased\n\n## ${version}`)
 }
 
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim()
@@ -84,6 +94,10 @@ function run(argv) {
   manifest.version = plan.version
   writeFileSync(VERSION_FILE, `${JSON.stringify(manifest, null, 2)}\n`)
   git('add', VERSION_FILE)
+  if (existsSync(CHANGELOG_FILE)) {
+    writeFileSync(CHANGELOG_FILE, stampChangelog(readFileSync(CHANGELOG_FILE, 'utf8'), plan.version))
+    git('add', CHANGELOG_FILE)
+  }
   git('commit', '-m', plan.bumpMessage)
   const parents = first ? [] : ['-p', 'origin/main']
   const release = git('commit-tree', 'HEAD^{tree}', ...parents, '-m', plan.releaseMessage)

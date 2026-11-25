@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { bumpVersion, canSkip, planRelease } from './release.mjs'
+import { bumpVersion, canSkip, planRelease, stampChangelog } from './release.mjs'
 
 const base = { version: '1.0.0', bump: 'patch', changedFiles: ['kit/motion.ts'], subjects: ['Fix the storyboard check-in', 'chore: back-merge v1.0.0 into dev', 'chore: bump version to 1.0.0'] }
 
@@ -38,5 +38,15 @@ describe('planRelease', () => {
 
   it('honours the requested bump', () => {
     assert.equal(planRelease({ ...base, bump: 'minor' }).version, '1.1.0')
+  })
+})
+
+describe('stampChangelog', () => {
+  it('names the Unreleased section after the version and opens a new one', () => {
+    const out = stampChangelog('# Changelog\n\n## Unreleased\n\n- A change.\n\n## 1.0.0\n', '1.1.0')
+    assert.equal(out, '# Changelog\n\n## Unreleased\n\n## 1.1.0\n\n- A change.\n\n## 1.0.0\n')
+  })
+  it('leaves a changelog without an Unreleased section alone', () => {
+    assert.equal(stampChangelog('# Changelog\n\n## 1.0.0\n', '1.1.0'), '# Changelog\n\n## 1.0.0\n')
   })
 })
