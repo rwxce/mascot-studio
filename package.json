@@ -1,6 +1,6 @@
 {
   "name": "mascot-studio",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "description": "Original SVG mascots that feel alive: real rigs, clean lines, 60 fps motion, zero dependencies.",
   "license": "MIT",

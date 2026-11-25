@@ -6,6 +6,7 @@
 <title>mascot-studio — original SVG mascots that feel alive</title>
 <!--HEAD-->
 <link rel="stylesheet" href="./vendor/lenis.css">
+<link rel="stylesheet" href="./chrome.css">
 <meta name="description" content="Original SVG mascots in 50 styles: real rigs, clean lines, 60 fps motion, zero dependencies.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,9 +14,6 @@
 <style>
 body{margin:0;background:#0F0F17}
 a{color:#5EE0CC}a:hover{color:#9AF0E2}
-.ms{container-type:inline-size;width:100%}
-.ms *{box-sizing:border-box}
-.wrap{width:100%;max-width:1200px;margin:0 auto;padding-inline:40px}
 .h2{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:52px;line-height:1.05;letter-spacing:-0.02em;margin:0;color:#F4F2EC}
 .kicker{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#FF7A6B;margin:0}
 .lead{font-size:19px;line-height:1.6;color:#B4B3C2;margin:0;max-width:640px}
@@ -25,14 +23,9 @@ a{color:#5EE0CC}a:hover{color:#9AF0E2}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
 .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
-.navlinks{display:flex;gap:28px;align-items:center}
-.menubtn{display:none}
 .code{font-family:'JetBrains Mono',monospace;font-size:14px;line-height:1.7;white-space:pre;overflow-x:auto;margin:0;color:#D9D7E4}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:12px;font-weight:600;font-size:16px;text-decoration:none;border:0;cursor:pointer;font-family:'Inter',sans-serif}
 .tab{min-height:44px;padding:0 16px;border-radius:999px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer}
-.mobonly{display:none}
 section[id]{scroll-margin-top:72px}
-[hidden]{display:none!important}
 @container (max-width: 900px){
  .hero{grid-template-columns:minmax(0,1fr);gap:8px}
  .h1{font-size:60px}
@@ -42,13 +35,7 @@ section[id]{scroll-margin-top:72px}
  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
  .h2{font-size:40px}
 }
-@container (max-width: 1020px){
- .navlinks{display:none}
- .menubtn{display:inline-flex}
- .mobonly{display:flex}
-}
 @container (max-width: 640px){
- .wrap{padding-inline:20px}
  .h1{font-size:44px}
  .h2{font-size:32px}
  .lead{font-size:17px}
@@ -61,7 +48,7 @@ section[id]{scroll-margin-top:72px}
 <body>
 <div class="ms" style="background: #0F0F17; color: #F4F2EC; font-family: 'Inter', sans-serif">
 
-<header style="position: sticky; top: 0; z-index: 10; background: rgba(15,15,23,0.86); backdrop-filter: blur(12px); border-bottom: 1px solid #23232F">
+<header style="font-family: 'Inter', sans-serif; position: sticky; top: 0; z-index: 10; background: rgba(15,15,23,0.86); backdrop-filter: blur(12px); border-bottom: 1px solid #23232F">
 <div class="wrap" style="display: flex; align-items: center; justify-content: space-between; height: 72px; gap: 16px">
 <a href="#top" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #F4F2EC">
 <img src="./logo.svg" width="30" height="30" alt="" style="display: block">
@@ -88,7 +75,7 @@ GitHub</a>
 <a href="#styles" style="color: #F4F2EC; text-decoration: none; font-size: 18px; padding: 12px 0">50 styles</a>
 <a href="#how" style="color: #F4F2EC; text-decoration: none; font-size: 18px; padding: 12px 0">How it works</a>
 <a href="#make" style="color: #F4F2EC; text-decoration: none; font-size: 18px; padding: 12px 0">Make your own</a>
-<!--LANGS-->
+<!--LANGS-MOBILE-->
 <a class="btn" href="https://github.com/rwxce/mascot-studio" style="background: #F4F2EC; color: #0F0F17; margin-top: 8px">View on GitHub</a>
 </nav>
 </header>
@@ -302,15 +289,12 @@ function renderStyles() {
   }));
 }
 renderStyles();
-const btn = $('menubtn'), nav = $('mobnav');
-function setMenu(open) { nav.hidden = !open; $('ico-close').hidden = !open; $('ico-open').hidden = open; btn.setAttribute('aria-expanded', String(open)); btn.setAttribute('aria-label', open ? T.closeMenu : T.openMenu); }
-btn.onclick = () => setMenu(nav.hidden);
-nav.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setMenu(false)));
 $('copy').onclick = () => {
   try { navigator.clipboard.writeText('pnpm install && pnpm dev'); } catch (e) {}
   $('copy').textContent = T.copied; setTimeout(() => ($('copy').textContent = T.copy), 1600);
 };
 </script>
+<script src="./menu.js"></script>
 <script src="./vendor/lenis.min.js"></script>
 <script src="./smooth-scroll.js"></script>
 </body>

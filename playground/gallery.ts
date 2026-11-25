@@ -12,13 +12,20 @@ let current = specs.find((s) => s.name === params.get('mascot')) ?? specs[0];
 const clock = createClock();
 let live: Mascot[] = [];
 
+// Translations injected by tools/build-gallery.mjs (window.__GT); without it the page is English.
+type GT = { ui?: Record<string, string>; looks?: Record<string, string>; fams?: Record<string, string> };
+const gt: GT = (window as unknown as { __GT?: GT }).__GT ?? {};
+const T = { title: 'mascot-studio · styles', mascot: 'Mascot', reducedMotion: 'Reduced motion', styles: '{n} styles', close: 'Close', hint: 'Hover the mascot to say hi, click it to surprise it. Move the pointer: it follows you.', ...gt.ui };
+const look = (s: string) => gt.looks?.[s] ?? s;
+const famName = (s: string) => gt.fams?.[s] ?? s;
+
 app.innerHTML = `
 <div class="top"><div class="in">
-  <h1>mascot-studio · styles</h1>
-  <div class="seg" role="group" aria-label="Mascot">${specs.map((s) => `<button data-m="${s.name}">${s.title}</button>`).join('')}</div>
+  <h1>${T.title}</h1>
+  <div class="seg" role="group" aria-label="${T.mascot}">${specs.map((s) => `<button data-m="${s.name}">${s.title}</button>`).join('')}</div>
   <div class="meta">
-    <label><input type="checkbox" id="rm"> Reduced motion</label>
-    <span>${styles.length} styles</span>
+    <label><input type="checkbox" id="rm"> ${T.reducedMotion}</label>
+    <span>${T.styles.replace('{n}', String(styles.length))}</span>
     <span>FPS <output id="fps">–</output></span>
   </div>
 </div></div>
@@ -26,13 +33,13 @@ app.innerHTML = `
 <div class="focus" id="focus" aria-hidden="true"><div class="panel" role="dialog" aria-modal="true" aria-labelledby="f-title">
   <div class="stage" id="f-stage"></div>
   <div class="side">
-    <button class="close" id="f-close">Close</button>
+    <button class="close" id="f-close">${T.close}</button>
     <div class="fam-l" id="f-fam"></div>
     <h3 id="f-title"></h3>
     <p id="f-look"></p>
     <div class="axes" id="f-axes"></div>
     <div class="acts" id="f-acts"></div>
-    <div class="hint">Hover the mascot to say hi, click it to surprise it. Move the pointer: it follows you.</div>
+    <div class="hint">${T.hint}</div>
   </div>
 </div></div>`;
 
@@ -48,7 +55,7 @@ function render() {
   for (const fam of families) {
     const sec = document.createElement('section');
     sec.className = 'fam';
-    sec.innerHTML = `<h2>${fam}</h2><div class="grid"></div>`;
+    sec.innerHTML = `<h2>${famName(fam)}</h2><div class="grid"></div>`;
     const grid = sec.querySelector('.grid')!;
     for (const st of styles.filter((s) => s.family === fam)) {
       const card = document.createElement('div');
@@ -58,7 +65,7 @@ function render() {
       card.dataset.style = st.id;
       const m = makeMascot(current, { style: st.id, salt: live.length });
       card.append(m.el);
-      card.insertAdjacentHTML('beforeend', `<div class="name">${st.title}</div><div class="look">${st.look}</div>`);
+      card.insertAdjacentHTML('beforeend', `<div class="name">${st.title}</div><div class="look">${look(st.look)}</div>`);
       card.addEventListener('click', (e) => { if (!(e.target as Element).closest('.mascot')) open(st.id); });
       card.addEventListener('keydown', (e) => { if (e.key === 'Enter') open(st.id); });
       card.querySelector('.name')!.addEventListener('click', () => open(st.id));
@@ -83,9 +90,9 @@ function open(id: string) {
   stage.style.background = st.bg;
   stage.append(m.el);
   clock.add(m);
-  document.getElementById('f-fam')!.textContent = st.family;
+  document.getElementById('f-fam')!.textContent = famName(st.family);
   document.getElementById('f-title')!.textContent = `${current.title} · ${st.title}`;
-  document.getElementById('f-look')!.textContent = st.look;
+  document.getElementById('f-look')!.textContent = look(st.look);
   document.getElementById('f-axes')!.innerHTML = Object.entries(st.axes).map(([k, v]) => `<span><b>${k}</b> ${v}</span>`).join('');
   const acts = document.getElementById('f-acts')!;
   acts.innerHTML = '';
@@ -99,6 +106,7 @@ function open(id: string) {
   f.classList.add('open');
   f.setAttribute('aria-hidden', 'false');
   history.replaceState(null, '', `?mascot=${current.name}&style=${id}`);
+  syncLangLinks();
   applyRm();
 }
 function close() {
@@ -108,6 +116,11 @@ function close() {
   if (focusMascot) clock.remove(focusMascot);
   focusMascot = null;
   history.replaceState(null, '', `?mascot=${current.name}`);
+  syncLangLinks();
+}
+// The header's language links go to the same view in the other language.
+function syncLangLinks() {
+  document.querySelectorAll<HTMLAnchorElement>('a[data-gallery-lang]').forEach((a) => { a.search = location.search; });
 }
 document.getElementById('f-close')!.onclick = close;
 document.getElementById('focus')!.addEventListener('click', (e) => { if (e.target === e.currentTarget) close(); });
@@ -124,6 +137,7 @@ function applyRm() { clock.freeze(rm.checked); }
 rm.addEventListener('change', applyRm);
 
 render();
+syncLangLinks();
 clock.start();
 const want = params.get('style');
 if (want) open(want);
