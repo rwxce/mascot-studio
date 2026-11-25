@@ -90,8 +90,8 @@ GitHub</a>
 <a class="btn" href="https://github.com/rwxce/mascot-studio" style="background: #3ED3BE; color: #0F0F17">View on GitHub</a>
 <a class="btn" href="./gallery/" style="background: transparent; color: #F4F2EC; border: 1px solid #34344A">Watch them live</a>
 </div>
-<div style="display: flex; align-items: center; gap: 12px; background: #171722; border: 1px solid #262634; border-radius: 12px; padding: 6px 6px 6px 16px; max-width: 460px">
-<code style="font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #D9D7E4; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap"><span style="color: #FF7A6B">$</span> pnpm install &amp;&amp; pnpm dev</code>
+<div style="display: flex; align-items: center; gap: 12px; background: #171722; border: 1px solid #262634; border-radius: 12px; padding: 10px 6px 10px 16px; max-width: 520px">
+<code style="display: flex; flex-direction: column; gap: 4px; font-family: 'JetBrains Mono', monospace; font-size: 14px; line-height: 1.5; color: #D9D7E4; flex: 1; min-width: 0; white-space: nowrap; overflow-x: auto; scrollbar-width: none"><span><span style="color: #FF7A6B">$</span> git clone https://github.com/rwxce/mascot-studio</span><span><span style="color: #FF7A6B">$</span> cd mascot-studio &amp;&amp; pnpm install &amp;&amp; pnpm dev</span></code>
 <button class="btn" id="copy" style="background: #23232F; color: #F4F2EC; min-height: 40px; padding: 0 14px; font-size: 14px; border-radius: 8px">Copy</button>
 </div>
 </div>
@@ -290,7 +290,7 @@ function renderStyles() {
 }
 renderStyles();
 $('copy').onclick = () => {
-  try { navigator.clipboard.writeText('pnpm install && pnpm dev'); } catch (e) {}
+  try { navigator.clipboard.writeText('git clone https://github.com/rwxce/mascot-studio\ncd mascot-studio && pnpm install && pnpm dev\n'); } catch (e) {}
   $('copy').textContent = T.copied; setTimeout(() => ($('copy').textContent = T.copy), 1600);
 };
 </script>
