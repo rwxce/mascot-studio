@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.0
+
 - The README and landing Nodi now changes style as it moves: sticker, ink, low poly, bauhaus and anime,
   crossfading on the same pose (`docs/media/nodi.webp`, transparent).
 - `tools/render.mjs --styles a,b,c [--every ms] [--fade ms]`: one render that changes style over time;
