@@ -52,6 +52,11 @@ function galleryHead(loc) {
   const g = (l) => `${ORIGIN}${path(l)}gallery/`;
   return [
     `<link rel="icon" type="image/svg+xml" href="${up}logo.svg">`,
+    `<link rel="icon" type="image/png" sizes="32x32" href="${up}favicon-32.png">`,
+    `<link rel="apple-touch-icon" href="${up}apple-touch-icon.png">`,
+    `<link rel="stylesheet" href="${up}vendor/lenis.css">`,
+    `<script src="${up}vendor/lenis.min.js" defer></script>`,
+    `<script src="${up}smooth-scroll.js" defer></script>`,
     `<link rel="canonical" href="${g(loc)}">`,
     ...LOCALES.map((l) => `<link rel="alternate" hreflang="${l}" href="${g(l)}">`),
     `<link rel="alternate" hreflang="x-default" href="${g('en')}">`,
@@ -76,6 +81,8 @@ for (const loc of LOCALES) {
       '<!--HEAD-->',
       [
         '<link rel="icon" type="image/svg+xml" href="./logo.svg">',
+        '<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">',
+        '<link rel="apple-touch-icon" href="./apple-touch-icon.png">',
         `<link rel="canonical" href="${ORIGIN}${path(loc)}">`,
         ...LOCALES.map((l) => `<link rel="alternate" hreflang="${l}" href="${ORIGIN}${path(l)}">`),
         `<link rel="alternate" hreflang="x-default" href="${ORIGIN}/">`,
@@ -90,7 +97,7 @@ for (const loc of LOCALES) {
     .replace('<!--LANGS-->', langs(loc, (l) => `${loc === 'en' ? '.' : '..'}${path(l)}`, false))
     .replace('<!--LANGS-MOBILE-->', langs(loc, (l) => `${loc === 'en' ? '.' : '..'}${path(l)}`, true));
   header[loc] = html.match(/<header[\s\S]*?<\/header>/)[0];
-  if (loc !== 'en') html = html.replace(/(["'(])\.\/(media|vendor|logo\.svg|smooth-scroll\.js|chrome\.css|menu\.js)/g, '$1../$2');
+  if (loc !== 'en') html = html.replace(/(["'(])\.\/(media|vendor|logo\.svg|favicon-32\.png|apple-touch-icon\.png|smooth-scroll\.js|chrome\.css|menu\.js)/g, '$1../$2');
   void base;
   const file = loc === 'en' ? `${out}/index.html` : `${out}/${loc}/index.html`;
   mkdirSync(file.replace(/\/index\.html$/, ''), { recursive: true });
@@ -98,7 +105,7 @@ for (const loc of LOCALES) {
 }
 mkdirSync(`${out}/media`, { recursive: true });
 for (const f of media) cpSync(`docs/media/${f}`, `${out}/media/${f}`);
-for (const f of ['logo.svg', 'smooth-scroll.js', 'chrome.css', 'menu.js']) cpSync(`site/${f}`, `${out}/${f}`);
+for (const f of ['logo.svg', 'favicon-32.png', 'apple-touch-icon.png', 'smooth-scroll.js', 'chrome.css', 'menu.js']) cpSync(`site/${f}`, `${out}/${f}`);
 cpSync('site/vendor', `${out}/vendor`, { recursive: true });
 cpSync('site/og', `${out}/og`, { recursive: true });
 for (const loc of LOCALES) {
