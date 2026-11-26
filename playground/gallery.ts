@@ -30,7 +30,7 @@ app.innerHTML = `
   </div>
 </div></div>
 <main id="families"></main>
-<div class="focus" id="focus" aria-hidden="true"><div class="panel" role="dialog" aria-modal="true" aria-labelledby="f-title">
+<div class="focus" id="focus" aria-hidden="true"><div class="panel" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="f-title">
   <div class="stage" id="f-stage"></div>
   <div class="side">
     <button class="close" id="f-close">${T.close}</button>
