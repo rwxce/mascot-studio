@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.1
+
 - The site shows its icon in Safari too (PNG favicon and `apple-touch-icon` next to the SVG), and the gallery scrolls with Lenis like the landing.
 
 ## 1.1.0
