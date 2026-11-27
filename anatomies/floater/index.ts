@@ -7,6 +7,7 @@ import { browSet, eyeModel, faceInks, mouthSet, type BrowSet, type EyeSet, type 
 import { markParts, renderMarks } from '../../kit/faces/marks.js';
 import { DEFAULT_FORM, isDefaultForm, scales, snapTo, type Form } from '../../kit/form.js';
 import { blendPaths, mapPoints, parse, toD, type PathSpec } from '../../kit/morph.js';
+import { backLimb, frontLimb, frontWhenRaised } from '../../kit/limbs.js';
 import { wave } from '../../kit/motion.js';
 import type { Part, Rig, Shape } from '../../kit/rig.js';
 import { ellipse, roundRect as roundRectD } from '../../kit/shapes.js';
@@ -15,6 +16,10 @@ import type { Painter } from '../../kit/style.js';
 import type { ActionSpec, Pose } from '../../kit/timeline.js';
 
 const det = (s: Shape): Shape => ({ ...s, kind: 'detail' });
+/** The ghost's body, in the arms' parent space (the 'ghost' group): what a back arm hides behind. */
+const GHOST: Part[] = [{ shapes: [{ pathRef: 'body' }] }];
+/** How raised a ghost arm is (0 at rest, 1 at 100°: the flipper above the shoulder). */
+const armLift = (rot: number) => Math.max(0, -rot / 100);
 const EYES = eyePoses(6, 8);
 const MOUTH = eyePoses(4, 5).open;
 const MOUTH_BIG = eyePoses(7, 9).open;
@@ -292,11 +297,11 @@ function buildForm(spec: MascotSpec, paint: Painter, form: Form): Built {
       { outline: null, root: { id: 'shadow', at: [80, 148], shapes: [det({ el: { tag: 'ellipse', attrs: { rx: 30, ry: 5, fill: paint.shadow } }, ref: 'shadow' })] } },
       // speed lines trail under the ghost but do not spin with it
       ...(marks.behind.length ? [{ outline: null, root: { id: 'fx', at: [80, 82] as [number, number], children: [{ id: 'ghost', children: marks.behind }] } }] : []),
-      { outline: out, root: root([{ id: 'ghost', children: [arm('L'), arm('R')] }]) },
+      { outline: out, root: root([{ id: 'ghost', children: [backLimb(arm('L'), GHOST), backLimb(arm('R'), GHOST)] }]) },
       {
         outline: out,
         root: root([{
-          id: 'ghost', shapes: [{ pathRef: 'body', fill: paint.fill('body') }],
+          id: 'ghost', data: { body: '' }, shapes: [{ pathRef: 'body', fill: paint.fill('body') }],
           children: [
             { id: 'eyes', at: [0, G.eyesY], children: [eyes.part('L', [-G.eyeX, 0]), eyes.part('R', [G.eyeX, 0]), ...browParts] },
             mouth.part([0, G.mouthY], paint.flat('eye')),
@@ -310,6 +315,8 @@ function buildForm(spec: MascotSpec, paint: Painter, form: Form): Built {
           ],
         }]),
       },
+      // A raised arm is drawn in front of the body (no drop shadow on the body).
+      { outline: out, tag: 'front', root: root([{ id: 'ghost', children: [frontLimb(arm('L')), frontLimb(arm('R'))] }]) },
     ],
   };
 }
@@ -331,11 +338,11 @@ function buildAuthored(spec: MascotSpec, paint: Painter): Built {
     label: `${spec.title} mascot`,
     layers: [
       { outline: null, root: { id: 'shadow', at: [80, 148], shapes: [det({ el: { tag: 'ellipse', attrs: { rx: 30, ry: 5, fill: paint.shadow } }, ref: 'shadow' })] } },
-      { outline: out, root: root([{ id: 'ghost', children: [arm('L'), arm('R')] }]) },
+      { outline: out, root: root([{ id: 'ghost', children: [backLimb(arm('L'), GHOST), backLimb(arm('R'), GHOST)] }]) },
       {
         outline: out,
         root: root([{
-          id: 'ghost', shapes: [{ pathRef: 'body', fill: paint.fill('body') }],
+          id: 'ghost', data: { body: '' }, shapes: [{ pathRef: 'body', fill: paint.fill('body') }],
           children: [
             { id: 'eyes', at: [0, -8], children: [eyePart('L', [-12, 0], EYES, paint), eyePart('R', [12, 0], EYES, paint)] },
             { at: [0, 10], shapes: [det({ pathRef: 'mouth', fill: paint.flat('eye') })] },
@@ -348,6 +355,8 @@ function buildAuthored(spec: MascotSpec, paint: Painter): Built {
           ],
         }]),
       },
+      // A raised arm is drawn in front of the body (no drop shadow on the body).
+      { outline: out, tag: 'front', root: root([{ id: 'ghost', children: [frontLimb(arm('L')), frontLimb(arm('R'))] }]) },
     ],
   };
 }
@@ -381,6 +390,8 @@ export const floater: Anatomy = {
     rig.path('body', bodyPath((t / 1100) * Math.PI * 2, p.hem));
     rig.set('armR', { rot: p.armR });
     rig.set('armL', { rot: -p.armL });
+    frontWhenRaised(rig, 'armR', armLift(p.armR));
+    frontWhenRaised(rig, 'armL', armLift(p.armL));
     rig.set('eyes', { x: gaze.x * 4, y: gaze.y * 3 });
     renderEyes(rig, p, EYES);
     const open = Math.max(0, Math.min(1, p['mouth.open']));
@@ -395,6 +406,8 @@ function renderForm(rig: Rig, p: Pose, gaze: { x: number; y: number }, t: number
   rig.path('body', formBody(G, (t / 1100) * Math.PI * 2, p.hem));
   rig.set('armR', { rot: p.armR });
   rig.set('armL', { rot: -p.armL });
+  frontWhenRaised(rig, 'armR', armLift(p.armR));
+  frontWhenRaised(rig, 'armL', armLift(p.armL));
   if (I.noodle) {
     rig.path('noodleR', noodlePath(I.len, p['body.rot'] + p.armR, 1));
     rig.path('noodleL', noodlePath(I.len, p['body.rot'] - p.armL, -1));

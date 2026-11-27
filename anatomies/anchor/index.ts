@@ -379,6 +379,8 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
       ],
     };
   };
+  // The body's outline, in the handles' parent space (the 'body' group), morphing with it.
+  const silhouette: Part[] = [{ shapes: [{ pathRef: 'shape' }] }];
   const dots: Shape[] = [];
   for (let gx = -2; gx <= 2; gx++) for (let gy = -1; gy <= 1; gy++) {
     dots.push(det({ el: { tag: 'circle', attrs: { cx: gx * 15, cy: 52 + gy * 8, r: 1.8, fill: paint.flat('body-dark') } } }));
@@ -420,11 +422,13 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
           })],
         }, ...marks.behind] }]),
       },
-      { outline: out, root: root([{ id: 'body', children: [handle('L'), handle('R')] }]) },
+      // The handles grow from the centre, behind the body: only what leaves the silhouette
+      // shows, in every style (a handle seen through a glass body reads as a mistake).
+      { outline: out, root: root([{ id: 'body', children: [{ ...handle('L'), behind: silhouette }, { ...handle('R'), behind: silhouette }] }]) },
       {
         outline: out,
         root: root([{
-          id: 'body', shapes: [{ pathRef: 'shape', fill: paint.fill('body') }],
+          id: 'body', data: { body: '' }, shapes: [{ pathRef: 'shape', fill: paint.fill('body') }],
           children: [
             { id: 'eyes', at: g.eyesAt, children: [eyes.part('L', [-g.eyeX, 0]), eyes.part('R', [g.eyeX, 0]), ...browParts] },
             mouth.part(g.mouthAt, paint.flat('eye')),

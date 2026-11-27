@@ -3,6 +3,10 @@
 A body on two legs, a head on a neck, arms with a shoulder and an elbow, and an antenna that
 lags the head on a loose spring. Example: `mascots/robot`. viewBox `0 -30 160 190`, ground at y=148.
 
+## Limbs and the body
+
+The legs are masked by the torso and the arms by the head, so nothing of them shows through. At rest the arms hang in front of the torso; a shoulder raised past 45° (`-armX.sh / 90` above 0.5, back below 0.4) brings the arm in front of the head and the face (`kit/limbs.ts`).
+
 ## Palette roles
 
 Required: `body`. Optional (derived from `body` when missing): `body-dark` (legs, upper arms,

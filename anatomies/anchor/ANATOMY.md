@@ -7,6 +7,10 @@ a curve in the air, a selection box can appear around the body, and a dot grid c
 snaps. Example: `mascots/nodi`. viewBox `0 -6 160 166`; the body is centred at (80, 84), its
 shadow on the ground at y=148, so a prop anchor of `[0, -64]` is the body's centre.
 
+## Limbs and the body
+
+The handles grow from the centre of the body, so they never come in front of it: a front copy would cross the face. They are masked by the body's silhouette (it morphs with the shape), so only what leaves the body shows, in every style.
+
 ## Palette roles
 
 Required: `body`. Optional: `body-dark` (handle sticks, grid dots), `accent` (knobs, the drawn

@@ -4,6 +4,10 @@ A sitting animal: body, front legs with paws, a head with ears, and a tail that 
 base while its tip bends a beat later (two springs). Example: `mascots/fox`.
 viewBox `-10 -32 180 192`, ground at y=148.
 
+## Limbs and the body
+
+The tail is masked by the body, so nothing of it shows through. The legs stand in front of the body in its own layer; a lifted paw stays inside the chest and never rises over the head, so the legs need no front copy.
+
 ## Palette roles
 
 Required: `body`. Optional: `belly` (chest, face mask, tail tip, legs), `eye` (eyes, nose, inner

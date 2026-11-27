@@ -4,6 +4,10 @@ An object with puzzle-tab arms, a face on a lid that opens, and an optional secr
 rises out of its mouth.
 Any `mascot.json` with `"anatomy": "object-limbs"` uses it.
 
+## Limbs and the body
+
+The tabs join the pocket from behind at rest (same layer, so the joint has no seam) and are masked by the pocket and the lid, so nothing of them shows through in a translucent style. Raised past halfway (`lift = -armX.rot / 95` above 0.5, back below 0.4) a tab is drawn in front of the pocket, the lid and the face (`kit/limbs.ts`).
+
 ## Body parameters (`body`)
 
 | Parameter | Type | Default | What it does |

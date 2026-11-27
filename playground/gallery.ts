@@ -129,7 +129,18 @@ document.querySelectorAll<HTMLButtonElement>('.seg button').forEach((b) => b.add
   current = specs.find((s) => s.name === b.dataset.m)!;
   close();
   render();
+  showPicked();
 }));
+// On a phone the picker is a scrolling row: keep the chosen mascot in view, scrolling only the
+// row (scrollIntoView could also move the page).
+function showPicked() {
+  const seg = document.querySelector<HTMLElement>('.seg')!;
+  const b = seg.querySelector<HTMLElement>('button[aria-pressed="true"]');
+  if (!b || seg.scrollWidth <= seg.clientWidth) return;
+  const l = b.offsetLeft - seg.offsetLeft, r = l + b.offsetWidth;
+  if (l < seg.scrollLeft) seg.scrollLeft = l - 8;
+  else if (r > seg.scrollLeft + seg.clientWidth - 28) seg.scrollLeft = r - seg.clientWidth + 36;
+}
 
 const rm = document.getElementById('rm') as HTMLInputElement;
 rm.checked = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -137,6 +148,8 @@ function applyRm() { clock.freeze(rm.checked); }
 rm.addEventListener('change', applyRm);
 
 render();
+showPicked();
+addEventListener('resize', showPicked);
 syncLangLinks();
 clock.start();
 const want = params.get('style');

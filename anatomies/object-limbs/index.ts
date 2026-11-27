@@ -7,6 +7,7 @@ import { browSet, eyeModel, faceInks, mouthSet, type BrowSet, type EyeSet, type 
 import { markParts, renderMarks } from '../../kit/faces/marks.js';
 import { DEFAULT_FORM, isDefaultForm, scales, snapTo, type Form } from '../../kit/form.js';
 import { blendPaths, mapPoints, parse, type PathSpec } from '../../kit/morph.js';
+import { backLimb, frontLimb, frontWhenRaised } from '../../kit/limbs.js';
 import { lerp, wave } from '../../kit/motion.js';
 import type { Part, Shape } from '../../kit/rig.js';
 import type { Painter } from '../../kit/style.js';
@@ -252,6 +253,9 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
     instances.set(paint, { geo: G, eyes, brows, mouth, marks: form.marks });
   }
 
+  // The silhouette a back tab hides behind: the pocket and the closed lid (same ids, so it
+  // follows the lid as it opens).
+  const cover: Part[] = [{ shapes: [{ d: pocket }] }, { id: 'lidF', at: [0, top], shapes: [{ d: flap }] }];
   const arm = (side: 'L' | 'R'): Part => ({
     id: `arm${side}`, at: [side === 'L' ? -hw : hw, midY], shapes: [{ pathRef: `arm${side}`, fill: paint.fill('body') }],
   });
@@ -305,9 +309,12 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
       {
         outline: ink,
         root: root([
-          arm('L'),
-          arm('R'),
+          // At rest a tab joins the pocket from behind (same layer: no seam at the joint), and
+          // nothing of it shows through the pocket or the lid, in any style.
+          backLimb(arm('L'), cover),
+          backLimb(arm('R'), cover),
           {
+            data: { body: '' },
             shapes: [
               { d: pocket, fill: paint.fill('body') },
               ...(cross ? [
@@ -337,6 +344,8 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
         }]),
       },
       ...(marks.face.length ? [{ outline: null, root: root(marks.face) }] : []),
+      // A raised tab is drawn in front of the pocket, the lid and the face (no drop shadow on the body).
+      { outline: ink, tag: 'front', root: root([frontLimb(arm('L')), frontLimb(arm('R'))]) },
     ],
   };
 }
@@ -382,6 +391,9 @@ export const objectLimbs: Anatomy = {
     const lift = G ? G.lift : 40;
     rig.set('armR', { y: -lift * liftR, x: -3 * liftR, rot: tr });
     rig.set('armL', { y: -lift * liftL, x: 3 * liftL, rot: -tl });
+    // Past halfway up, the tab comes in front of the body (CRAFT.md → Drawing).
+    frontWhenRaised(rig, 'armR', liftR);
+    frontWhenRaised(rig, 'armL', liftL);
     // armX.long is kept as a channel so older actions stay valid, but a tab never stretches.
     const T = G ? G.tabs : { R: [TAB_REST, TAB_THUMB], L: [TABL_REST, TABL_THUMB] };
     rig.path('armR', blendPaths(T.R[0], [[T.R[1], p['armR.thumb']]]));

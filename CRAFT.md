@@ -10,6 +10,8 @@ the ones a tool can check are enforced by `pnpm check` (marked ✓).
 | Each part turns on its **real pivot** (shoulder, base of the tail, the lid's hinge). | A part spinning around its own centre reads as a sticker sliding, not a joint. |
 | Parts that touch live in the **same layer** of the rig: outlines first, fills on top. | Two separately outlined shapes leave a seam at the joint (the jagged arm of v1). |
 | A raised arm **leaves the body from the edge** it would really come from. | An arm rotating around the middle of a side sweeps behind the face and pokes out as a spike. |
+| A raised limb is **drawn in front of the body** (waving, hopping, cheering); at rest it joins the body from behind (`kit/limbs.ts`). ✓ | Hidden behind the body's corner, a raised arm reads as waving from behind, and its outline pokes out as a dark smudge. |
+| **Nothing behind the body shows through it**, in any style (glass, hologram, neon, line art): a part drawn behind a body is masked by its silhouette (`Part.behind`). ✓ | A limb seen through a translucent body reads as a drawing mistake. |
 | Rotating parts have a **round cap** at the pivot. | A square end turns into a corner sticking out of the body. |
 | Shapes that change pose are drawn with **the same commands** in every pose. | That is what lets them morph point by point (a tab becoming an arm) without popping. |
 | The rest pose (frame 0) is a **complete drawing**. ✓ | Reduced motion shows only that frame. |
