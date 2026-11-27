@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.3.0
+
 - Raised limbs are drawn in front of the body: Secret Letter's tabs (no more dark smudge at the
   corner when it waves or hops), the ghost's arms and the robot's arms (in front of the head). At
   rest they still join the body from behind. Kit: `kit/limbs.ts` (`backLimb`, `frontLimb`,
