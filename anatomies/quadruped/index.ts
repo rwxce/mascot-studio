@@ -331,11 +331,14 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
       ...(marks.behind.length ? [{ outline: null, root: root(marks.behind) }] : []),
       {
         outline: out,
-        root: root([torso([{ id: 'tail', at: custom ? [18 * bs, -6 * bs] : [18, -6], shapes: [{ pathRef: 'tail', fill: paint.fill('body') }, { pathRef: 'tailTip', fill: paint.fill('belly') }] }])]),
+        // The tail hides behind the body: nothing of it shows through a translucent one.
+        root: root([torso([{ id: 'tail', at: custom ? [18 * bs, -6 * bs] : [18, -6], behind: [{ shapes: bodyShapes }], shapes: [{ pathRef: 'tail', fill: paint.fill('body') }, { pathRef: 'tailTip', fill: paint.fill('belly') }] }])]),
       },
       {
         outline: out,
-        root: root([torso([leg('L'), leg('R')], bodyShapes)]),
+        // The legs stand in front of the body (same layer: no seam where they join it). A lifted
+        // paw stays inside the chest, so it needs no front copy (ANATOMY.md).
+        root: root([{ ...torso([leg('L'), leg('R')], bodyShapes), data: { body: '' } }]),
       },
       {
         outline: out,

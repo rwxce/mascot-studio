@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 1.3.0
+
+- Raised limbs are drawn in front of the body: Secret Letter's tabs (no more dark smudge at the
+  corner when it waves or hops), the ghost's arms and the robot's arms (in front of the head). At
+  rest they still join the body from behind. Kit: `kit/limbs.ts` (`backLimb`, `frontLimb`,
+  `frontWhenRaised`, with hysteresis so a waving arm does not flicker).
+- Nothing behind the body shows through it in translucent or hollow styles (hologram, glass, neon,
+  blueprint, x-ray…): Nodi's handles, the ghost's arms, the robot's legs and arms, the fox's tail
+  and the letter's tabs. Rig: `Part.behind` masks a part with the animated silhouette of the body.
+- `pnpm check`: new rules `front-limbs` (a raised limb is drawn after the body) and
+  `no-see-through` (in translucent styles, parts behind the body change no pixel inside it).
+- Secret Letter: the `idea` bulb floats higher, with air above the envelope.
+- Gallery: on phones the mascot picker is one row that scrolls sideways, with the chosen mascot
+  kept in view.
+
 ## 1.2.0
 
 - Secret Letter: the secret puzzle piece is 1.9× bigger (`body.innerScale`) and rises whole out of

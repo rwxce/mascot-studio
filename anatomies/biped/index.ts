@@ -6,6 +6,7 @@ import { browSet, eyeModel, faceInks, type BrowSet, type EyeSet } from '../../ki
 import { markParts, renderMarks } from '../../kit/faces/marks.js';
 import { cornerScale, DEFAULT_FORM, isDefaultForm, scales, snapTo, type Form } from '../../kit/form.js';
 import { mapPoints, parse, toD, type PathSpec } from '../../kit/morph.js';
+import { backLimb, frontLimb, frontWhenRaised } from '../../kit/limbs.js';
 import { wave } from '../../kit/motion.js';
 import type { Part, Shape } from '../../kit/rig.js';
 import { ellipse, roundRect } from '../../kit/shapes.js';
@@ -218,6 +219,16 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
   }, paint);
   instances.set(paint, { geo: G, eyes, brows, noodle, marks: form.marks });
   const [v0, v1, v2, v3] = G.visor;
+  const neck: Shape = { d: roundRect(-6, -42 * bs - 10, 6, -42 * bs + 2, 2), fill: paint.fill('body-dark') };
+  const chest: Shape = { d: roundRect(-26 * bs, -42 * bs, 26 * bs, 0, 18 * bs * kr), fill: paint.fill('body') };
+  const headShapes: Shape[] = [
+    { d: roundRect(-41 * hs, -26 * vy, -32 * hs, -9 * vy, 4.5 * kr), fill: paint.fill('body-dark') },
+    { d: roundRect(32 * hs, -26 * vy, 41 * hs, -9 * vy, 4.5 * kr), fill: paint.fill('body-dark') },
+    { d: roundRect(-34 * hs, -40 * vy, 34 * hs, 4 * hs, 18 * Math.min(hs, vy) * kr), fill: paint.fill('body') },
+  ];
+  // Silhouettes a limb hides behind, in the limb's parent space, with the same ids so they move.
+  const torsoSil: Part[] = [{ id: 'torso', at: [0, G.torsoY], shapes: [neck, chest] }];
+  const headSil: Part[] = [{ id: 'head', at: [0, G.headY], shapes: headShapes }];
   return {
     viewBox: '0 -30 160 190',
     rootAt: [80, 148],
@@ -226,19 +237,16 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
     layers: [
       { outline: null, root: { id: 'shadow', at: [80, 148], shapes: [det({ el: { tag: 'ellipse', attrs: { rx: 30, ry: 5, fill: paint.shadow } }, ref: 'shadow' })] } },
       ...(marks.behind.length ? [{ outline: null, root: root(marks.behind) }] : []),
-      { outline: out, root: root([leg('L'), leg('R')]) },
+      // Legs and arms hide behind the torso and the head: nothing of them shows through.
+      { outline: out, root: root([{ ...leg('L'), behind: torsoSil }, { ...leg('R'), behind: torsoSil }]) },
       {
         outline: out,
-        root: root([torso([], [
-          { d: roundRect(-6, -42 * bs - 10, 6, -42 * bs + 2, 2), fill: paint.fill('body-dark') },
-          { d: roundRect(-26 * bs, -42 * bs, 26 * bs, 0, 18 * bs * kr), fill: paint.fill('body') },
-          det({ el: { tag: 'circle', attrs: { cx: 0, cy: -21 * bs, r: 6 * bs, fill: paint.flat('eye') } }, ref: 'core' }),
-        ])]),
+        root: root([{ ...torso([], [neck, chest, det({ el: { tag: 'circle', attrs: { cx: 0, cy: -21 * bs, r: 6 * bs, fill: paint.flat('eye') } }, ref: 'core' })]), data: { body: '' } }]),
       },
-      { outline: out, root: root([torso([arm('L'), arm('R')])]) },
+      { outline: out, root: root([torso([backLimb(arm('L'), headSil), backLimb(arm('R'), headSil)])]) },
       {
         outline: out,
-        root: root([torso([head([
+        root: root([torso([{ ...head([
           {
             id: 'antenna', at: [0, -40 * vy], shapes: [
               { d: 'M0 0L0 -13', stroke: paint.flat('body-dark'), width: 3.5 },
@@ -246,19 +254,19 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
             ],
           },
         ], [
-          { d: roundRect(-41 * hs, -26 * vy, -32 * hs, -9 * vy, 4.5 * kr), fill: paint.fill('body-dark') },
-          { d: roundRect(32 * hs, -26 * vy, 41 * hs, -9 * vy, 4.5 * kr), fill: paint.fill('body-dark') },
-          { d: roundRect(-34 * hs, -40 * vy, 34 * hs, 4 * hs, 18 * Math.min(hs, vy) * kr), fill: paint.fill('body') },
+          ...headShapes,
           det({ d: roundRect(v0, v1, v2, v3, 12 * kr), fill: paint.fill('visor'), stroke: out ? paint.flat('ink') : undefined, width: out ? lw : undefined }),
           det({ el: { tag: 'ellipse', attrs: { cx: -22 * hs, cy: -1 * hs, rx: 4.5, ry: 2.6, fill: paint.flat('cheek') } }, ref: 'blush' }),
           det({ el: { tag: 'ellipse', attrs: { cx: 22 * hs, cy: -1 * hs, rx: 4.5, ry: 2.6, fill: paint.flat('cheek') } }, ref: 'blush' }),
-        ])])]),
+        ]), data: { body: '' } }])]),
       },
       // eyes inside the visor (their travel stays within it, so no clip is needed)
       {
         outline: null,
         root: root([torso([head([{ id: 'eyes', at: [0, G.eyeY], children: [eyes.part('L', [-G.eyeX, 0]), eyes.part('R', [G.eyeX, 0]), ...browParts] }, ...marks.face])])]),
       },
+      // A raised arm is drawn in front of the head and the face (no drop shadow on the body).
+      { outline: out, tag: 'front', root: root([torso([frontLimb(arm('L')), frontLimb(arm('R'))])]) },
     ],
   };
 }
@@ -322,6 +330,9 @@ export const biped: Anatomy = {
     rig.set('armL', { rot: -p['armL.sh'] });
     rig.set('elbowR', { rot: p['armR.el'] });
     rig.set('elbowL', { rot: -p['armL.el'] });
+    // A shoulder raised past ~45° (the hand by the head) brings the arm in front of the head.
+    frontWhenRaised(rig, 'armR', -p['armR.sh'] / 90);
+    frontWhenRaised(rig, 'armL', -p['armL.sh'] / 90);
     rig.set('head', { x: gaze.x * 1.5, y: p['head.y'], rot: p['head.rot'] + gaze.x * 4 });
     rig.set('antenna', { rot: p.antenna });
     rig.set('eyes', { x: gaze.x * G.gazeX, y: gaze.y * 3 });

@@ -4,6 +4,10 @@ A body with no legs that floats: a round top, a wavy hem that ripples on every f
 arms, a mouth that opens or smiles. It can spin, swell and fade. Example: `mascots/ghost`.
 viewBox `0 -6 160 166`; the body is centred at (80, 82), its shadow on the ground at y=148.
 
+## Limbs and the body
+
+The arms join the body from behind and are masked by its silhouette (it follows the hem), so nothing of them shows through. An arm raised past 50° (`-armX / 100` above 0.5, back below 0.4) is drawn in front of the body (`kit/limbs.ts`).
+
 ## Palette roles
 
 Required: `body`. Optional: `body-dark` (arms), `eye` (eyes, mouth), `cheek`, `glow`, `accent`,

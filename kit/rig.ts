@@ -42,6 +42,17 @@ export interface Part {
   children?: Part[];
   /** Show this part only inside [x, y, w, h], in its own coordinates (it moves with the part). */
   clipRect?: readonly [number, number, number, number];
+  /**
+   * The body this part sits behind, as parts in this part's PARENT coordinates (usually the
+   * same objects, or the same ids, the body is built from). The part is masked by their
+   * silhouette, so in a translucent or hollow style nothing of it shows through the body. The
+   * silhouette is built from the same ids and path refs, so it moves and morphs with the body.
+   */
+  behind?: Part[];
+  /** Starting opacity of the part (e.g. 0 for a copy shown later with rig.opacity). */
+  opacity?: number;
+  /** data-* attributes on the part's group, for checks and tools (e.g. { limb: 'armR' }). */
+  data?: Record<string, string>;
 }
 
 export interface Layer {
@@ -83,6 +94,8 @@ export interface Transform {
   skew?: number;
 }
 
+type Pass = 'drop' | 'outline' | 'fill' | 'mask';
+
 const r2 = (n: number) => Math.round(n * 100) / 100;
 const hash = (s: string) => [...s].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 9973, 7);
 
@@ -102,6 +115,9 @@ export class Rig {
   private refs = new Map<string, Element[]>();
   private statics = new Map<Shape, { els: Element[]; spec: Seg[] }>();
   private boilFrame = -1;
+  /** One mask per part with `behind`, shared by its passes (they all draw in the same space). */
+  private masks = new Map<Part, string>();
+  private maskDefs: SVGDefsElement | null = null;
   private uid = Math.random().toString(36).slice(2, 8);
 
   constructor(private opts: RigOptions) {
@@ -136,7 +152,7 @@ export class Rig {
     if (list) list.push(el); else map.set(key, [el]);
   }
 
-  private build(part: Part, pass: 'drop' | 'outline' | 'fill', outline: Layer['outline']): SVGGElement {
+  private build(part: Part, pass: Pass, outline: Layer['outline']): SVGGElement {
     const g = document.createElementNS(SVGNS, 'g') as SVGGElement;
     // Pivot group (static translate) wrapping the animated group.
     const outer = document.createElementNS(SVGNS, 'g');
@@ -152,18 +168,52 @@ export class Rig {
     }
     outer.append(g);
     if (part.id) this.add(this.parts, part.id, g);
+    if (part.opacity !== undefined && pass !== 'mask') g.setAttribute('opacity', String(part.opacity));
+    if (part.data && pass !== 'mask') for (const [k, v] of Object.entries(part.data)) g.setAttribute(`data-${k}`, v);
     for (const s of part.shapes ?? []) {
       const el = this.shape(s, pass, outline);
       if (el) g.append(el);
     }
     for (const c of part.children ?? []) g.append(this.build(c, pass, outline));
+    if (part.behind?.length && pass !== 'mask') {
+      // The mask is read in the user space of the element it is set on: an untransformed
+      // wrapper, so that space is the parent's, where the body's parts are given.
+      const wrap = document.createElementNS(SVGNS, 'g') as SVGGElement;
+      wrap.setAttribute('mask', `url(#${this.mask(part, outline)})`);
+      wrap.setAttribute('data-behind', '');
+      wrap.append(outer);
+      return wrap;
+    }
     return outer as SVGGElement;
   }
 
-  private shape(s: Shape, pass: 'drop' | 'outline' | 'fill', outline: Layer['outline']): Element | null {
+  /** The mask for a part drawn behind a body: everything, less the body's silhouette. */
+  private mask(part: Part, outline: Layer['outline']): string {
+    const known = this.masks.get(part);
+    if (known) return known;
+    const id = `m${this.uid}${Math.random().toString(36).slice(2, 7)}`;
+    this.masks.set(part, id);
+    if (!this.maskDefs) {
+      this.maskDefs = document.createElementNS(SVGNS, 'defs') as SVGDefsElement;
+      this.svg.append(this.maskDefs);
+    }
+    const m = document.createElementNS(SVGNS, 'mask');
+    m.setAttribute('id', id);
+    m.setAttribute('maskUnits', 'userSpaceOnUse');
+    m.setAttribute('x', '-5000'); m.setAttribute('y', '-5000');
+    m.setAttribute('width', '10000'); m.setAttribute('height', '10000');
+    const all = document.createElementNS(SVGNS, 'rect');
+    for (const [k, v] of Object.entries({ x: -5000, y: -5000, width: 10000, height: 10000, fill: '#fff' })) all.setAttribute(k, String(v));
+    m.append(all);
+    for (const b of part.behind ?? []) m.append(this.build(b, 'mask', outline));
+    this.maskDefs.append(m);
+    return id;
+  }
+
+  private shape(s: Shape, pass: Pass, outline: Layer['outline']): Element | null {
     const kind = s.kind ?? 'body';
     if (pass === 'outline' && (kind !== 'body' || !outline)) return null;
-    if (pass === 'drop' && kind !== 'body') return null;
+    if ((pass === 'drop' || pass === 'mask') && kind !== 'body') return null;
     if (s.clip) {
       if (pass !== 'fill') return null;
       const id = `c${this.uid}${Math.random().toString(36).slice(2, 7)}`;
@@ -200,7 +250,16 @@ export class Rig {
     }
     const look = this.opts.look ?? {};
     const strokeLimb = !!s.stroke && (!s.fill || s.fill === 'none');
-    if (pass === 'drop') {
+    if (pass === 'mask') {
+      // The body's fill area in black (hidden); its outline stays drawn over the part's edge.
+      el.setAttribute('fill', strokeLimb ? 'none' : '#000');
+      if (strokeLimb) {
+        el.setAttribute('stroke', '#000');
+        el.setAttribute('stroke-width', String(s.width ?? 2));
+        el.setAttribute('stroke-linecap', 'round');
+        el.setAttribute('stroke-linejoin', 'round');
+      }
+    } else if (pass === 'drop') {
       const c = look.drop!.color, w = outline ? outline.width * 2 : 0;
       el.setAttribute('fill', strokeLimb ? 'none' : c);
       el.setAttribute('stroke', c);
@@ -261,6 +320,13 @@ export class Rig {
     if (!els) return;
     const o = String(Math.round(Math.max(0, Math.min(1, v)) * 1000) / 1000);
     for (const el of els) el.setAttribute('opacity', o);
+  }
+
+  /** Set a data-* attribute on a part's groups (all passes), for checks and tools. */
+  data(id: string, name: string, value: string) {
+    const els = this.parts.get(id);
+    if (!els) return;
+    for (const el of els) el.setAttribute(`data-${name}`, value);
   }
 
   /** Set a morphing shape's path. */

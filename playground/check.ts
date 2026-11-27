@@ -10,6 +10,85 @@ interface Issue { rule: string; where: string; message: string }
 /** Max movement of the drawing between two frames at 30 fps before it reads as a jump (px). */
 const MAX_STEP = 22;
 
+/** Styles where `no-see-through` runs: translucent and hollow ones, and one opaque control. */
+const SEE_THROUGH = new Set(['hologram', 'glass', 'neon', 'blueprint', 'x-ray', 'line-art', 'ink']);
+const RASTER = 240;
+
+async function raster(svg: SVGSVGElement, bg: string): Promise<Uint8ClampedArray> {
+  const copy = svg.cloneNode(true) as SVGSVGElement;
+  copy.setAttribute('width', String(RASTER));
+  copy.setAttribute('height', String(RASTER));
+  const img = new Image();
+  const url = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(copy));
+  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+  const c = document.createElement('canvas');
+  c.width = c.height = RASTER;
+  const g = c.getContext('2d')!;
+  g.fillStyle = bg; g.fillRect(0, 0, RASTER, RASTER);
+  g.drawImage(img, 0, 0, RASTER, RASTER);
+  return g.getImageData(0, 0, RASTER, RASTER).data;
+}
+
+/**
+ * Nothing behind the body shows through it. For each part drawn behind a body (`data-behind`,
+ * kit/rig.ts), render the mascot with and without it and count the pixels that differ inside the
+ * silhouette of the body it sits behind (shrunk by a few px, so antialiased edges and the
+ * outline do not count). Returns the worst %, over all such parts.
+ */
+async function seeThrough(svg: SVGSVGElement, bg: string): Promise<number> {
+  const NS = 'http://www.w3.org/2000/svg';
+  const byMask = new Map<string, Element[]>();
+  for (const w of svg.querySelectorAll('[data-behind]')) {
+    if (w.closest('defs')) continue;
+    const id = w.getAttribute('mask')!;
+    if (!byMask.has(id)) byMask.set(id, []);
+    byMask.get(id)!.push(w);
+  }
+  if (!byMask.size) return 0;
+  const withParts = await raster(svg, bg);
+  const toView = svg.getScreenCTM()!.inverse();
+  let worst = 0;
+  for (const [ref, wraps] of byMask) {
+    const without = svg.cloneNode(true) as SVGSVGElement;
+    const all = [...svg.querySelectorAll('[data-behind]')];
+    const drop = new Set(wraps.map((w) => all.indexOf(w)));
+    [...without.querySelectorAll('[data-behind]')].forEach((e, i) => { if (drop.has(i)) e.remove(); });
+    const withoutParts = await raster(without, bg);
+    // The silhouette of the body drawn over the part: every `data-body` group after it in the
+    // DOM (independent of the mask, so a missing or misplaced mask is caught).
+    const first = wraps[0];
+    const sil = document.createElementNS(NS, 'svg');
+    sil.setAttribute('viewBox', svg.getAttribute('viewBox')!);
+    for (const b of svg.querySelectorAll<SVGGraphicsElement>('[data-body]')) {
+      if (b.closest('defs, [data-drop]') || !(first.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)) continue;
+      const m = toView.multiply(b.getScreenCTM()!);
+      const k = b.cloneNode(true) as SVGGElement;
+      k.removeAttribute('transform');
+      const g = document.createElementNS(NS, 'g');
+      g.setAttribute('transform', `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`);
+      k.querySelectorAll('*').forEach((e) => {
+        e.removeAttribute('filter'); e.removeAttribute('opacity'); e.removeAttribute('mask'); e.removeAttribute('clip-path');
+        const filled = e.getAttribute('fill') !== 'none';
+        e.setAttribute('fill', filled ? '#000' : 'none');
+        e.setAttribute('stroke', '#fff');
+        e.setAttribute('stroke-width', filled ? '6' : '0');
+      });
+      g.append(k);
+      sil.append(g);
+    }
+    const mask = await raster(sil as unknown as SVGSVGElement, '#fff');
+    let inside = 0, diff = 0;
+    for (let i = 0; i < mask.length; i += 4) {
+      if (mask[i] > 40) continue;
+      inside++;
+      const d = Math.abs(withParts[i] - withoutParts[i]) + Math.abs(withParts[i + 1] - withoutParts[i + 1]) + Math.abs(withParts[i + 2] - withoutParts[i + 2]);
+      if (d > 24) diff++;
+    }
+    if (inside) worst = Math.max(worst, (diff / inside) * 100);
+  }
+  return worst;
+}
+
 (window as any).__names = () => specs.map((s) => s.name);
 (window as any).__styles = () => styles.map((s) => s.id);
 (window as any).__styleMeta = () => Object.fromEntries(styles.map((s) => [s.id, { title: s.title, family: s.family, bg: s.bg }]));
@@ -51,16 +130,29 @@ const MAX_STEP = 22;
     }
     return true;
   };
-  /** Centre of every visible body part (props excluded), in viewBox units; null when hidden. */
+  // A limb drawn twice (kit/limbs.ts: a back copy and a front copy, one shown at a time) is one
+  // part: the n-th shape of either copy gets the same key, so switching copies is not a pop.
+  const seen = new Map<string, number>();
+  const keys = leaves.map((el, i) => {
+    const copy = el.closest('[data-copy]');
+    if (!copy) return String(i);
+    const k = `${copy.getAttribute('data-limb')}:${copy.getAttribute('data-copy')}`;
+    const n = seen.get(k) ?? 0;
+    seen.set(k, n + 1);
+    return `${copy.getAttribute('data-limb')}#${n}`;
+  });
+  /** Centre of every visible body part (props excluded), in viewBox units, by key. */
   const centres = () => {
     const inv = (svg as SVGSVGElement).getScreenCTM()!.inverse();
-    return leaves.map((el) => {
-      if (el.closest('[data-props]') || !visible(el)) return null;
+    const out = new Map<string, [number, number]>();
+    leaves.forEach((el, i) => {
+      if (el.closest('[data-props]') || !visible(el)) return;
       const b = el.getBBox();
-      if (!b.width && !b.height) return null;
+      if (!b.width && !b.height) return;
       const q = new DOMPoint(b.x + b.width / 2, b.y + b.height / 2).matrixTransform(inv.multiply(el.getScreenCTM()!));
-      return [q.x, q.y] as [number, number];
+      out.set(keys[i], [q.x, q.y]);
     });
+    return out;
   };
   const box = () => {
     const inv = (svg as SVGSVGElement).getScreenCTM()!.inverse();
@@ -83,6 +175,10 @@ const MAX_STEP = 22;
   clock.freeze(true);
   const still = box();
   if (!inside(still)) issues.push({ rule: 'frame-0', where: 'reduced motion', message: 'the rest pose does not fit in the viewBox' });
+  if (SEE_THROUGH.has(style ?? '')) {
+    const leak = await seeThrough(svg, styleById[style!].bg);
+    if (leak > 0.5) issues.push({ rule: 'no-see-through', where: 'reduced motion', message: `parts behind the body change ${leak.toFixed(1)}% of the pixels inside its silhouette` });
+  }
   clock.freeze(false);
   clock.stop();
 
@@ -97,8 +193,11 @@ const MAX_STEP = 22;
   let worst = 0, total = 0, frames = 0;
   for (const action of m.actions) {
     m.reset([action]);
-    let prevC: ([number, number] | null)[] | null = null;
-    const moves: { t: number; d: number }[][] = [];
+    // front-limbs: the frame where each limb is most raised, and whether the copy shown then is
+    // drawn after the body (kit/limbs.ts records the lift on the front copy).
+    const peak = new Map<string, { lift: number; t: number; ok: boolean }>();
+    let prevC: Map<string, [number, number]> | null = null;
+    const moves = new Map<string, { t: number; d: number }[]>();
     const flagged = { out: false };
     for (let t = 0; t < 500 + 16000; t += step) {
       const t0 = performance.now();
@@ -110,17 +209,33 @@ const MAX_STEP = 22;
         flagged.out = true;
         issues.push({ rule: 'in-frame', where: `${action} @ ${Math.round(t - 500)} ms`, message: `drawing leaves the viewBox (${Math.round(b.x)},${Math.round(b.y)} ${Math.round(b.w)}×${Math.round(b.h)} vs ${vx},${vy} ${vw}×${vh})` });
       }
+      for (const front of svg.querySelectorAll<SVGGElement>('[data-copy="front"][data-lift]')) {
+        if (front.closest('defs, [data-drop]')) continue;
+        const limb = front.getAttribute('data-limb')!, lift = Number(front.getAttribute('data-lift'));
+        const best = peak.get(limb);
+        if (best && best.lift >= lift) continue;
+        const back = [...svg.querySelectorAll(`[data-limb="${limb}"][data-copy="back"]`)].find((b) => !b.closest('defs, [data-drop]'));
+        const shown = visible(front) ? front : back;
+        const bodies = [...svg.querySelectorAll('[data-body]')].filter((b) => !b.closest('defs, [data-drop]'));
+        const lastBody = bodies[bodies.length - 1];
+        const ok = !!shown && !!lastBody && !!(lastBody.compareDocumentPosition(shown) & Node.DOCUMENT_POSITION_FOLLOWING);
+        peak.set(limb, { lift, t: Math.round(t - 500), ok });
+      }
       const c = centres();
       if (prevC) {
-        c.forEach((p, i) => {
-          const q = prevC![i];
-          if (!p || !q) return;
-          (moves[i] ??= []).push({ t: Math.round(t - 500), d: Math.hypot(p[0] - q[0], p[1] - q[1]) });
+        c.forEach((p, k) => {
+          const q = prevC!.get(k);
+          if (!q) return;
+          if (!moves.has(k)) moves.set(k, []);
+          moves.get(k)!.push({ t: Math.round(t - 500), d: Math.hypot(p[0] - q[0], p[1] - q[1]) });
         });
       }
       prevC = c;
       // stop once the action has finished and the idle has taken over again
       if (t > 700 && m.playing() === null) break;
+    }
+    for (const [limb, p] of peak) {
+      if (p.lift > 0.5 && !p.ok) issues.push({ rule: 'front-limbs', where: `${action} @ ${p.t} ms`, message: `${limb} is raised (lift ${p.lift}) but drawn behind the body` });
     }
     // A pop: one part moves far more in one frame than it does in the frames around it.
     // Fast motion is fine; a part teleporting is not. Stepped styles (stop-motion, pixel) skip
@@ -128,7 +243,7 @@ const MAX_STEP = 22;
     // and a fast move landing in one step is what stop-motion looks like. Forms with
     // hold-then-snap timing are checked unsnapped (see makeMascot above), so they keep the rule.
     let popped = styleStep > 34;
-    for (const steps of moves) {
+    for (const steps of moves.values()) {
       if (popped || !steps) continue;
       for (let i = 0; i < steps.length; i++) {
         const around = [steps[i - 2], steps[i - 1], steps[i + 1], steps[i + 2]].filter(Boolean).map((x) => x.d).sort((a, b) => a - b);
