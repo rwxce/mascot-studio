@@ -40,6 +40,8 @@ export interface Part {
   at?: readonly [number, number];
   shapes?: Shape[];
   children?: Part[];
+  /** Show this part only inside [x, y, w, h], in its own coordinates (it moves with the part). */
+  clipRect?: readonly [number, number, number, number];
 }
 
 export interface Layer {
@@ -139,6 +141,15 @@ export class Rig {
     // Pivot group (static translate) wrapping the animated group.
     const outer = document.createElementNS(SVGNS, 'g');
     if (part.at) outer.setAttribute('transform', `translate(${part.at[0]},${part.at[1]})`);
+    if (part.clipRect) {
+      // Unique per rig and per pass, so two copies on a page never borrow each other's clip.
+      const id = `c${this.uid}${Math.random().toString(36).slice(2, 7)}`;
+      const [x, y, w, h] = part.clipRect;
+      const defs = document.createElementNS(SVGNS, 'defs');
+      defs.innerHTML = `<clipPath id="${id}"><rect x="${x}" y="${y}" width="${w}" height="${h}"/></clipPath>`;
+      outer.append(defs);
+      g.setAttribute('clip-path', `url(#${id})`);
+    }
     outer.append(g);
     if (part.id) this.add(this.parts, part.id, g);
     for (const s of part.shapes ?? []) {

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 1.2.0
+
+- Secret Letter: the secret puzzle piece is 1.9× bigger (`body.innerScale`) and rises whole out of
+  the envelope's mouth; a clip at the mouth keeps it from showing through the bottom notch.
+- `object-limbs`: the tabs stay puzzle tabs in every style. Styles no longer turn them into arms
+  with hands, and `armX.long` no longer stretches them (the channel stays, with no effect).
+- Rig: a part can carry `clipRect` (a rectangular clip in its own coordinates, unique per copy).
+
 ## 1.1.1
 
 - The site shows its icon in Safari too (PNG favicon and `apple-touch-icon` next to the SVG), and the gallery scrolls with Lenis like the landing.

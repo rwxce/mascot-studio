@@ -1,13 +1,13 @@
 // object-limbs: an object (an envelope) with puzzle-tab arms, a face on a lid that opens,
-// and a secret inside that can peek out. Parametric: width, height, the bottom notch, the
-// cross lines and the inner secret are body parameters in mascot.json.
+// and a secret inside that rises out of its mouth. Parametric: width, height, the bottom notch,
+// the cross lines and the inner secret (and its size) are body parameters in mascot.json.
+// The tabs stay tabs in every style: they turn and rise, but never become arms with hands.
 import type { Anatomy, Built } from '../../kit/character.js';
 import { browSet, eyeModel, faceInks, mouthSet, type BrowSet, type EyeSet, type MouthSet } from '../../kit/faces/index.js';
 import { markParts, renderMarks } from '../../kit/faces/marks.js';
-import { cornerScale, DEFAULT_FORM, isDefaultForm, scales, snapTo, type Form } from '../../kit/form.js';
+import { DEFAULT_FORM, isDefaultForm, scales, snapTo, type Form } from '../../kit/form.js';
 import { blendPaths, mapPoints, parse, type PathSpec } from '../../kit/morph.js';
 import { lerp, wave } from '../../kit/motion.js';
-import { ellipse as oval } from '../../kit/shapes.js';
 import type { Part, Shape } from '../../kit/rig.js';
 import type { Painter } from '../../kit/style.js';
 import type { AnatomyContract, MascotSpec } from '../../kit/spec.js';
@@ -16,14 +16,13 @@ import type { ActionSpec } from '../../kit/timeline.js';
 const det = (s: Shape): Shape => ({ ...s, kind: 'detail' });
 const r = (n: number) => Math.round(n * 100) / 100;
 
-// Right tab, local to its pivot on the side edge. Same commands in every pose so they morph:
-// the top segment is flat at rest and becomes a thumb; the neck stretches into an arm; the
-// round cap keeps the joint clean when the arm turns.
+// Right tab, local to its pivot on the side edge. Same commands in both poses so they morph:
+// the top segment is flat at rest and becomes a thumb; the round cap keeps the joint clean when
+// the tab turns.
 const TAB_REST = parse('M0 -9L11 -9C9 -17 15 -16 20 -16C22 -16 26 -16 28 -16C35 -16 40 -9 40 0C40 9 34 16 24 16C15 16 9 17 11 9L0 9C-5 9 -9 5 -9 0C-9 -5 -5 -9 0 -9Z');
-const TAB_LONG = parse('M0 -9L31 -9C29 -17 35 -16 40 -16C42 -16 46 -16 48 -16C55 -16 60 -9 60 0C60 9 54 16 44 16C35 16 29 17 31 9L0 9C-5 9 -9 5 -9 0C-9 -5 -5 -9 0 -9Z');
 const TAB_THUMB = parse('M0 -9L11 -9C9 -17 15 -16 20 -16C18 -40 30 -40 28 -16C35 -16 40 -9 40 0C40 9 34 16 24 16C15 16 9 17 11 9L0 9C-5 9 -9 5 -9 0C-9 -5 -5 -9 0 -9Z');
 const mirror = (p: PathSpec) => mapPoints(p, (_, x, y) => [-x, y]);
-const TABL_REST = mirror(TAB_REST), TABL_LONG = mirror(TAB_LONG), TABL_THUMB = mirror(TAB_THUMB);
+const TABL_REST = mirror(TAB_REST), TABL_THUMB = mirror(TAB_THUMB);
 
 const K = 0.5523;
 const ellipse = (a: number, b: number) =>
@@ -32,6 +31,10 @@ const EYE = ellipse(6, 9);
 const EYE_SHUT = ellipse(6.5, 1.3);
 const EYE_HAPPY = parse('M0 -5C4.5 -5 7.5 -1 7.5 3C6 3 4 -1.5 0 -1.5C-4 -1.5 -6 3 -7.5 3C-7.5 -1 -4.5 -5 0 -5Z');
 const INNER = 'M-16 -12L-5 -12C-8 -26 8 -26 5 -12L16 -12L16 2L22 2C28 2 28 12 22 12L16 12L16 16L-16 16L-16 12L-22 12C-28 12 -28 2 -22 2L-16 2Z';
+/** How far the secret reaches above (its knob) and below its origin, at size 1. */
+const INNER_UP = 23, INNER_DOWN = 16;
+/** The secret's path at size s: the path is scaled, not the group, so its outline keeps its width. */
+const innerPath = (s: number) => INNER.replace(/-?\d+(\.\d+)?/g, (n) => String(r(Number(n) * s)));
 
 export const contract: AnatomyContract = {
   name: 'object-limbs',
@@ -44,7 +47,7 @@ export const contract: AnatomyContract = {
   palette: ['ink', 'body', 'inside', 'accent', 'cheek', 'prop', 'glow', 'eye', 'line'],
   required: ['body'],
   contrastPairs: [['eye', 'body']],
-  body: { width: 'number', height: 'number', notch: 'number', crossLines: 'boolean', inner: 'boolean', line: 'number' },
+  body: { width: 'number', height: 'number', notch: 'number', crossLines: 'boolean', inner: 'boolean', innerScale: 'number', line: 'number' },
   builtins: ['wave', 'hop', 'look-around', 'stretch', 'notice', 'surprise'],
 };
 
@@ -56,7 +59,6 @@ export const builtins: ActionSpec[] = [
     name: 'wave', duration: 2600, weight: 3,
     tracks: [
       { ch: 'armR.rot', keys: [[0, -100], [2600, -100]], osc: { amp: 20, period: 560 } },
-      { ch: 'armR.long', keys: ENV1(2600) },
       { ch: 'eyes.happy', keys: [[0, 0.7], [2600, 0.7]] },
       { ch: 'body.rot', keys: [[0, -2.5], [2600, -2.5]] },
       { ch: 'look.x', op: 'set', keys: [[0, 0.2], [2600, 0.2]] },
@@ -91,8 +93,6 @@ export const builtins: ActionSpec[] = [
       { ch: 'body.sx', op: 'mul', keys: [[0, 1], [600, 0.93], [1500, 0.93], [1800, 1.021], [2100, 0.993], [2400, 1]] },
       { ch: 'armR.rot', keys: [[0, 0], [600, -80], [1500, -80], [1800, 0], [2400, 0]] },
       { ch: 'armL.rot', keys: [[0, 0], [600, -80], [1500, -80], [1800, 0], [2400, 0]] },
-      { ch: 'armR.long', keys: [[0, 0], [600, 1], [1500, 1], [1800, 0], [2400, 0]] },
-      { ch: 'armL.long', keys: [[0, 0], [600, 1], [1500, 1], [1800, 0], [2400, 0]] },
       { ch: 'eyes.open', op: 'min', keys: [[0, 1], [600, 0.1], [1500, 0.1], [1800, 1], [2400, 1]] },
       { ch: 'body.rot', osc: { amp: 2, period: 1200, window: [300, 1600] } },
     ],
@@ -103,7 +103,6 @@ export const builtins: ActionSpec[] = [
     tracks: [
       { ch: 'eyes.scale', op: 'mul', keys: [[0, 1], [250, 1.28], [500, 1], [1900, 1]] },
       { ch: 'armR.rot', keys: [[0, 0], [500, 0], [800, -95], [1900, -95]], osc: { amp: 18, period: 500, window: [500, 1900] } },
-      { ch: 'armR.long', keys: [[0, 0], [500, 0], [800, 1], [1900, 1]] },
       { ch: 'eyes.happy', keys: [[0, 0], [450, 0], [700, 1], [1900, 1]] },
     ],
   },
@@ -114,8 +113,6 @@ export const builtins: ActionSpec[] = [
       { ch: 'eyes.scale', op: 'mul', keys: [[0, 1], [450, 1.45], [900, 1], [1500, 1]] },
       { ch: 'armR.rot', keys: [[0, 0], [60, 0], [200, -115], [600, -115], [1000, 0], [1500, 0]] },
       { ch: 'armL.rot', keys: [[0, 0], [60, 0], [200, -115], [600, -115], [1000, 0], [1500, 0]] },
-      { ch: 'armR.long', keys: [[0, 0], [60, 0], [200, 1], [600, 1], [1000, 0], [1500, 0]] },
-      { ch: 'armL.long', keys: [[0, 0], [60, 0], [200, 1], [600, 1], [1000, 0], [1500, 0]] },
     ],
   },
 ];
@@ -130,18 +127,10 @@ interface Geo {
   vbW: number; rootX: number; rootY: number; vbTop: number;
   /** How far a raised arm's root slides up the side. */
   lift: number;
-  /** tab: the authored puzzle tab (scaled); stick: a straight arm with a hand; noodle: a hose. */
-  arm: 'tab' | 'stick' | 'noodle';
-  tabs: { R: [PathSpec, PathSpec, PathSpec]; L: [PathSpec, PathSpec, PathSpec] };
-  /** Stick / noodle: half thickness, length at rest and stretched (armX.long = 1). */
-  t: number; len: [number, number];
+  /** The puzzle tabs at rest and with a thumb, scaled with the envelope. */
+  tabs: { R: [PathSpec, PathSpec]; L: [PathSpec, PathSpec] };
   /** Scale of the face features (the envelope is all head). */
   F: number;
-}
-
-/** How far a hand reaches past the end of its arm, for a hand of size k. */
-function handReach(kind: Form['hands'], k: number, t: number): number {
-  return kind === 'glove' ? 15 * k : kind === 'mitten' ? 11 * k : kind === 'knob' ? 2 + 6.5 * k : kind === 'none' ? 0 : 1.5 * t;
 }
 
 function geometry(spec: MascotSpec, form: Form): Geo {
@@ -157,9 +146,8 @@ function geometry(spec: MascotSpec, form: Form): Geo {
     const W = Wa, H = Ha, hw = W / 2, top = -8 - H, bot = -8, vy = top + H * 0.583, flapH = vy - top;
     return {
       custom, W, H, hw, top, bot, vy, flapH, midY: (top + bot) / 2 - 2, k: W / 148, notch: notchA, rc: 0,
-      vbW, rootX, rootY, vbTop, lift: 40, arm: 'tab',
-      tabs: { R: [TAB_REST, TAB_LONG, TAB_THUMB], L: [TABL_REST, TABL_LONG, TABL_THUMB] },
-      t: 9, len: [40, 60], F: 1,
+      vbW, rootX, rootY, vbTop, lift: 40,
+      tabs: { R: [TAB_REST, TAB_THUMB], L: [TABL_REST, TABL_THUMB] }, F: 1,
     };
   }
   const S = scales(form);
@@ -173,35 +161,24 @@ function geometry(spec: MascotSpec, form: Form): Geo {
   const midY = g((top + bot) / 2 - 2);
   const rc = form.corners > 0.5 ? (form.corners - 0.5) * 2 * Math.min(hw, H) * 0.22 : 0;
   const F = S.head;
-  const A = S.arm / S.head;
-  const noodle = form.limbs === 'noodle';
-  const arm: Geo['arm'] = noodle ? 'noodle' : form.hands === 'default' ? 'tab' : 'stick';
-  // Tab: the neck stretches or shrinks (the round end keeps its shape), thickness scales, and a
-  // taper thins it towards the end. Its reach stays close to the authored one so it stays in frame.
-  const d = Math.max(-9, Math.min(6, (A - 1) * 30));
-  const tk = S.thick, taper = form.taper;
-  const tab = (p: PathSpec) => mapPoints(p, (_, x, y) => {
-    const xs = x <= 0 ? x * tk : x + d * Math.min(1, x / 11);
-    const f = 1 - 0.45 * taper * Math.max(0, Math.min(1, xs / (40 + d)));
-    return [xs, y * tk * f];
-  });
-  const R: [PathSpec, PathSpec, PathSpec] = [tab(TAB_REST), tab(TAB_LONG), tab(TAB_THUMB)];
-  const t = g(5.5 * S.thick);
-  const hr = handReach(form.hands, Math.sqrt(S.thick), t);
-  const len0 = g(Math.max(t + 4, Math.min(40 * A, 44) - hr));
-  const len1 = g(Math.max(len0 + 6, Math.min(60 * A, 62) - hr));
+  // The tabs keep their authored shape in every form; they only shrink with a smaller envelope.
+  const ts = Math.min(1, W / Wa);
+  const tab = (p: PathSpec) => mapPoints(p, (_, x, y) => [x * ts, y * ts]);
+  const R: [PathSpec, PathSpec] = [tab(TAB_REST), tab(TAB_THUMB)];
   return {
     custom, W, H, hw, top, bot, vy, flapH, midY, k: W / 148, notch: g(notchA * Math.min(1, W / Wa)), rc,
-    vbW, rootX, rootY, vbTop, lift: midY - top - 6, arm,
-    tabs: { R, L: [mirror(R[0]), mirror(R[1]), mirror(R[2])] },
-    t, len: [len0, len1], F,
+    vbW, rootX, rootY, vbTop, lift: midY - top - 6,
+    tabs: { R, L: [mirror(R[0]), mirror(R[1])] }, F,
   };
 }
 
 interface Instance {
-  geo: Geo; eyes: EyeSet; brows: BrowSet; mouth: MouthSet; marks: Form['marks']; taper: number; kr: number;
+  geo: Geo; eyes: EyeSet; brows: BrowSet; mouth: MouthSet; marks: Form['marks'];
 }
 const instances = new WeakMap<Painter, Instance>();
+/** Where the secret sits hidden (inner = 0) and fully out (inner = 1), and its size. */
+interface Secret { rest: number; out: number; size: number }
+const secrets = new WeakMap<Painter, Secret>();
 
 type P = [number, number];
 const pt = (p: P) => `${r(p[0])} ${r(p[1])}`;
@@ -224,51 +201,6 @@ function pocketPath(G: Geo, notchD: string): string {
   const { hw, top, bot, vy, rc } = G;
   const TL: P = [-hw, top], V: P = [0, vy], TR: P = [hw, top], BR: P = [hw, bot], BL: P = [-hw, bot];
   return `M${pt([-hw, (top + bot) / 2])}${corner(BL, TL, V, rc)}${corner(TL, V, TR, 0)}${corner(V, TR, BR, rc)}${corner(TR, BR, BL, rc)}${notchD}${corner(BR, BL, TL, rc)}Z`;
-}
-
-/** A hand drawn along +x (m = 1) or −x (m = −1), sized by k. */
-function handShapes(kind: Form['hands'], m: number, k: number, t: number, paint: Painter): Shape[] {
-  if (kind === 'glove') {
-    const w = paint.flat('shine');
-    return [
-      { d: oval(-1 * m, 0, 2.6 * k, 5.4 * k), fill: w },
-      { d: oval(6 * m * k, 0, 6 * k, 5.8 * k), fill: w },
-      { d: oval(11.2 * m * k, -3.6 * k, 2.8 * k, 2.3 * k), fill: w },
-      { d: oval(12.2 * m * k, 0.4 * k, 2.8 * k, 2.3 * k), fill: w },
-      { d: oval(10.8 * m * k, 4.2 * k, 2.6 * k, 2.2 * k), fill: w },
-    ];
-  }
-  if (kind === 'mitten') {
-    return [
-      { d: oval(4 * m * k, 0.5 * k, 7 * k, 6.2 * k), fill: paint.fill('accent') },
-      { d: oval(2.4 * m * k, -5.2 * k, 2.6 * k, 2.6 * k), fill: paint.fill('accent') },
-    ];
-  }
-  if (kind === 'knob') return [{ d: oval(2 * m, 0, 6.5 * k, 6.5 * k), fill: paint.fill('accent') }];
-  if (kind === 'none') return [];
-  return [{ d: oval(0.5 * t * m, 0, 1.5 * t, 1.5 * t), fill: paint.fill('body') }];
-}
-
-/** Where the thumb grows from, on top of a hand of size k. */
-function thumbAt(kind: Form['hands'], m: number, k: number, t: number): [number, number, number] {
-  if (kind === 'glove') return [5 * m * k, -4.6 * k, k];
-  if (kind === 'mitten') return [2.4 * m * k, -6 * k, k];
-  if (kind === 'knob') return [2 * m, -5 * k, k];
-  return [0.5 * t * m, -1.2 * t, t / 6];
-}
-
-/** A straight arm from inside the body out to `len` (m = ±1), thinning by `taper`. */
-function stickPath(len: number, t: number, taper: number, kr: number, m: number): PathSpec {
-  const e = t * (1 - 0.45 * taper), re = e * Math.min(1, kr);
-  const x = (v: number) => r(v * m);
-  return parse(`M${x(-t)} ${r(-t)}L${x(len - re)} ${r(-e)}Q${x(len)} ${r(-e)} ${x(len)} ${r(-e + re)}L${x(len)} ${r(e - re)}Q${x(len)} ${r(e)} ${x(len - re)} ${r(e)}L${x(-t)} ${r(t)}Z`);
-}
-
-/** A noodle arm that sags under gravity, in the arm's own frame (rotated by `deg`). */
-function noodlePath(len: number, deg: number, m: number): PathSpec {
-  const a = (deg * Math.PI) / 180;
-  const gx = Math.sin(a), gy = Math.cos(a), sag = len * 0.24;
-  return [['M', 0, 0], ['Q', (m * len) / 2 + gx * sag * 0.4, gy * sag, m * len, 0]];
 }
 
 function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Built {
@@ -317,28 +249,36 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
       cheeks: [[r(-hw * 0.6), r(bot - H * 0.333)], [r(hw * 0.6), r(bot - H * 0.333)]],
       speed: [hw * 0.55, bot + 6],
     }, paint);
-    instances.set(paint, { geo: G, eyes, brows, mouth, marks: form.marks, taper: form.taper, kr: cornerScale(form.corners) });
+    instances.set(paint, { geo: G, eyes, brows, mouth, marks: form.marks });
   }
 
-  const arm = (side: 'L' | 'R'): Part => {
-    const m = side === 'L' ? -1 : 1;
-    const at: [number, number] = [m * hw, midY];
-    if (G.arm === 'tab') return { id: `arm${side}`, at, shapes: [{ pathRef: `arm${side}`, fill: paint.fill('body') }] };
-    const hk = Math.sqrt(form.proportions.limbThickness);
-    const [tx, ty, tk] = thumbAt(form.hands, m, hk, G.t);
-    const hand = handShapes(form.hands, m, hk, G.t, paint);
-    const thumbFill = form.hands === 'glove' ? paint.flat('shine') : form.hands === 'default' ? paint.fill('body') : paint.fill('accent');
-    return {
-      id: `arm${side}`, at,
-      shapes: [G.arm === 'noodle'
-        ? { pathRef: `arm${side}`, stroke: paint.flat('body'), width: 2 * G.t }
-        : { pathRef: `arm${side}`, fill: paint.fill('body') }],
-      children: [{
-        id: `hand${side}`, shapes: hand,
-        children: form.hands === 'none' ? [] : [{ id: `thumb${side}`, at: [tx, ty], shapes: [{ d: oval(0, -4.2 * tk, 2.5 * tk, 4.4 * tk), fill: thumbFill }] }],
-      }],
-    };
-  };
+  const arm = (side: 'L' | 'R'): Part => ({
+    id: `arm${side}`, at: [side === 'L' ? -hw : hw, midY], shapes: [{ pathRef: `arm${side}`, fill: paint.fill('body') }],
+  });
+
+  // The secret rises out of the mouth: hidden with its knob just under the V of the pocket,
+  // fully out with its base on the top edge. A clip at the V keeps it from showing anywhere
+  // below the mouth (through the bottom notch, or under the pocket's edges).
+  const ss = (b.innerScale as number) ?? 1;
+  const ol = 5.5 * line * 0.64;
+  secrets.set(paint, { rest: vy + INNER_UP * ss + ol, out: top - INNER_DOWN * ss - ol / 2, size: ss });
+  const e = (cx: number, cy: number, rx: number, ry: number, fill: string, ref: string) =>
+    det({ el: { tag: 'ellipse', attrs: { cx: r(cx * ss), cy: r(cy * ss), rx: r(rx * ss), ry: r(ry * ss), fill } }, ref });
+  const big = ss > 1.2;
+  const innerShapes: Shape[] = big
+    ? [
+      { d: innerPath(ss), fill: paint.fill('accent'), ref: 'inner' },
+      e(-12, 3.5, 3, 1.7, paint.flat('cheek'), 'innerEye'),
+      e(12, 3.5, 3, 1.7, paint.flat('cheek'), 'innerEye'),
+      e(-6.5, -3, 3.2, 4.6, paint.flat('eye'), 'innerEye'),
+      e(6.5, -3, 3.2, 4.6, paint.flat('eye'), 'innerEye'),
+      ...(paint.shine ? [e(-7.4, -4.6, 1.1, 1.1, paint.flat('shine'), 'innerEye'), e(5.6, -4.6, 1.1, 1.1, paint.flat('shine'), 'innerEye')] : []),
+    ]
+    : [
+      { d: innerPath(ss), fill: paint.fill('accent'), ref: 'inner' },
+      e(-6, 1, 3, 4.5, paint.flat('eye'), 'innerEye'),
+      e(6, 1, 3, 4.5, paint.flat('eye'), 'innerEye'),
+    ];
 
   return {
     viewBox: `0 ${vbTop} ${vbW} ${220 - vbTop}`,
@@ -358,13 +298,8 @@ function build(spec: MascotSpec, paint: Painter, form: Form = DEFAULT_FORM): Bui
       ...(hasInner ? [{
         outline: paint.outline(line * 0.64),
         root: root([{
-          id: 'inner', at: [0, top + 44 * (H / 96)], children: [{
-            id: 'innerBody', shapes: [
-              { d: INNER, fill: paint.fill('accent'), ref: 'inner' },
-              det({ el: { tag: 'ellipse', attrs: { cx: -6, cy: 1, rx: 3, ry: 4.5, fill: paint.flat('eye') } }, ref: 'innerEye' }),
-              det({ el: { tag: 'ellipse', attrs: { cx: 6, cy: 1, rx: 3, ry: 4.5, fill: paint.flat('eye') } }, ref: 'innerEye' }),
-            ],
-          }],
+          clipRect: [-vbW, r(vy - 2 * vbW), 2 * vbW, 2 * vbW],
+          children: [{ id: 'inner', children: [{ id: 'innerBody', shapes: innerShapes }] }],
         }]),
       }] : []),
       {
@@ -447,20 +382,10 @@ export const objectLimbs: Anatomy = {
     const lift = G ? G.lift : 40;
     rig.set('armR', { y: -lift * liftR, x: -3 * liftR, rot: tr });
     rig.set('armL', { y: -lift * liftL, x: 3 * liftL, rot: -tl });
-    if (!G || G.arm === 'tab') {
-      const T = G ? G.tabs : { R: [TAB_REST, TAB_LONG, TAB_THUMB], L: [TABL_REST, TABL_LONG, TABL_THUMB] };
-      rig.path('armR', blendPaths(T.R[0], [[T.R[1], Math.min(1, p['armR.long'])], [T.R[2], p['armR.thumb']]]));
-      rig.path('armL', blendPaths(T.L[0], [[T.L[1], Math.min(1, p['armL.long'])], [T.L[2], p['armL.thumb']]]));
-    } else {
-      for (const [side, m, deg] of [['R', 1, tr], ['L', -1, -tl]] as const) {
-        const len = lerp(G.len[0], G.len[1], clamp01(p[`arm${side}.long`]));
-        rig.path(`arm${side}`, G.arm === 'noodle' ? noodlePath(len, deg, m) : stickPath(len, G.t, I!.taper, I!.kr, m));
-        rig.set(`hand${side}`, { x: m * len });
-        const th = clamp01(p[`arm${side}.thumb`]);
-        rig.set(`thumb${side}`, { sx: Math.max(0.001, th), sy: Math.max(0.001, th) });
-        rig.opacity(`thumb${side}`, th > 0.02 ? 1 : 0);
-      }
-    }
+    // armX.long is kept as a channel so older actions stay valid, but a tab never stretches.
+    const T = G ? G.tabs : { R: [TAB_REST, TAB_THUMB], L: [TABL_REST, TABL_THUMB] };
+    rig.path('armR', blendPaths(T.R[0], [[T.R[1], p['armR.thumb']]]));
+    rig.path('armL', blendPaths(T.L[0], [[T.L[1], p['armL.thumb']]]));
 
     rig.set('lidF', { sy: Math.max(p.lid, 0.001) });
     rig.set('lidB', { sy: Math.min(p.lid, -0.001) });
@@ -482,10 +407,11 @@ export const objectLimbs: Anatomy = {
     }
 
     const inner = p.inner;
-    rig.set('inner', { y: 34 + (-62 - 34) * inner });
+    const sec = secrets.get(paint) ?? { rest: -22, out: -122, size: 1 };
+    rig.set('inner', { y: lerp(sec.rest, sec.out, inner) });
     rig.attr('inner', 'opacity', inner > 0.02 ? 1 : 0);
     rig.attr('innerEye', 'opacity', inner > 0.02 ? 1 : 0);
-    rig.set('innerBody', { x: p['inner.look'] * 4, rot: p['inner.look'] * 6 });
+    rig.set('innerBody', { x: p['inner.look'] * 4 * sec.size, rot: p['inner.look'] * 6 });
     rig.attr('blush', 'opacity', Math.max(paint.cheekRest, Math.min(1, p['face.blush']) * 0.9));
     if (!I) rig.attr('shine', 'opacity', happy > 0.3 || shut > 0.5 ? 0 : 1);
   },
