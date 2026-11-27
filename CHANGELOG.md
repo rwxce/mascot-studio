@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.2.0
+
 - Secret Letter: the secret puzzle piece is 1.9× bigger (`body.innerScale`) and rises whole out of
   the envelope's mouth; a clip at the mouth keeps it from showing through the bottom notch.
 - `object-limbs`: the tabs stay puzzle tabs in every style. Styles no longer turn them into arms
