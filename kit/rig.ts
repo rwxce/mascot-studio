@@ -49,6 +49,12 @@ export interface Part {
    * silhouette is built from the same ids and path refs, so it moves and morphs with the body.
    */
   behind?: Part[];
+  /**
+   * Parts drawn OVER this one that hide it (a corner of paper lifted in front of a letter), in
+   * the same coordinates as `behind`. The same mask, so in a translucent style nothing of this
+   * part shows through them; unlike `behind`, this part is not behind a body (checks skip it).
+   */
+  under?: Part[];
   /** Starting opacity of the part (e.g. 0 for a copy shown later with rig.opacity). */
   opacity?: number;
   /** data-* attributes on the part's group, for checks and tools (e.g. { limb: 'armR' }). */
@@ -115,7 +121,7 @@ export class Rig {
   private refs = new Map<string, Element[]>();
   private statics = new Map<Shape, { els: Element[]; spec: Seg[] }>();
   private boilFrame = -1;
-  /** One mask per part with `behind`, shared by its passes (they all draw in the same space). */
+  /** One mask per part with `behind` or `under`, shared by its passes (they all draw in the same space). */
   private masks = new Map<Part, string>();
   private maskDefs: SVGDefsElement | null = null;
   private uid = Math.random().toString(36).slice(2, 8);
@@ -175,12 +181,12 @@ export class Rig {
       if (el) g.append(el);
     }
     for (const c of part.children ?? []) g.append(this.build(c, pass, outline));
-    if (part.behind?.length && pass !== 'mask') {
+    if ((part.behind?.length || part.under?.length) && pass !== 'mask') {
       // The mask is read in the user space of the element it is set on: an untransformed
       // wrapper, so that space is the parent's, where the body's parts are given.
       const wrap = document.createElementNS(SVGNS, 'g') as SVGGElement;
       wrap.setAttribute('mask', `url(#${this.mask(part, outline)})`);
-      wrap.setAttribute('data-behind', '');
+      wrap.setAttribute(part.behind?.length ? 'data-behind' : 'data-under', '');
       wrap.append(outer);
       return wrap;
     }
@@ -205,7 +211,7 @@ export class Rig {
     const all = document.createElementNS(SVGNS, 'rect');
     for (const [k, v] of Object.entries({ x: -5000, y: -5000, width: 10000, height: 10000, fill: '#fff' })) all.setAttribute(k, String(v));
     m.append(all);
-    for (const b of part.behind ?? []) m.append(this.build(b, 'mask', outline));
+    for (const b of [...(part.behind ?? []), ...(part.under ?? [])]) m.append(this.build(b, 'mask', outline));
     this.maskDefs.append(m);
     return id;
   }
