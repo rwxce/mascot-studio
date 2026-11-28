@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Secret Letter has no arms, as in the original drawing. The puzzle tabs are part of the
+  envelope's outline (no joint, nothing behind the body) and never move; the knob grows straight
+  out of the edge, with no wrist. To wave, a tab flattens into the side and the top corner curls
+  up into a thin paper hook from where the tab was (both corners for `hop`, `surprise`,
+  `stretch` and `reveal`).
+  The lifted corner is opaque paper: nothing of the letter shows under it, in translucent styles
+  too. Rig: `Part.under` masks a part with the silhouette of parts drawn over it (like `behind`,
+  but `no-see-through` does not treat it as a part behind the body).
+
 ## 1.3.0
 
 - Raised limbs are drawn in front of the body: Secret Letter's tabs (no more dark smudge at the
