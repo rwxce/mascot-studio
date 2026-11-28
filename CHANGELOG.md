@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.4.0
+
 - Secret Letter has no arms, as in the original drawing. The puzzle tabs are part of the
   envelope's outline (no joint, nothing behind the body) and never move; the knob grows straight
   out of the edge, with no wrist. To wave, a tab flattens into the side and the top corner curls
