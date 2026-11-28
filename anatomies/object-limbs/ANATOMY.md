@@ -6,7 +6,7 @@ Any `mascot.json` with `"anatomy": "object-limbs"` uses it.
 
 ## Limbs and the body
 
-The tabs join the pocket from behind at rest (same layer, so the joint has no seam) and are masked by the pocket and the lid, so nothing of them shows through in a translucent style. Raised past halfway (`lift = -armX.rot / 95` above 0.5, back below 0.4) a tab is drawn in front of the pocket, the lid and the face (`kit/limbs.ts`).
+No arms. The tabs are part of the pocket's outline (one closed path with the side edges), so there is no joint and nothing of them can show behind the body; they never turn or slide. Raising an arm channel (`armX.rot` below 0, `lift = -armX.rot / 95`) flattens that tab into the side edge (from `lift` 0.3, at most a whole tab per 120 ms) and curls that side's top corner up into a thin paper hook (`curlR`, `curlL`) that grows from where the tab was, at most a whole hook per 140 ms so a fast raise does not pop. Past `lift` 1 the extra rocks the hook outwards from its root (where the tab was), up to 8° (wave's swing). Below `lift` 0.3 (`heart`) and above 0 (`shy`, `sleepy`) nothing changes. The hook is the lifted corner of paper: opaque, drawn in front of the pocket and the lid, which are masked by its silhouette (`curlFR`, `curlFL`) so nothing of the letter shows under it, even in a translucent style. Its ball curls over the corner, its tip hangs down in front of the lid and folds back to the side edge; with an outline it is a single line as thick as the visible edge, as in the original drawing.
 
 ## Body parameters (`body`)
 
@@ -59,8 +59,9 @@ The anatomy uses a style's `form` (`kit/form.ts`); without one it draws exactly 
   `corners` above 0.5 round the outer corners; at or below 0.5 they stay sharp. `grid` snaps
   its size. `body` and `feet` are ignored (no torso, no legs).
 - **Arms.** Always the authored puzzle tabs, in every form: `hands`, `limbs`, `limbLength`,
-  `limbThickness` and `taper` are ignored. The tabs only shrink with a smaller envelope; they turn
-  and slide up to the top corner with `armX.rot`, and `armX.thumb` grows a thumb from the tab.
+  `limbThickness` and `taper` are ignored. The tabs only shrink with a smaller envelope; a raised
+  `armX.rot` flattens them and curls the corner instead (see above), and `armX.thumb` grows a
+  thumb from the knob.
 - **Secret.** It is clipped at the V of the mouth, so it never shows through the bottom notch or
   under the pocket; its travel follows the envelope, so it comes out whole in every form.
 - **Face.** The form's eye, brow and mouth models sit on the lid, pushed down when big eyes or
